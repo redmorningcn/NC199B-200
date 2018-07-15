@@ -1,0 +1,1953 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.50.1.10123/W32 for ARM       15/Jul/2018  10:36:18
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  F:\iar\NC210\NC210-200处理板\source\driver\bsp_max7219.c
+#    Command line =  
+#        F:\iar\NC210\NC210-200处理板\source\driver\bsp_max7219.c -D
+#        USE_STDPERIPH_DRIVER -D APP_RELEASE -lCN
+#        F:\iar\NC210\NC210-200处理板\project\app_release\List -o
+#        F:\iar\NC210\NC210-200处理板\project\app_release\Obj --no_cse
+#        --no_unroll --no_inline --no_code_motion --no_tbaa --no_clustering
+#        --no_scheduling --debug --endian=little --cpu=Cortex-M3 -e --fpu=None
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.3\arm\INC\c\DLib_Config_Full.h" -I
+#        F:\iar\NC210\NC210-200处理板\project\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\config\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\task\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\user\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\OSAL\OS\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\OSAL\Ports\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\driver\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-LIB\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-CPU\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-CPU\ARM-Cortex-M3\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uCOS-III\Ports\ARM-Cortex-M3\Generic\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uCOS-III\Source\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\ST\STM32\inc\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\OS\uCOS-III\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Cfg\Template\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\OS\uCOS-III\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Ports\STM32\STM32F103\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Source\
+#        -Ol --use_c++_inline -I "C:\Program Files (x86)\IAR Systems\Embedded
+#        Workbench 7.3\arm\CMSIS\Include\"
+#    List file    =  
+#        F:\iar\NC210\NC210-200处理板\project\app_release\List\bsp_max7219.lst
+#    Object file  =  
+#        F:\iar\NC210\NC210-200处理板\project\app_release\Obj\bsp_max7219.o
+#
+###############################################################################
+
+F:\iar\NC210\NC210-200处理板\source\driver\bsp_max7219.c
+      1          /*******************************************************************************
+      2           *   Filename:      bsp_max7219.c
+      3           *   Revised:       $Date: 2015-12-07$
+      4           *   Revision:      $
+      5           *	 Writer:		Wuming Shen.
+      6           *
+      7           *   Description:
+      8           *   Notes:
+      9           *					QQ:276193028
+     10           *     				E-mail:shenchangwei945@163.com
+     11           *
+     12           *   All copyrights reserved to Wuming Shen.
+     13           *
+     14           *******************************************************************************/
+     15          
+     16          /*******************************************************************************
+     17          * INCLUDES
+     18          */
+     19          #include <includes.h>
+     20          #include <global.h>
+     21          #include <string.h>
+     22          #include <stdlib.h> 
+     23          #include <bsp_max7219.h>
+     24          
+     25          #define BSP_MAX7219_MODULE_EN 1
+     26          #if BSP_MAX7219_MODULE_EN > 0
+     27          /*******************************************************************************
+     28           * CONSTANTS
+     29           */
+     30          /***********************************************
+     31          * 描述： max7219寄存器地址定义
+     32          */
+     33          #define MAX7279_NON_OPT         0x00            // 空操作寄存器
+     34          #define Digit0                  0x01            // 数码管1寄存器
+     35          #define Digit1                  0x02            // 数码管2寄存器
+     36          #define Digit2                  0x03            // 数码管3寄存器
+     37          #define Digit3                  0x04            // 数码管4寄存器
+     38          #define Digit4                  0x05            // 数码管5寄存器
+     39          #define Digit5                  0x06            // 数码管6寄存器
+     40          #define Digit6                  0x07            // 数码管7寄存器
+     41          #define Digit7                  0x08            // 数码管8寄存器
+     42          /**/
+     43          #define MAX7279_DECODE_MODE     0x09            // 译码模式寄存器
+     44          #define MAX7279_BRIGHTNESS      0x0a            // 亮度寄存器
+     45          #define MAX7279_SCAN            0x0b            // 扫描位数寄存器
+     46          #define MAX7279_LOW_PWR         0x0c            // 低功耗模式寄存器
+     47          #define MAX7279_DISP_TEST       0x0f            // 显示测试寄存器
+     48          
+     49          /***********************************************
+     50          * 描述： max7219控制寄存器命令
+     51          */
+     52          #define MAX7279_LOW_PWR_MODE    0x00            // 低功耗方式
+     53          #define MAX7279_NORMAL_MODE     0x01            // 正常操作方式
+     54          #define MAX7279_DECODE_SET      0x00            // 译码设置，8位均为BCD码;对8个数都编码
+     55          #define MAX7279_8_DIGIT_SCAN    0x07            // 扫描位数设置，显示8位数码管
+     56          #define MAX7279_4_DIGIT_SCAN    0x03            // 扫描位数设置，显示4位数码管
+     57          //#define MAX7279_BRIGHTNESS_LEVEL    0x00      // 亮度级别设置
+     58          #define MAX7279_BRIGHTNESS_LEVEL 0X0A           // 亮度级别设置
+     59          //#define MAX7279_BRIGHTNESS_LEVEL    0xf       // 亮度级别设置
+     60          #define MAX7279_TEST_ENTER      0x01            // 显示测试模式
+     61          #define MAX7279_TEST_EXIT       0x00            // 显示测试结束，恢复正常工作模式
+     62          
+     63          /***********************************************
+     64          * 描述: OS接口
+     65          */
+     66          #if UCOS_EN     == DEF_ENABLED
+     67          #if OS_VERSION > 30000U
+
+   \                                 In section .bss, align 4
+     68          static  OS_SEM			Bsp_DispSem;    	    //信号量
+   \                     Bsp_DispSem:
+   \   00000000                      DS8 40
+     69          #else
+     70          static  OS_EVENT      *Bsp_DispSem;             //信号量
+     71          #endif
+     72          #endif
+     73          /***********************************************
+     74          * 描述： 
+     75          */
+
+   \                                 In section .bss, align 1
+     76          uint8           dis_num_pos = 0;                //显示位置
+   \                     dis_num_pos:
+   \   00000000                      DS8 1
+     77          
+
+   \                                 In section .bss, align 4
+     78          StrLedDisp    LedDispCtrl[DISPLAY_FRAME_NUM]  = {0};
+   \                     LedDispCtrl:
+   \   00000000                      DS8 44
+
+   \                                 In section .data, align 4
+     79          u8       LedDispBuf[DISPLAY_LED_NUM]     = {Digit0,Digit1,Digit2,Digit3,Digit4,Digit5,Digit6,Digit7};
+   \                     LedDispBuf:
+   \   00000000   0x01 0x02          DC8 1, 2, 3, 4, 5, 6, 7, 8
+   \              0x03 0x04    
+   \              0x05 0x06    
+   \              0x07 0x08    
+     80          /***********************************************
+     81          * 描述： redmorningcn 2017-05-22
+     82          */
+
+   \                                 In section .rodata, align 4
+     83          const u8 LED_SEG_CODE[]    = {
+   \                     LED_SEG_CODE:
+   \   00000000   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00         
+   \   00000017   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 229, 229, 229, 229, 229, 229, 229
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0xE5 0xE5    
+   \              0xE5 0xE5    
+   \              0xE5 0xE5    
+   \              0xE5         
+   \   00000028   0xE5 0xE5          DC8 229, 229, 229, 229, 128, 1, 128, 229, 126, 48, 109, 121, 51, 91, 95
+   \              0xE5 0xE5    
+   \              0x80 0x01    
+   \              0x80 0xE5    
+   \              0x7E 0x30    
+   \              0x6D 0x79    
+   \              0x33 0x5B    
+   \              0x5F         
+   \   00000037   0x70 0x7F          DC8 112, 127, 123, 229, 229, 229, 229, 229, 229, 229, 119, 31, 78, 61
+   \              0x7B 0xE5    
+   \              0xE5 0xE5    
+   \              0xE5 0xE5    
+   \              0xE5 0xE5    
+   \              0x77 0x1F    
+   \              0x4E 0x3D    
+   \   00000045   0x4F 0x47          DC8 79, 71, 95, 55, 48, 60, 135, 14, 229, 118, 126, 103, 254, 102, 91
+   \              0x5F 0x37    
+   \              0x30 0x3C    
+   \              0x87 0x0E    
+   \              0xE5 0x76    
+   \              0x7E 0x67    
+   \              0xFE 0x66    
+   \              0x5B         
+   \   00000054   0x0F 0x3E          DC8 15, 62, 62, 229, 55, 51, 109, 229, 229, 229, 229, 8, 229, 119, 31
+   \              0x3E 0xE5    
+   \              0x37 0x33    
+   \              0x6D 0xE5    
+   \              0xE5 0xE5    
+   \              0xE5 0x08    
+   \              0xE5 0x77    
+   \              0x1F         
+   \   00000063   0x0D 0x3D          DC8 13, 61, 79, 71, 123, 23, 48, 60, 135, 14, 229, 21, 29, 103, 115, 5
+   \              0x4F 0x47    
+   \              0x7B 0x17    
+   \              0x30 0x3C    
+   \              0x87 0x0E    
+   \              0xE5 0x15    
+   \              0x1D 0x67    
+   \              0x73 0x05    
+   \   00000073   0x5B 0x0F          DC8 91, 15, 28, 28, 211, 55, 51, 109, 229, 229, 229, 229, 229, 0
+   \              0x1C 0x1C    
+   \              0xD3 0x37    
+   \              0x33 0x6D    
+   \              0xE5 0xE5    
+   \              0xE5 0xE5    
+   \              0xE5 0x00    
+   \   00000081   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+     84              //
+     85              0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+     86              0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+     87          
+     88          //    //空格 !    "    #    $    %    &    '    (     )    *    +    ,    -    .   /
+     89          //    0x00,0xE5,0xE5,0xE5,0xE5,0xE5,0xE5,0xE5,0xE5,0xE5,0xE5,0xE5,0xE5,0x01,0xE5,0xE5,
+     90          //    // 0    1    2      3        4    5    6    7    8    9
+     91          //    0x7E,0x30,0x6D,0x79,0x33,0x5B,0x5F,0x70,0x7F,0x7B,
+     92          //    // :    ;    <    =     >   ?    @
+     93          //    0xE5,0xE5,0xE5,0xE5,0xE5,0xE5,0xE5,
+     94          //    //  A    B   C    D     E    F    G    H   I    J    K    L    M
+     95          //    0x77,0x1F,0x4E,0x3d,0x4F,0x47,0x5F,0x37,0x30,0x3c,0x87,0x0e,0xE5,
+     96          //    //  N    O    P   Q    R     S    T    U    V   W    X    Y    Z
+     97          //    0x76,0x7E,0x67,0xFE,0x66,0x5B,0x0F,0x3E,0x3E,0xE5,0x37,0x33,0x6D,
+     98          //    // [    \    ]    ^    _    `
+     99          //    0xE5,0xE5,0xE5,0xE5,0xE5,0xE5,
+    100          //    // a    b   c    d     e    f    g    h    i    j     k    l    m
+    101          //    0x77,0x1F,0x0D,0x3D,0x4F,0x47,0x5F,0x17,0x30,0x3c,0x87,0x0e,0xE5,
+    102          //    // n    o   p    q     r    s    t    u    v   w    x    y    z
+    103          //    0x15,0x1D,0x67,0x73,0x05,0x5B,0x0F,0x1C,0x1C,0xD3,0x37,0x33,0x6D,
+    104          //    // {    |    }    ~       灭
+    105          //    0xE5,0xE5,0xE5,0xE5,0xE5,0x00
+    106              
+    107              
+    108              0x00,0xE5,0xE5,0xE5,0xE5,0xE5,0xE5,0xE5,0xE5,0xE5,0xE5,0xE5,0x80,0x01,0x80,0xE5,
+    109              //       !    "    #    $    %    &    '    (     )    *    +    ,    -    .   /
+    110                0x7E,0x30,0x6D,0x79,0x33,0x5B,0x5F,0x70,0x7F,0x7B, 
+    111              // 0    1    2		3   4    5    6    7    8    9	
+    112                0xE5,0xE5,0xE5,0xE5,0xE5,0xE5,0xE5,
+    113              // :    ;    <    =     >   ?    @
+    114                0x77,0x1F,0x4E,0x3d,0x4F,0x47,0x5F,0x37,0x30,0x3c,0x87,0x0e,0xE5,
+    115              //  A    B   C    D     E    F    G    H   I    J    K    L    M    
+    116                0x76,0x7E,0x67,0xFE,0x66,0x5B,0x0F,0x3E,0x3E,0xE5,0x37,0x33,0x6D,
+    117              //  N    O    P   Q    R     S    T    U    V   W    X    Y    Z     
+    118                0xE5,0xE5,0xE5,0xE5,0x08,0xE5,
+    119               // [    \    ]    ^    _    `
+    120                0x77,0x1F,0x0D,0x3D,0x4F,0x47,0x7B,0x17,0x30,0x3c,0x87,0x0e,0xE5,
+    121               // a    b   c    d     e    f    g    h    i    j     k    l    m
+    122                0x15,0x1D,0x67,0x73,0x05,0x5B,0x0F,0x1C,0x1C,0xD3,0x37,0x33,0x6D,
+    123               // n    o   p    q     r    s    t    u    v   w    x    y    z     
+    124                0xE5,0xE5,0xE5,0xE5,0xE5,0x00//
+    125                // {    |    }    ~       ?e
+    126              
+    127          };
+    128          
+    129          
+    130          /*******************************************************************************
+    131           * MACROS
+    132           */
+    133          /***********************************************
+    134          * 描述： IO,时钟等定义
+    135          */
+    136          #define     DIS_CS          112   /*PB.12*/
+    137          #define     DIS_SCK         113   /*PB.13*/
+    138          #define     DIS_MISO        114   /*PB.14*/
+    139          #define     DIS_MOSI        115   /*PB.15*/
+    140          
+    141          
+    142          /***********************************************
+    143          * 描述： IO操作定义
+    144          */
+    145          #define SPI_CS_LOW()     	  GPIO_Set(DIS_CS,0)
+    146          #define SPI_CS_HIGH()    	  GPIO_Set(DIS_CS,1)
+    147          
+    148          #define SPI_SCK_LOW()    	  GPIO_Set(DIS_SCK,0)
+    149          #define SPI_SCK_HIGH()   	  GPIO_Set(DIS_SCK,1)
+    150          
+    151          #define SPI_MOSI_LOW()        GPIO_Set(DIS_MOSI,0)
+    152          #define SPI_MOSI_HIGH()       GPIO_Set(DIS_MOSI,1)
+    153          
+    154          /*******************************************************************************
+    155           * TYPEDEFS
+    156           */
+    157          
+    158          /*******************************************************************************
+    159           * LOCAL VARIABLES
+    160           */
+    161          
+    162          /*******************************************************************************
+    163           * GLOBAL VARIABLES
+    164           */
+    165          
+    166          /*******************************************************************************
+    167           * LOCAL FUNCTIONS
+    168           */
+    169          
+    170          /*******************************************************************************
+    171           * GLOBAL FUNCTIONS
+    172           */
+    173          
+    174          /*******************************************************************************
+    175           * EXTERN VARIABLES
+    176           */
+    177          
+    178          /*******************************************************************************
+    179           * EXTERN FUNCTIONS
+    180           */
+    181          
+    182          /*******************************************************************************
+    183          * 名    称： SPI_GpioInit
+    184          * 功    能： ADC GPIO初始化
+    185          * 入口参数： 无
+    186          * 出口参数： 无
+    187          * 作    者： wumingshen.
+    188          * 创建日期： 2015-12-07
+    189          * 修    改：
+    190          * 修改日期：
+    191          * 备    注：
+    192          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    193          static void SPI_GpioInit(void)
+    194          {
+    195            
+    196          }
+   \                     SPI_GpioInit: (+1)
+   \   00000000   0x4770             BX       LR               ;; return
+    197          
+    198          /*******************************************************************************
+    199          * 名    称： SPI_SendByte
+    200          * 功    能： 通过SPI总线发送一个字节数据(同时接收一个字节数据)
+    201          * 入口参数： 要写入的一个字节数据
+    202          * 出口参数： 在发数据时，MISO信号线上接收的一个字节
+    203          * 作    者： wumingshen.
+    204          * 创建日期： 2015-12-07
+    205          * 修    改：
+    206          * 修改日期：
+    207          * 备    注：
+    208          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    209          static void SPI_SendByte(u8 byte)
+    210          {
+   \                     SPI_SendByte: (+1)
+   \   00000000   0xB538             PUSH     {R3-R5,LR}
+   \   00000002   0x0004             MOVS     R4,R0
+    211              u8 i;
+    212              
+    213              /***********************************************
+    214              * 描述： 
+    215              */
+    216              for(i=0;i<8;i++) {		
+   \   00000004   0x2500             MOVS     R5,#+0
+   \   00000006   0xE00F             B.N      ??SPI_SendByte_0
+    217          		SPI_SCK_LOW();
+    218          		Delay_Nus(10);
+    219          		if(byte & 0x80)
+    220          			SPI_MOSI_HIGH();
+    221          		else
+    222          			SPI_MOSI_LOW();
+   \                     ??SPI_SendByte_1: (+1)
+   \   00000008   0x2100             MOVS     R1,#+0
+   \   0000000A   0x2073             MOVS     R0,#+115
+   \   0000000C   0x.... 0x....      BL       GPIO_Set
+    223          		byte = byte << 1;
+   \                     ??SPI_SendByte_2: (+1)
+   \   00000010   0x0064             LSLS     R4,R4,#+1
+    224          		Delay_Nus(5);
+   \   00000012   0x2005             MOVS     R0,#+5
+   \   00000014   0x.... 0x....      BL       Delay_Nus
+    225          		SPI_SCK_HIGH();
+   \   00000018   0x2101             MOVS     R1,#+1
+   \   0000001A   0x2071             MOVS     R0,#+113
+   \   0000001C   0x.... 0x....      BL       GPIO_Set
+    226          		Delay_Nus(10);
+   \   00000020   0x200A             MOVS     R0,#+10
+   \   00000022   0x.... 0x....      BL       Delay_Nus
+   \   00000026   0x1C6D             ADDS     R5,R5,#+1
+   \                     ??SPI_SendByte_0: (+1)
+   \   00000028   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   0000002A   0x2D08             CMP      R5,#+8
+   \   0000002C   0xDA0D             BGE.N    ??SPI_SendByte_3
+   \   0000002E   0x2100             MOVS     R1,#+0
+   \   00000030   0x2071             MOVS     R0,#+113
+   \   00000032   0x.... 0x....      BL       GPIO_Set
+   \   00000036   0x200A             MOVS     R0,#+10
+   \   00000038   0x.... 0x....      BL       Delay_Nus
+   \   0000003C   0x0620             LSLS     R0,R4,#+24
+   \   0000003E   0xD5E3             BPL.N    ??SPI_SendByte_1
+   \   00000040   0x2101             MOVS     R1,#+1
+   \   00000042   0x2073             MOVS     R0,#+115
+   \   00000044   0x.... 0x....      BL       GPIO_Set
+   \   00000048   0xE7E2             B.N      ??SPI_SendByte_2
+    227          	}
+    228          }	
+   \                     ??SPI_SendByte_3: (+1)
+   \   0000004A   0xBD31             POP      {R0,R4,R5,PC}    ;; return
+    229          
+    230          /*******************************************************************************
+    231          * 名    称： BSP_MAX7219Init
+    232          * 功    能： MAX7219初始化
+    233          * 入口参数： 无
+    234          * 出口参数： 无
+    235          * 作    者： wumingshen.
+    236          * 创建日期： 2015-12-07
+    237          * 修    改：
+    238          * 修改日期：
+    239          * 备    注：
+    240          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    241          void BSP_MAX7219Init( void )
+    242          {
+   \                     BSP_MAX7219Init: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+    243          	SPI_GpioInit(); 
+   \   00000002   0x.... 0x....      BL       SPI_GpioInit
+    244              
+    245          	SPI_CS_HIGH();
+   \   00000006   0x2101             MOVS     R1,#+1
+   \   00000008   0x2070             MOVS     R0,#+112
+   \   0000000A   0x.... 0x....      BL       GPIO_Set
+    246          	SPI_SCK_HIGH();
+   \   0000000E   0x2101             MOVS     R1,#+1
+   \   00000010   0x2071             MOVS     R0,#+113
+   \   00000012   0x.... 0x....      BL       GPIO_Set
+    247              
+    248          	Delay_Nus(30);
+   \   00000016   0x201E             MOVS     R0,#+30
+   \   00000018   0x.... 0x....      BL       Delay_Nus
+    249          }
+   \   0000001C   0xBD01             POP      {R0,PC}          ;; return
+    250          
+    251          /*******************************************************************************
+    252          * 名    称： LED_SPI_SendData
+    253          * 功    能： 向7219发送1Byte数据或命令
+    254          * 入口参数：-addr:   数据接收地址
+    255          *           -num:   要存的数据
+    256          * 出口参数： 
+    257          * 作    者： wumingshen.
+    258          * 创建日期： 2015-12-08
+    259          * 修    改：
+    260          * 修改日期：
+    261          * 备    注：
+    262          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    263          void LED_SPI_SendData(u8 Addr,u8 Num)
+    264          {    
+   \                     LED_SPI_SendData: (+1)
+   \   00000000   0xB538             PUSH     {R3-R5,LR}
+   \   00000002   0x0004             MOVS     R4,R0
+   \   00000004   0x000D             MOVS     R5,R1
+    265              SPI_CS_LOW();                                  //7219允许接接收
+   \   00000006   0x2100             MOVS     R1,#+0
+   \   00000008   0x2070             MOVS     R0,#+112
+   \   0000000A   0x.... 0x....      BL       GPIO_Set
+    266              SPI_SendByte( Addr );                          //送地址
+   \   0000000E   0x0020             MOVS     R0,R4
+   \   00000010   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000012   0x.... 0x....      BL       SPI_SendByte
+    267              SPI_SendByte( Num );                           //送数据
+   \   00000016   0x0028             MOVS     R0,R5
+   \   00000018   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000001A   0x.... 0x....      BL       SPI_SendByte
+    268              SPI_CS_HIGH();                                 //关7219接收
+   \   0000001E   0x2101             MOVS     R1,#+1
+   \   00000020   0x2070             MOVS     R0,#+112
+   \   00000022   0x.... 0x....      BL       GPIO_Set
+    269          }
+   \   00000026   0xBD31             POP      {R0,R4,R5,PC}    ;; return
+    270          
+    271          /*******************************************************************************
+    272          * 名    称： BSP_DispWrite
+    273          * 功    能： 将显示数据写入显示缓存
+    274          * 入口参数： - Num         显示数据
+    275          *           - Fmt         显示数据格式。如："e%",显示字母‘e’和数据Num
+    276          *           - Align       对齐方式 ‘1’为左对齐，’0‘为右对齐
+    277          *           - FmtType     格式化模式。’1‘前面显示，’0‘后面显示
+    278          *           - DotPosition 显示点的位置
+    279          *           - Cycle       闪烁次数
+    280          *           - Duty    亮的时间
+    281          *           - OffX100ms   灭的时间
+    282          *           - Index       显示序号
+    283          * 出口参数： 
+    284          * 作    者： wumingshen.
+    285          * 创建日期： 2015-12-08
+    286          * 修    改：
+    287          * 修改日期：
+    288          * 备    注：
+    289          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    290          void BSP_DispWrite( int     Num,
+    291                              char    *Fmt,
+    292                              char    Align,
+    293                              u8   FmtType,
+    294                              u8   DotPosition,
+    295                              u8   Cycle,
+    296                              u8   Duty,
+    297                              // u8   OffX100ms,
+    298                              u8   Index)
+    299          {
+   \                     BSP_DispWrite: (+1)
+   \   00000000   0xE92D 0x4FFA      PUSH     {R1,R3-R11,LR}
+   \   00000004   0xB089             SUB      SP,SP,#+36
+   \   00000006   0x0014             MOVS     R4,R2
+    300          
+    301              char    i               = 0,    Nflag   = 0,    b       = 0;
+   \   00000008   0xF05F 0x0A00      MOVS     R10,#+0
+   \   0000000C   0x2500             MOVS     R5,#+0
+   \   0000000E   0x2200             MOVS     R2,#+0
+    302              char    NbrCnt          = 0,    Chcnt   = 0;
+   \   00000010   0x2600             MOVS     R6,#+0
+   \   00000012   0x2700             MOVS     R7,#+0
+    303              char    NumPosition     = 0;
+   \   00000014   0xF05F 0x0800      MOVS     R8,#+0
+    304              int     temp            = 0;
+   \   00000018   0xF05F 0x0900      MOVS     R9,#+0
+    305              char    flag            = 0;
+   \   0000001C   0x2100             MOVS     R1,#+0
+    306              u8   BSP_DispBuff[8] = {0};
+   \   0000001E   0x4669             MOV      R1,SP
+   \   00000020   0x2200             MOVS     R2,#+0
+   \   00000022   0x2300             MOVS     R3,#+0
+   \   00000024   0xC10C             STM      R1!,{R2,R3}
+   \   00000026   0x3908             SUBS     R1,R1,#+8
+    307              u8   CharBuffer[8]   = {0};
+   \   00000028   0xA904             ADD      R1,SP,#+16
+   \   0000002A   0x2200             MOVS     R2,#+0
+   \   0000002C   0x2300             MOVS     R3,#+0
+   \   0000002E   0xC10C             STM      R1!,{R2,R3}
+   \   00000030   0x3908             SUBS     R1,R1,#+8
+    308              u8   NumbBuffer[8]   = {0};
+   \   00000032   0xA902             ADD      R1,SP,#+8
+   \   00000034   0x2200             MOVS     R2,#+0
+   \   00000036   0x2300             MOVS     R3,#+0
+   \   00000038   0xC10C             STM      R1!,{R2,R3}
+   \   0000003A   0x3908             SUBS     R1,R1,#+8
+    309              u8   buf[DISPLAY_LED_NUM]          = {128,128,128,128,128,128,128,128};
+   \   0000003C   0xA906             ADD      R1,SP,#+24
+   \   0000003E   0x.... 0x....      LDR.W    R2,??DataTable8
+   \   00000042   0xE8B2 0x1008      LDM      R2!,{R3,R12}
+   \   00000046   0xE8A1 0x1008      STM      R1!,{R3,R12}
+   \   0000004A   0x3A08             SUBS     R2,R2,#+8
+   \   0000004C   0x3908             SUBS     R1,R1,#+8
+    310                      temp            = Num;
+   \   0000004E   0x4681             MOV      R9,R0
+   \   00000050   0xF8DD 0xB05C      LDR      R11,[SP, #+92]
+    311          
+    312              /***********************************************
+    313              * 描述： 
+    314              */
+    315              if(Index > sizeof(LedDispCtrl)/sizeof(StrLedDisp)-1) {
+   \   00000054   0xFA5F 0xFB8B      UXTB     R11,R11          ;; ZeroExt  R11,R11,#+24,#+24
+   \   00000058   0xF1BB 0x0F04      CMP      R11,#+4
+   \   0000005C   0xF080 0x8217      BCS.W    ??BSP_DispWrite_0
+    316                  return;
+    317              }
+    318              
+    319              LedDispCtrl[Index].Flag         = 1;
+   \                     ??BSP_DispWrite_1: (+1)
+   \   00000060   0x2001             MOVS     R0,#+1
+   \   00000062   0x.... 0x....      LDR.W    R1,??DataTable8_1
+   \   00000066   0xFA5F 0xFB8B      UXTB     R11,R11          ;; ZeroExt  R11,R11,#+24,#+24
+   \   0000006A   0x220B             MOVS     R2,#+11
+   \   0000006C   0xFB02 0x110B      MLA      R1,R2,R11,R1
+   \   00000070   0x7008             STRB     R0,[R1, #+0]
+    320              LedDispCtrl[Index].Cycle        = Cycle;
+   \   00000072   0x9815             LDR      R0,[SP, #+84]
+   \   00000074   0x.... 0x....      LDR.W    R1,??DataTable8_1
+   \   00000078   0xFA5F 0xFB8B      UXTB     R11,R11          ;; ZeroExt  R11,R11,#+24,#+24
+   \   0000007C   0x220B             MOVS     R2,#+11
+   \   0000007E   0xFB02 0x110B      MLA      R1,R2,R11,R1
+   \   00000082   0x7048             STRB     R0,[R1, #+1]
+    321              LedDispCtrl[Index].Duty         = Duty;
+   \   00000084   0x9816             LDR      R0,[SP, #+88]
+   \   00000086   0x.... 0x....      LDR.W    R1,??DataTable8_1
+   \   0000008A   0xFA5F 0xFB8B      UXTB     R11,R11          ;; ZeroExt  R11,R11,#+24,#+24
+   \   0000008E   0x220B             MOVS     R2,#+11
+   \   00000090   0xFB02 0x110B      MLA      R1,R2,R11,R1
+   \   00000094   0x7088             STRB     R0,[R1, #+2]
+    322              // LedDispCtrl[Index].OffX100ms     = OffX100ms;
+    323          
+    324              /***********************************************
+    325              * 描述： 
+    326              */
+    327              for(i = 0;i < strlen(Fmt);i++) {
+   \   00000096   0xF05F 0x0A00      MOVS     R10,#+0
+   \   0000009A   0xE00A             B.N      ??BSP_DispWrite_2
+    328                  if(Fmt[i] == '%') {
+    329                      if ( FmtType == 0 ) {
+    330                          if(temp < 0) {
+    331                              Nflag = 1;
+    332                              temp = abs(temp);
+    333                              NumbBuffer[0] = '-';
+    334                              NbrCnt++;
+    335                          }
+    336                          
+    337                          do {
+    338                              NumbBuffer[NbrCnt] = temp%10 + '0';
+    339                              temp /= 10;
+    340                              NbrCnt++;
+    341                          } while((NbrCnt <= 8)&&temp);
+    342                      } else {
+    343                          do {
+    344                              NumbBuffer[NbrCnt] = temp%10 + '0';
+    345                              temp /= 10;
+    346                              NbrCnt++;
+    347                          } while((NbrCnt <= 8)&&temp);
+    348                          
+    349                          if(temp < 0) {
+    350                              Nflag = 1;
+    351                              temp = abs(temp);
+    352                              NumbBuffer[NbrCnt] = '-';
+    353                              NbrCnt++;
+    354                          }
+    355                      
+    356                      }
+    357                      
+    358                      switch(i) {
+    359                      case 0: NumPosition = 0;break;
+    360                      case 1: NumPosition = 1;break;
+    361                      case 2: NumPosition = 2;break;
+    362                      case 3: NumPosition = 3;break;
+    363                      }
+    364                      
+    365                      if(Nflag == 0) {
+    366                          flag = 1;
+    367                      } else {
+    368                          flag = 0;
+    369                      }
+    370                      
+    371                      for(b = 0;b < (NbrCnt - Nflag)/2;b++) {
+    372                          temp = NumbBuffer[b + Nflag];
+    373                          NumbBuffer[b + Nflag] = NumbBuffer[NbrCnt -flag- Nflag - b];
+    374                          NumbBuffer[NbrCnt - flag - Nflag - b] = temp;
+    375                      }
+    376                  } else {
+    377                      CharBuffer[Chcnt] = Fmt[i];
+   \                     ??BSP_DispWrite_3: (+1)
+   \   0000009C   0x9809             LDR      R0,[SP, #+36]
+   \   0000009E   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   000000A2   0xF81A 0x0000      LDRB     R0,[R10, R0]
+   \   000000A6   0xA904             ADD      R1,SP,#+16
+   \   000000A8   0xB2FF             UXTB     R7,R7            ;; ZeroExt  R7,R7,#+24,#+24
+   \   000000AA   0x5478             STRB     R0,[R7, R1]
+    378                      Chcnt++;
+   \   000000AC   0x1C7F             ADDS     R7,R7,#+1
+    379                  }
+   \                     ??BSP_DispWrite_4: (+1)
+   \   000000AE   0xF11A 0x0A01      ADDS     R10,R10,#+1
+   \                     ??BSP_DispWrite_2: (+1)
+   \   000000B2   0x9809             LDR      R0,[SP, #+36]
+   \   000000B4   0x.... 0x....      BL       strlen
+   \   000000B8   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   000000BC   0x4582             CMP      R10,R0
+   \   000000BE   0xF080 0x8095      BCS.W    ??BSP_DispWrite_5
+   \   000000C2   0x9809             LDR      R0,[SP, #+36]
+   \   000000C4   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   000000C8   0xF81A 0x0000      LDRB     R0,[R10, R0]
+   \   000000CC   0x2825             CMP      R0,#+37
+   \   000000CE   0xD1E5             BNE.N    ??BSP_DispWrite_3
+   \   000000D0   0xF89D 0x0028      LDRB     R0,[SP, #+40]
+   \   000000D4   0x2800             CMP      R0,#+0
+   \   000000D6   0xD11F             BNE.N    ??BSP_DispWrite_6
+   \   000000D8   0xF1B9 0x0F00      CMP      R9,#+0
+   \   000000DC   0xD508             BPL.N    ??BSP_DispWrite_7
+   \   000000DE   0x2501             MOVS     R5,#+1
+   \   000000E0   0x4648             MOV      R0,R9
+   \   000000E2   0x.... 0x....      BL       abs
+   \   000000E6   0x4681             MOV      R9,R0
+   \   000000E8   0x202D             MOVS     R0,#+45
+   \   000000EA   0xF88D 0x0008      STRB     R0,[SP, #+8]
+   \   000000EE   0x1C76             ADDS     R6,R6,#+1
+   \                     ??BSP_DispWrite_7: (+1)
+   \   000000F0   0x200A             MOVS     R0,#+10
+   \   000000F2   0xFB99 0xF1F0      SDIV     R1,R9,R0
+   \   000000F6   0xFB00 0x9011      MLS      R0,R0,R1,R9
+   \   000000FA   0x3030             ADDS     R0,R0,#+48
+   \   000000FC   0xA902             ADD      R1,SP,#+8
+   \   000000FE   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   00000100   0x5470             STRB     R0,[R6, R1]
+   \   00000102   0x200A             MOVS     R0,#+10
+   \   00000104   0xFB99 0xF9F0      SDIV     R9,R9,R0
+   \   00000108   0x1C76             ADDS     R6,R6,#+1
+   \   0000010A   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   0000010C   0x2E09             CMP      R6,#+9
+   \   0000010E   0xDA23             BGE.N    ??BSP_DispWrite_8
+   \   00000110   0xF1B9 0x0F00      CMP      R9,#+0
+   \   00000114   0xD1EC             BNE.N    ??BSP_DispWrite_7
+   \   00000116   0xE01F             B.N      ??BSP_DispWrite_8
+   \                     ??BSP_DispWrite_6: (+1)
+   \   00000118   0x200A             MOVS     R0,#+10
+   \   0000011A   0xFB99 0xF1F0      SDIV     R1,R9,R0
+   \   0000011E   0xFB00 0x9011      MLS      R0,R0,R1,R9
+   \   00000122   0x3030             ADDS     R0,R0,#+48
+   \   00000124   0xA902             ADD      R1,SP,#+8
+   \   00000126   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   00000128   0x5470             STRB     R0,[R6, R1]
+   \   0000012A   0x200A             MOVS     R0,#+10
+   \   0000012C   0xFB99 0xF9F0      SDIV     R9,R9,R0
+   \   00000130   0x1C76             ADDS     R6,R6,#+1
+   \   00000132   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   00000134   0x2E09             CMP      R6,#+9
+   \   00000136   0xDA02             BGE.N    ??BSP_DispWrite_9
+   \   00000138   0xF1B9 0x0F00      CMP      R9,#+0
+   \   0000013C   0xD1EC             BNE.N    ??BSP_DispWrite_6
+   \                     ??BSP_DispWrite_9: (+1)
+   \   0000013E   0xF1B9 0x0F00      CMP      R9,#+0
+   \   00000142   0xD509             BPL.N    ??BSP_DispWrite_8
+   \   00000144   0x2501             MOVS     R5,#+1
+   \   00000146   0x4648             MOV      R0,R9
+   \   00000148   0x.... 0x....      BL       abs
+   \   0000014C   0x4681             MOV      R9,R0
+   \   0000014E   0x202D             MOVS     R0,#+45
+   \   00000150   0xA902             ADD      R1,SP,#+8
+   \   00000152   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   00000154   0x5470             STRB     R0,[R6, R1]
+   \   00000156   0x1C76             ADDS     R6,R6,#+1
+   \                     ??BSP_DispWrite_8: (+1)
+   \   00000158   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   0000015C   0xF1BA 0x0F00      CMP      R10,#+0
+   \   00000160   0xD007             BEQ.N    ??BSP_DispWrite_10
+   \   00000162   0xF1BA 0x0F02      CMP      R10,#+2
+   \   00000166   0xD00A             BEQ.N    ??BSP_DispWrite_11
+   \   00000168   0xD306             BCC.N    ??BSP_DispWrite_12
+   \   0000016A   0xF1BA 0x0F03      CMP      R10,#+3
+   \   0000016E   0xD009             BEQ.N    ??BSP_DispWrite_13
+   \   00000170   0xE00A             B.N      ??BSP_DispWrite_14
+   \                     ??BSP_DispWrite_10: (+1)
+   \   00000172   0xF05F 0x0800      MOVS     R8,#+0
+   \   00000176   0xE007             B.N      ??BSP_DispWrite_14
+   \                     ??BSP_DispWrite_12: (+1)
+   \   00000178   0xF05F 0x0801      MOVS     R8,#+1
+   \   0000017C   0xE004             B.N      ??BSP_DispWrite_14
+   \                     ??BSP_DispWrite_11: (+1)
+   \   0000017E   0xF05F 0x0802      MOVS     R8,#+2
+   \   00000182   0xE001             B.N      ??BSP_DispWrite_14
+   \                     ??BSP_DispWrite_13: (+1)
+   \   00000184   0xF05F 0x0803      MOVS     R8,#+3
+   \                     ??BSP_DispWrite_14: (+1)
+   \   00000188   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   0000018A   0x2D00             CMP      R5,#+0
+   \   0000018C   0xD101             BNE.N    ??BSP_DispWrite_15
+   \   0000018E   0x2101             MOVS     R1,#+1
+   \   00000190   0xE000             B.N      ??BSP_DispWrite_16
+   \                     ??BSP_DispWrite_15: (+1)
+   \   00000192   0x2100             MOVS     R1,#+0
+   \                     ??BSP_DispWrite_16: (+1)
+   \   00000194   0x2200             MOVS     R2,#+0
+   \                     ??BSP_DispWrite_17: (+1)
+   \   00000196   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   00000198   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   0000019A   0x1B70             SUBS     R0,R6,R5
+   \   0000019C   0x2302             MOVS     R3,#+2
+   \   0000019E   0xFB90 0xF0F3      SDIV     R0,R0,R3
+   \   000001A2   0xB2D2             UXTB     R2,R2            ;; ZeroExt  R2,R2,#+24,#+24
+   \   000001A4   0x4282             CMP      R2,R0
+   \   000001A6   0xDA82             BGE.N    ??BSP_DispWrite_4
+   \   000001A8   0xA802             ADD      R0,SP,#+8
+   \   000001AA   0xB2D2             UXTB     R2,R2            ;; ZeroExt  R2,R2,#+24,#+24
+   \   000001AC   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   000001AE   0x18AB             ADDS     R3,R5,R2
+   \   000001B0   0xF813 0x9000      LDRB     R9,[R3, R0]
+   \   000001B4   0xA802             ADD      R0,SP,#+8
+   \   000001B6   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   000001B8   0xB2C9             UXTB     R1,R1            ;; ZeroExt  R1,R1,#+24,#+24
+   \   000001BA   0x1A73             SUBS     R3,R6,R1
+   \   000001BC   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   000001BE   0x1B5B             SUBS     R3,R3,R5
+   \   000001C0   0xB2D2             UXTB     R2,R2            ;; ZeroExt  R2,R2,#+24,#+24
+   \   000001C2   0x1A9B             SUBS     R3,R3,R2
+   \   000001C4   0x5C18             LDRB     R0,[R3, R0]
+   \   000001C6   0xAB02             ADD      R3,SP,#+8
+   \   000001C8   0xB2D2             UXTB     R2,R2            ;; ZeroExt  R2,R2,#+24,#+24
+   \   000001CA   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   000001CC   0xEB15 0x0C02      ADDS     R12,R5,R2
+   \   000001D0   0xF80C 0x0003      STRB     R0,[R12, R3]
+   \   000001D4   0xA802             ADD      R0,SP,#+8
+   \   000001D6   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   000001D8   0xB2C9             UXTB     R1,R1            ;; ZeroExt  R1,R1,#+24,#+24
+   \   000001DA   0x1A73             SUBS     R3,R6,R1
+   \   000001DC   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   000001DE   0x1B5B             SUBS     R3,R3,R5
+   \   000001E0   0xB2D2             UXTB     R2,R2            ;; ZeroExt  R2,R2,#+24,#+24
+   \   000001E2   0x1A9B             SUBS     R3,R3,R2
+   \   000001E4   0xF803 0x9000      STRB     R9,[R3, R0]
+   \   000001E8   0x1C52             ADDS     R2,R2,#+1
+   \   000001EA   0xE7D4             B.N      ??BSP_DispWrite_17
+    380              }
+    381              /***********************************************
+    382              * 描述： 
+    383              */
+    384              switch(NumPosition) {
+   \                     ??BSP_DispWrite_5: (+1)
+   \   000001EC   0xFA5F 0xF888      UXTB     R8,R8            ;; ZeroExt  R8,R8,#+24,#+24
+   \   000001F0   0xF1B8 0x0F00      CMP      R8,#+0
+   \   000001F4   0xD008             BEQ.N    ??BSP_DispWrite_18
+   \   000001F6   0xF1B8 0x0F02      CMP      R8,#+2
+   \   000001FA   0xD060             BEQ.N    ??BSP_DispWrite_19
+   \   000001FC   0xD32E             BCC.N    ??BSP_DispWrite_20
+   \   000001FE   0xF1B8 0x0F03      CMP      R8,#+3
+   \   00000202   0xF000 0x8091      BEQ.W    ??BSP_DispWrite_21
+   \   00000206   0xE0B9             B.N      ??BSP_DispWrite_22
+    385              case 0: 
+    386                  for(i = 0;i < 8;i++) {
+   \                     ??BSP_DispWrite_18: (+1)
+   \   00000208   0xF05F 0x0A00      MOVS     R10,#+0
+   \   0000020C   0xE00B             B.N      ??BSP_DispWrite_23
+    387                      BSP_DispBuff[i] = NumbBuffer[i];
+   \                     ??BSP_DispWrite_24: (+1)
+   \   0000020E   0xA802             ADD      R0,SP,#+8
+   \   00000210   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   00000214   0xF81A 0x0000      LDRB     R0,[R10, R0]
+   \   00000218   0x4669             MOV      R1,SP
+   \   0000021A   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   0000021E   0xF80A 0x0001      STRB     R0,[R10, R1]
+    388                  }
+   \   00000222   0xF11A 0x0A01      ADDS     R10,R10,#+1
+   \                     ??BSP_DispWrite_23: (+1)
+   \   00000226   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   0000022A   0xF1BA 0x0F08      CMP      R10,#+8
+   \   0000022E   0xDBEE             BLT.N    ??BSP_DispWrite_24
+    389                  for(i = NbrCnt;i < 8;i++) {
+   \   00000230   0x46B2             MOV      R10,R6
+   \   00000232   0xE00D             B.N      ??BSP_DispWrite_25
+    390                      BSP_DispBuff[i] = CharBuffer[i - NbrCnt];
+   \                     ??BSP_DispWrite_26: (+1)
+   \   00000234   0xA804             ADD      R0,SP,#+16
+   \   00000236   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   0000023A   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   0000023C   0xEBBA 0x0106      SUBS     R1,R10,R6
+   \   00000240   0x5C08             LDRB     R0,[R1, R0]
+   \   00000242   0x4669             MOV      R1,SP
+   \   00000244   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   00000248   0xF80A 0x0001      STRB     R0,[R10, R1]
+    391                  }
+   \   0000024C   0xF11A 0x0A01      ADDS     R10,R10,#+1
+   \                     ??BSP_DispWrite_25: (+1)
+   \   00000250   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   00000254   0xF1BA 0x0F08      CMP      R10,#+8
+   \   00000258   0xDBEC             BLT.N    ??BSP_DispWrite_26
+    392                  break;
+   \   0000025A   0xE08F             B.N      ??BSP_DispWrite_22
+    393              case 1: 
+    394                  BSP_DispBuff[0] = CharBuffer[0];
+   \                     ??BSP_DispWrite_20: (+1)
+   \   0000025C   0xF89D 0x0010      LDRB     R0,[SP, #+16]
+   \   00000260   0xF88D 0x0000      STRB     R0,[SP, #+0]
+    395                  for(i = 1;i < 8;i++) {
+   \   00000264   0xF05F 0x0A01      MOVS     R10,#+1
+   \   00000268   0xE00D             B.N      ??BSP_DispWrite_27
+    396                      BSP_DispBuff[i] = NumbBuffer[i - 1];
+   \                     ??BSP_DispWrite_28: (+1)
+   \   0000026A   0xA802             ADD      R0,SP,#+8
+   \   0000026C   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   00000270   0xEB1A 0x0000      ADDS     R0,R10,R0
+   \   00000274   0xF810 0x0C01      LDRB     R0,[R0, #-1]
+   \   00000278   0x4669             MOV      R1,SP
+   \   0000027A   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   0000027E   0xF80A 0x0001      STRB     R0,[R10, R1]
+    397                  }
+   \   00000282   0xF11A 0x0A01      ADDS     R10,R10,#+1
+   \                     ??BSP_DispWrite_27: (+1)
+   \   00000286   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   0000028A   0xF1BA 0x0F08      CMP      R10,#+8
+   \   0000028E   0xDBEC             BLT.N    ??BSP_DispWrite_28
+    398                  for(i = (NbrCnt + 1);i < 8;i++) {
+   \   00000290   0xF116 0x0A01      ADDS     R10,R6,#+1
+   \   00000294   0xE00D             B.N      ??BSP_DispWrite_29
+    399                      BSP_DispBuff[i] = CharBuffer[i - NbrCnt];
+   \                     ??BSP_DispWrite_30: (+1)
+   \   00000296   0xA804             ADD      R0,SP,#+16
+   \   00000298   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   0000029C   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   0000029E   0xEBBA 0x0106      SUBS     R1,R10,R6
+   \   000002A2   0x5C08             LDRB     R0,[R1, R0]
+   \   000002A4   0x4669             MOV      R1,SP
+   \   000002A6   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   000002AA   0xF80A 0x0001      STRB     R0,[R10, R1]
+    400                  }
+   \   000002AE   0xF11A 0x0A01      ADDS     R10,R10,#+1
+   \                     ??BSP_DispWrite_29: (+1)
+   \   000002B2   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   000002B6   0xF1BA 0x0F08      CMP      R10,#+8
+   \   000002BA   0xDBEC             BLT.N    ??BSP_DispWrite_30
+    401              break;
+   \   000002BC   0xE05E             B.N      ??BSP_DispWrite_22
+    402              case 2: 
+    403                  BSP_DispBuff[0] = CharBuffer[0];
+   \                     ??BSP_DispWrite_19: (+1)
+   \   000002BE   0xF89D 0x0010      LDRB     R0,[SP, #+16]
+   \   000002C2   0xF88D 0x0000      STRB     R0,[SP, #+0]
+    404                  BSP_DispBuff[1] = CharBuffer[1];
+   \   000002C6   0xF89D 0x0011      LDRB     R0,[SP, #+17]
+   \   000002CA   0xF88D 0x0001      STRB     R0,[SP, #+1]
+    405                  for(i = 2;i < 8;i++) {
+   \   000002CE   0xF05F 0x0A02      MOVS     R10,#+2
+   \   000002D2   0xE00D             B.N      ??BSP_DispWrite_31
+    406                      BSP_DispBuff[i] = NumbBuffer[i - 2];
+   \                     ??BSP_DispWrite_32: (+1)
+   \   000002D4   0xA802             ADD      R0,SP,#+8
+   \   000002D6   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   000002DA   0xEB1A 0x0000      ADDS     R0,R10,R0
+   \   000002DE   0xF810 0x0C02      LDRB     R0,[R0, #-2]
+   \   000002E2   0x4669             MOV      R1,SP
+   \   000002E4   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   000002E8   0xF80A 0x0001      STRB     R0,[R10, R1]
+    407                  }
+   \   000002EC   0xF11A 0x0A01      ADDS     R10,R10,#+1
+   \                     ??BSP_DispWrite_31: (+1)
+   \   000002F0   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   000002F4   0xF1BA 0x0F08      CMP      R10,#+8
+   \   000002F8   0xDBEC             BLT.N    ??BSP_DispWrite_32
+    408                  for(i = (NbrCnt + 2);i < 8;i++) {
+   \   000002FA   0xF116 0x0A02      ADDS     R10,R6,#+2
+   \   000002FE   0xE00D             B.N      ??BSP_DispWrite_33
+    409                      BSP_DispBuff[i] = CharBuffer[i - NbrCnt];
+   \                     ??BSP_DispWrite_34: (+1)
+   \   00000300   0xA804             ADD      R0,SP,#+16
+   \   00000302   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   00000306   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   00000308   0xEBBA 0x0106      SUBS     R1,R10,R6
+   \   0000030C   0x5C08             LDRB     R0,[R1, R0]
+   \   0000030E   0x4669             MOV      R1,SP
+   \   00000310   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   00000314   0xF80A 0x0001      STRB     R0,[R10, R1]
+    410                  }
+   \   00000318   0xF11A 0x0A01      ADDS     R10,R10,#+1
+   \                     ??BSP_DispWrite_33: (+1)
+   \   0000031C   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   00000320   0xF1BA 0x0F08      CMP      R10,#+8
+   \   00000324   0xDBEC             BLT.N    ??BSP_DispWrite_34
+    411              break;
+   \   00000326   0xE029             B.N      ??BSP_DispWrite_22
+    412              case 3: 
+    413                  for(i = 0;i < 3;i++) {
+   \                     ??BSP_DispWrite_21: (+1)
+   \   00000328   0xF05F 0x0A00      MOVS     R10,#+0
+   \   0000032C   0xE00B             B.N      ??BSP_DispWrite_35
+    414                      BSP_DispBuff[i] = CharBuffer[i];
+   \                     ??BSP_DispWrite_36: (+1)
+   \   0000032E   0xA804             ADD      R0,SP,#+16
+   \   00000330   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   00000334   0xF81A 0x0000      LDRB     R0,[R10, R0]
+   \   00000338   0x4669             MOV      R1,SP
+   \   0000033A   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   0000033E   0xF80A 0x0001      STRB     R0,[R10, R1]
+    415                  }
+   \   00000342   0xF11A 0x0A01      ADDS     R10,R10,#+1
+   \                     ??BSP_DispWrite_35: (+1)
+   \   00000346   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   0000034A   0xF1BA 0x0F03      CMP      R10,#+3
+   \   0000034E   0xDBEE             BLT.N    ??BSP_DispWrite_36
+    416                  for(i = 3;i < 8;i++) {
+   \   00000350   0xF05F 0x0A03      MOVS     R10,#+3
+   \   00000354   0xE00D             B.N      ??BSP_DispWrite_37
+    417                      BSP_DispBuff[i] = NumbBuffer[i - 3];
+   \                     ??BSP_DispWrite_38: (+1)
+   \   00000356   0xA802             ADD      R0,SP,#+8
+   \   00000358   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   0000035C   0xEB1A 0x0000      ADDS     R0,R10,R0
+   \   00000360   0xF810 0x0C03      LDRB     R0,[R0, #-3]
+   \   00000364   0x4669             MOV      R1,SP
+   \   00000366   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   0000036A   0xF80A 0x0001      STRB     R0,[R10, R1]
+    418                  }
+   \   0000036E   0xF11A 0x0A01      ADDS     R10,R10,#+1
+   \                     ??BSP_DispWrite_37: (+1)
+   \   00000372   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   00000376   0xF1BA 0x0F08      CMP      R10,#+8
+   \   0000037A   0xDBEC             BLT.N    ??BSP_DispWrite_38
+    419              }
+    420              
+    421              for(i = 0;i < DISPLAY_LED_NUM;i++) {
+   \                     ??BSP_DispWrite_22: (+1)
+   \   0000037C   0xF05F 0x0A00      MOVS     R10,#+0
+   \   00000380   0xE007             B.N      ??BSP_DispWrite_39
+    422                  buf[i] = 128;
+   \                     ??BSP_DispWrite_40: (+1)
+   \   00000382   0x2080             MOVS     R0,#+128
+   \   00000384   0xA906             ADD      R1,SP,#+24
+   \   00000386   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   0000038A   0xF80A 0x0001      STRB     R0,[R10, R1]
+    423              }
+   \   0000038E   0xF11A 0x0A01      ADDS     R10,R10,#+1
+   \                     ??BSP_DispWrite_39: (+1)
+   \   00000392   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   00000396   0xF1BA 0x0F08      CMP      R10,#+8
+   \   0000039A   0xDBF2             BLT.N    ??BSP_DispWrite_40
+    424              
+    425              /***********************************************
+    426              * 描述： 
+    427              */
+    428          	if(Align == 1) {
+   \   0000039C   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   0000039E   0x2C01             CMP      R4,#+1
+   \   000003A0   0xD11A             BNE.N    ??BSP_DispWrite_41
+    429                  for(i = 0;(i < (NbrCnt + Chcnt))&&(i < DISPLAY_LED_NUM);i++) {
+   \   000003A2   0xF05F 0x0A00      MOVS     R10,#+0
+   \                     ??BSP_DispWrite_42: (+1)
+   \   000003A6   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   000003AA   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   000003AC   0xB2FF             UXTB     R7,R7            ;; ZeroExt  R7,R7,#+24,#+24
+   \   000003AE   0x19B8             ADDS     R0,R7,R6
+   \   000003B0   0x4582             CMP      R10,R0
+   \   000003B2   0xDA32             BGE.N    ??BSP_DispWrite_43
+   \   000003B4   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   000003B8   0xF1BA 0x0F08      CMP      R10,#+8
+   \   000003BC   0xDA2D             BGE.N    ??BSP_DispWrite_43
+    430                      buf[i]      = BSP_DispBuff[i];
+   \   000003BE   0x4668             MOV      R0,SP
+   \   000003C0   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   000003C4   0xF81A 0x0000      LDRB     R0,[R10, R0]
+   \   000003C8   0xA906             ADD      R1,SP,#+24
+   \   000003CA   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   000003CE   0xF80A 0x0001      STRB     R0,[R10, R1]
+    431                  }
+   \   000003D2   0xF11A 0x0A01      ADDS     R10,R10,#+1
+   \   000003D6   0xE7E6             B.N      ??BSP_DispWrite_42
+    432              } else {
+    433                  for(i = 0;(i < (NbrCnt + Chcnt))&&(i < DISPLAY_LED_NUM);i++) {
+   \                     ??BSP_DispWrite_41: (+1)
+   \   000003D8   0xF05F 0x0A00      MOVS     R10,#+0
+   \   000003DC   0xE011             B.N      ??BSP_DispWrite_44
+    434                      buf[3 - i]  = BSP_DispBuff[NbrCnt + Chcnt -1 -i];
+   \                     ??BSP_DispWrite_45: (+1)
+   \   000003DE   0x4668             MOV      R0,SP
+   \   000003E0   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   000003E2   0xB2FF             UXTB     R7,R7            ;; ZeroExt  R7,R7,#+24,#+24
+   \   000003E4   0x19B9             ADDS     R1,R7,R6
+   \   000003E6   0x1E49             SUBS     R1,R1,#+1
+   \   000003E8   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   000003EC   0xEBB1 0x010A      SUBS     R1,R1,R10
+   \   000003F0   0x5C08             LDRB     R0,[R1, R0]
+   \   000003F2   0xA906             ADD      R1,SP,#+24
+   \   000003F4   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   000003F8   0xEBB1 0x010A      SUBS     R1,R1,R10
+   \   000003FC   0x70C8             STRB     R0,[R1, #+3]
+    435                  }
+   \   000003FE   0xF11A 0x0A01      ADDS     R10,R10,#+1
+   \                     ??BSP_DispWrite_44: (+1)
+   \   00000402   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   00000406   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   00000408   0xB2FF             UXTB     R7,R7            ;; ZeroExt  R7,R7,#+24,#+24
+   \   0000040A   0x19B8             ADDS     R0,R7,R6
+   \   0000040C   0x4582             CMP      R10,R0
+   \   0000040E   0xDA04             BGE.N    ??BSP_DispWrite_43
+   \   00000410   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   00000414   0xF1BA 0x0F08      CMP      R10,#+8
+   \   00000418   0xDBE1             BLT.N    ??BSP_DispWrite_45
+    436              }
+    437              
+    438              /***********************************************
+    439              * 描述： 
+    440              */
+    441              for(i = 0;i < DISPLAY_LED_NUM;i++) {
+   \                     ??BSP_DispWrite_43: (+1)
+   \   0000041A   0xF05F 0x0A00      MOVS     R10,#+0
+   \   0000041E   0x9814             LDR      R0,[SP, #+80]
+   \   00000420   0xE013             B.N      ??BSP_DispWrite_46
+    442                  if(DotPosition & (0x01 << (3 - i))) {
+    443                      LedDispCtrl[Index].Code[i] = LED_SEG_CODE[buf[i]]|0x80;
+    444                  } else {
+    445                      LedDispCtrl[Index].Code[i] = LED_SEG_CODE[buf[i]];
+   \                     ??BSP_DispWrite_47: (+1)
+   \   00000422   0x....             LDR.N    R1,??DataTable8_1
+   \   00000424   0xFA5F 0xFB8B      UXTB     R11,R11          ;; ZeroExt  R11,R11,#+24,#+24
+   \   00000428   0x220B             MOVS     R2,#+11
+   \   0000042A   0xFB02 0x110B      MLA      R1,R2,R11,R1
+   \   0000042E   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   00000432   0xEB1A 0x0101      ADDS     R1,R10,R1
+   \   00000436   0x....             LDR.N    R2,??DataTable8_2
+   \   00000438   0xAB06             ADD      R3,SP,#+24
+   \   0000043A   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   0000043E   0xF81A 0x3003      LDRB     R3,[R10, R3]
+   \   00000442   0x5C9A             LDRB     R2,[R3, R2]
+   \   00000444   0x70CA             STRB     R2,[R1, #+3]
+    446                  }
+   \                     ??BSP_DispWrite_48: (+1)
+   \   00000446   0xF11A 0x0A01      ADDS     R10,R10,#+1
+   \                     ??BSP_DispWrite_46: (+1)
+   \   0000044A   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   0000044E   0xF1BA 0x0F08      CMP      R10,#+8
+   \   00000452   0xDA1C             BGE.N    ??BSP_DispWrite_49
+   \   00000454   0x2101             MOVS     R1,#+1
+   \   00000456   0xF1DA 0x0203      RSBS     R2,R10,#+3
+   \   0000045A   0x4091             LSLS     R1,R1,R2
+   \   0000045C   0x0002             MOVS     R2,R0
+   \   0000045E   0xB2D2             UXTB     R2,R2            ;; ZeroExt  R2,R2,#+24,#+24
+   \   00000460   0x420A             TST      R2,R1
+   \   00000462   0xD0DE             BEQ.N    ??BSP_DispWrite_47
+   \   00000464   0x....             LDR.N    R1,??DataTable8_1
+   \   00000466   0xFA5F 0xFB8B      UXTB     R11,R11          ;; ZeroExt  R11,R11,#+24,#+24
+   \   0000046A   0x220B             MOVS     R2,#+11
+   \   0000046C   0xFB02 0x110B      MLA      R1,R2,R11,R1
+   \   00000470   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   00000474   0xEB1A 0x0101      ADDS     R1,R10,R1
+   \   00000478   0x....             LDR.N    R2,??DataTable8_2
+   \   0000047A   0xAB06             ADD      R3,SP,#+24
+   \   0000047C   0xFA5F 0xFA8A      UXTB     R10,R10          ;; ZeroExt  R10,R10,#+24,#+24
+   \   00000480   0xF81A 0x3003      LDRB     R3,[R10, R3]
+   \   00000484   0x5C9A             LDRB     R2,[R3, R2]
+   \   00000486   0xF052 0x0280      ORRS     R2,R2,#0x80
+   \   0000048A   0x70CA             STRB     R2,[R1, #+3]
+   \   0000048C   0xE7DB             B.N      ??BSP_DispWrite_48
+    447              }
+    448          }
+   \                     ??BSP_DispWrite_49: (+1)
+   \                     ??BSP_DispWrite_0: (+1)
+   \   0000048E   0xB00B             ADD      SP,SP,#+44
+   \   00000490   0xE8BD 0x8FF0      POP      {R4-R11,PC}      ;; return
+    449          
+    450          /*******************************************************************************
+    451          * 名    称： BSP_Disp
+    452          * 功    能： 根据序号，给7219送相应的数据
+    453          * 入口参数： 
+    454          * 出口参数： 
+    455          * 作    者： wumingshen.
+    456          * 创建日期： 2015-12-08
+    457          * 修    改：
+    458          * 修改日期：
+    459          * 备    注：
+    460          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    461          void WIN_DispMsg(const char *msg)
+    462          {
+   \                     WIN_DispMsg: (+1)
+   \   00000000   0xB570             PUSH     {R4-R6,LR}
+   \   00000002   0x0004             MOVS     R4,R0
+   \   00000004   0xE004             B.N      ??WIN_DispMsg_0
+    463          
+    464              static  uint8   k = 0;
+    465              
+    466              //BSP_OS_SemWait(&Bsp_DispSem,0);           	    // 等待信号量
+    467              
+    468              while(k < DISPLAY_FRAME_NUM){
+    469                  if(LedDispCtrl[k].Flag == 0){
+    470                      break;
+    471                  }
+    472                  k++;
+   \                     ??WIN_DispMsg_1: (+1)
+   \   00000006   0x....             LDR.N    R0,??DataTable8_3
+   \   00000008   0x7800             LDRB     R0,[R0, #+0]
+   \   0000000A   0x1C40             ADDS     R0,R0,#+1
+   \   0000000C   0x....             LDR.N    R1,??DataTable8_3
+   \   0000000E   0x7008             STRB     R0,[R1, #+0]
+   \                     ??WIN_DispMsg_0: (+1)
+   \   00000010   0x....             LDR.N    R0,??DataTable8_3
+   \   00000012   0x7800             LDRB     R0,[R0, #+0]
+   \   00000014   0x2804             CMP      R0,#+4
+   \   00000016   0xDA08             BGE.N    ??WIN_DispMsg_2
+   \   00000018   0x....             LDR.N    R0,??DataTable8_1
+   \   0000001A   0x....             LDR.N    R1,??DataTable8_3
+   \   0000001C   0x7809             LDRB     R1,[R1, #+0]
+   \   0000001E   0x220B             MOVS     R2,#+11
+   \   00000020   0xFB02 0x0001      MLA      R0,R2,R1,R0
+   \   00000024   0x7800             LDRB     R0,[R0, #+0]
+   \   00000026   0x2800             CMP      R0,#+0
+   \   00000028   0xD1ED             BNE.N    ??WIN_DispMsg_1
+    473              }
+    474              
+    475              if(k == DISPLAY_FRAME_NUM)                      //没有空数据，直接退出
+   \                     ??WIN_DispMsg_2: (+1)
+   \   0000002A   0x....             LDR.N    R0,??DataTable8_3
+   \   0000002C   0x7800             LDRB     R0,[R0, #+0]
+   \   0000002E   0x2804             CMP      R0,#+4
+   \   00000030   0xD103             BNE.N    ??WIN_DispMsg_3
+    476              {   
+    477                  k = 0;
+   \   00000032   0x2000             MOVS     R0,#+0
+   \   00000034   0x....             LDR.N    R1,??DataTable8_3
+   \   00000036   0x7008             STRB     R0,[R1, #+0]
+    478                  return; 
+   \   00000038   0xE06E             B.N      ??WIN_DispMsg_4
+    479              }
+    480              
+    481              char i,j;
+    482              LedDispCtrl[k].Flag         = 1;
+   \                     ??WIN_DispMsg_3: (+1)
+   \   0000003A   0x2001             MOVS     R0,#+1
+   \   0000003C   0x....             LDR.N    R1,??DataTable8_1
+   \   0000003E   0x....             LDR.N    R2,??DataTable8_3
+   \   00000040   0x7812             LDRB     R2,[R2, #+0]
+   \   00000042   0x230B             MOVS     R3,#+11
+   \   00000044   0xFB03 0x1102      MLA      R1,R3,R2,R1
+   \   00000048   0x7008             STRB     R0,[R1, #+0]
+    483              LedDispCtrl[k].Cycle        = 1;
+   \   0000004A   0x2001             MOVS     R0,#+1
+   \   0000004C   0x....             LDR.N    R1,??DataTable8_1
+   \   0000004E   0x....             LDR.N    R2,??DataTable8_3
+   \   00000050   0x7812             LDRB     R2,[R2, #+0]
+   \   00000052   0x230B             MOVS     R3,#+11
+   \   00000054   0xFB03 0x1102      MLA      R1,R3,R2,R1
+   \   00000058   0x7048             STRB     R0,[R1, #+1]
+    484              LedDispCtrl[k].Duty         = 20;
+   \   0000005A   0x2014             MOVS     R0,#+20
+   \   0000005C   0x....             LDR.N    R1,??DataTable8_1
+   \   0000005E   0x....             LDR.N    R2,??DataTable8_3
+   \   00000060   0x7812             LDRB     R2,[R2, #+0]
+   \   00000062   0x230B             MOVS     R3,#+11
+   \   00000064   0xFB03 0x1102      MLA      R1,R3,R2,R1
+   \   00000068   0x7088             STRB     R0,[R1, #+2]
+    485              
+    486              /***********************************************
+    487              * 描述：补齐8位数据,如果字节8，在前面补空格 
+    488              * redmorningcn 
+    489              * 2017-05-24
+    490              */
+    491              
+    492              //对小数点处理。2017-05-24
+    493              uint8   datalen = strlen(msg);
+   \   0000006A   0x0020             MOVS     R0,R4
+   \   0000006C   0x.... 0x....      BL       strlen
+   \   00000070   0x0005             MOVS     R5,R0
+    494              for(i = 0;i < strlen(msg);i++) {
+   \   00000072   0x2600             MOVS     R6,#+0
+   \   00000074   0xE00B             B.N      ??WIN_DispMsg_5
+    495                  if(msg[i+1] == '.' && msg[i] != '.'){
+   \                     ??WIN_DispMsg_6: (+1)
+   \   00000076   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   00000078   0x1930             ADDS     R0,R6,R4
+   \   0000007A   0x7840             LDRB     R0,[R0, #+1]
+   \   0000007C   0x282E             CMP      R0,#+46
+   \   0000007E   0xD105             BNE.N    ??WIN_DispMsg_7
+   \   00000080   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   00000082   0x5D30             LDRB     R0,[R6, R4]
+   \   00000084   0x282E             CMP      R0,#+46
+   \   00000086   0xD001             BEQ.N    ??WIN_DispMsg_7
+    496                      datalen--;
+   \   00000088   0x1E6D             SUBS     R5,R5,#+1
+    497                      i++;
+   \   0000008A   0x1C76             ADDS     R6,R6,#+1
+    498                  }
+    499              }
+   \                     ??WIN_DispMsg_7: (+1)
+   \   0000008C   0x1C76             ADDS     R6,R6,#+1
+   \                     ??WIN_DispMsg_5: (+1)
+   \   0000008E   0x0020             MOVS     R0,R4
+   \   00000090   0x.... 0x....      BL       strlen
+   \   00000094   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   00000096   0x4286             CMP      R6,R0
+   \   00000098   0xD3ED             BCC.N    ??WIN_DispMsg_6
+    500              
+    501              for(i = 0,j = 0;j < DISPLAY_LED_NUM;j++) {
+   \   0000009A   0x2600             MOVS     R6,#+0
+   \   0000009C   0x2000             MOVS     R0,#+0
+   \   0000009E   0xE00E             B.N      ??WIN_DispMsg_8
+    502                  if(datalen < DISPLAY_LED_NUM)
+    503                  {
+    504                      LedDispCtrl[k].Code[j] = LED_SEG_CODE[0];
+    505                      datalen++;
+    506                  } else{
+    507                      if(msg[i+1] == '.' && msg[i] != '.') {
+    508                          LedDispCtrl[k].Code[j] = LED_SEG_CODE[msg[i]] | 0x80;
+    509                          i++;
+    510                      } else {
+    511                          LedDispCtrl[k].Code[j] = LED_SEG_CODE[msg[i]];
+   \                     ??WIN_DispMsg_9: (+1)
+   \   000000A0   0x....             LDR.N    R1,??DataTable8_1
+   \   000000A2   0x....             LDR.N    R2,??DataTable8_3
+   \   000000A4   0x7812             LDRB     R2,[R2, #+0]
+   \   000000A6   0x230B             MOVS     R3,#+11
+   \   000000A8   0xFB03 0x1102      MLA      R1,R3,R2,R1
+   \   000000AC   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000000AE   0x1841             ADDS     R1,R0,R1
+   \   000000B0   0x....             LDR.N    R2,??DataTable8_2
+   \   000000B2   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   000000B4   0x5D33             LDRB     R3,[R6, R4]
+   \   000000B6   0x5C9A             LDRB     R2,[R3, R2]
+   \   000000B8   0x70CA             STRB     R2,[R1, #+3]
+    512                      }
+    513                      i++;
+   \                     ??WIN_DispMsg_10: (+1)
+   \   000000BA   0x1C76             ADDS     R6,R6,#+1
+   \                     ??WIN_DispMsg_11: (+1)
+   \   000000BC   0x1C40             ADDS     R0,R0,#+1
+   \                     ??WIN_DispMsg_8: (+1)
+   \   000000BE   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000000C0   0x2808             CMP      R0,#+8
+   \   000000C2   0xDA29             BGE.N    ??WIN_DispMsg_12
+   \   000000C4   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   000000C6   0x2D08             CMP      R5,#+8
+   \   000000C8   0xDA0C             BGE.N    ??WIN_DispMsg_13
+   \   000000CA   0x....             LDR.N    R1,??DataTable8_1
+   \   000000CC   0x....             LDR.N    R2,??DataTable8_3
+   \   000000CE   0x7812             LDRB     R2,[R2, #+0]
+   \   000000D0   0x230B             MOVS     R3,#+11
+   \   000000D2   0xFB03 0x1102      MLA      R1,R3,R2,R1
+   \   000000D6   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000000D8   0x1841             ADDS     R1,R0,R1
+   \   000000DA   0x....             LDR.N    R2,??DataTable8_2
+   \   000000DC   0x7812             LDRB     R2,[R2, #+0]
+   \   000000DE   0x70CA             STRB     R2,[R1, #+3]
+   \   000000E0   0x1C6D             ADDS     R5,R5,#+1
+   \   000000E2   0xE7EB             B.N      ??WIN_DispMsg_11
+   \                     ??WIN_DispMsg_13: (+1)
+   \   000000E4   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   000000E6   0x1931             ADDS     R1,R6,R4
+   \   000000E8   0x7849             LDRB     R1,[R1, #+1]
+   \   000000EA   0x292E             CMP      R1,#+46
+   \   000000EC   0xD1D8             BNE.N    ??WIN_DispMsg_9
+   \   000000EE   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   000000F0   0x5D31             LDRB     R1,[R6, R4]
+   \   000000F2   0x292E             CMP      R1,#+46
+   \   000000F4   0xD0D4             BEQ.N    ??WIN_DispMsg_9
+   \   000000F6   0x....             LDR.N    R1,??DataTable8_1
+   \   000000F8   0x....             LDR.N    R2,??DataTable8_3
+   \   000000FA   0x7812             LDRB     R2,[R2, #+0]
+   \   000000FC   0x230B             MOVS     R3,#+11
+   \   000000FE   0xFB03 0x1102      MLA      R1,R3,R2,R1
+   \   00000102   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000104   0x1841             ADDS     R1,R0,R1
+   \   00000106   0x....             LDR.N    R2,??DataTable8_2
+   \   00000108   0xB2F6             UXTB     R6,R6            ;; ZeroExt  R6,R6,#+24,#+24
+   \   0000010A   0x5D33             LDRB     R3,[R6, R4]
+   \   0000010C   0x5C9A             LDRB     R2,[R3, R2]
+   \   0000010E   0xF052 0x0280      ORRS     R2,R2,#0x80
+   \   00000112   0x70CA             STRB     R2,[R1, #+3]
+   \   00000114   0x1C76             ADDS     R6,R6,#+1
+   \   00000116   0xE7D0             B.N      ??WIN_DispMsg_10
+    514                  }
+    515              }
+    516              
+    517              //BSP_OS_SemPost(&Bsp_DispSem);                   // 发送信号量
+    518              
+    519          //    /***********************************************
+    520          //    * 描述： 
+    521          //    */
+    522          //    for(i = 0,j = 0;j < DISPLAY_LED_NUM;j++,i++) {
+    523          //        if(msg[i] == '.') {
+    524          //            i++;
+    525          //            LedDispCtrl[k].Code[j] = LED_SEG_CODE[msg[i]] | 0x80;
+    526          //        } else {
+    527          //            LedDispCtrl[k].Code[j] = LED_SEG_CODE[msg[i]];
+    528          //        }
+    529          //    }    
+    530              
+    531              //BSP_DispSetBrightness(Ctrl.Para.dat.DispLevel);
+    532              //BSP_DispEvtProcess();    
+    533          }
+   \                     ??WIN_DispMsg_12: (+1)
+   \                     ??WIN_DispMsg_4: (+1)
+   \   00000118   0xBD70             POP      {R4-R6,PC}       ;; return
+
+   \                                 In section .bss, align 1
+   \                     ??k:
+   \   00000000                      DS8 1
+    534          
+    535          /*******************************************************************************
+    536          * 名    称： BSP_Disp
+    537          * 功    能： 根据序号，给7219送相应的数据
+    538          * 入口参数： 
+    539          * 出口参数： 
+    540          * 作    者： wumingshen.
+    541          * 创建日期： 2015-12-08
+    542          * 修    改：
+    543          * 修改日期：
+    544          * 备    注：
+    545          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    546          void BSP_Disp(u8 Index)
+    547          {
+   \                     BSP_Disp: (+1)
+   \   00000000   0xB538             PUSH     {R3-R5,LR}
+   \   00000002   0x0004             MOVS     R4,R0
+    548              u8 i;
+    549              if(Index > sizeof(LedDispCtrl)/sizeof(StrLedDisp)-1) {
+   \   00000004   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   00000006   0x2C04             CMP      R4,#+4
+   \   00000008   0xD212             BCS.N    ??BSP_Disp_0
+    550                  return;
+    551              }
+    552              //BSP_DispInit();
+    553              for(i = 0; i<DISPLAY_LED_NUM ; i++) {
+   \                     ??BSP_Disp_1: (+1)
+   \   0000000A   0x2500             MOVS     R5,#+0
+   \   0000000C   0xE00D             B.N      ??BSP_Disp_2
+    554                  LED_SPI_SendData(LedDispBuf[i],LedDispCtrl[Index].Code[i]);
+   \                     ??BSP_Disp_3: (+1)
+   \   0000000E   0x....             LDR.N    R0,??DataTable8_1
+   \   00000010   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   00000012   0x210B             MOVS     R1,#+11
+   \   00000014   0xFB01 0x0004      MLA      R0,R1,R4,R0
+   \   00000018   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   0000001A   0x1828             ADDS     R0,R5,R0
+   \   0000001C   0x78C1             LDRB     R1,[R0, #+3]
+   \   0000001E   0x....             LDR.N    R0,??DataTable8_4
+   \   00000020   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   00000022   0x5C28             LDRB     R0,[R5, R0]
+   \   00000024   0x.... 0x....      BL       LED_SPI_SendData
+    555              }
+   \   00000028   0x1C6D             ADDS     R5,R5,#+1
+   \                     ??BSP_Disp_2: (+1)
+   \   0000002A   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   0000002C   0x2D08             CMP      R5,#+8
+   \   0000002E   0xDBEE             BLT.N    ??BSP_Disp_3
+    556          }
+   \                     ??BSP_Disp_0: (+1)
+   \   00000030   0xBD31             POP      {R0,R4,R5,PC}    ;; return
+    557          
+    558          /*******************************************************************************
+    559          * 名    称： BSP_DispOff
+    560          * 功    能： 通过给数码管送消隐段码来清除显示
+    561          * 入口参数： 
+    562          * 出口参数： 
+    563          * 作    者： wumingshen.
+    564          * 创建日期： 2015-12-08
+    565          * 修    改：
+    566          * 修改日期：
+    567          * 备    注：
+    568          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    569          void BSP_DispOff(void)
+    570          {
+   \                     BSP_DispOff: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+    571              u8 i;
+    572              BSP_DispInit();
+   \   00000002   0x.... 0x....      BL       BSP_DispInit
+    573              for(i = 0; i<DISPLAY_LED_NUM ; i++) {
+   \   00000006   0x2400             MOVS     R4,#+0
+   \   00000008   0xE006             B.N      ??BSP_DispOff_0
+    574                  LED_SPI_SendData(LedDispBuf[i],0);
+   \                     ??BSP_DispOff_1: (+1)
+   \   0000000A   0x2100             MOVS     R1,#+0
+   \   0000000C   0x....             LDR.N    R0,??DataTable8_4
+   \   0000000E   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   00000010   0x5C20             LDRB     R0,[R4, R0]
+   \   00000012   0x.... 0x....      BL       LED_SPI_SendData
+    575              }
+   \   00000016   0x1C64             ADDS     R4,R4,#+1
+   \                     ??BSP_DispOff_0: (+1)
+   \   00000018   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   0000001A   0x2C08             CMP      R4,#+8
+   \   0000001C   0xDBF5             BLT.N    ??BSP_DispOff_1
+    576          }
+   \   0000001E   0xBD10             POP      {R4,PC}          ;; return
+    577          
+    578          
+    579          /*******************************************************************************
+    580          * 名    称： BSP_DispEvtProcess
+    581          * 功    能： 用数码管将整型数据显示出来
+    582          * 入口参数： 
+    583          * 出口参数： 有数据显示，返回1，无数据显示，返回0
+    584          * 作    者： redmorningcn.
+    585          * 创建日期： 2015-12-08
+    586          * 修    改：
+    587          * 修改日期：
+    588          * 备    注：
+    589          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    590          uint8 BSP_DispEvtProcess(void)
+    591          {        
+   \                     BSP_DispEvtProcess: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+    592              for( u8 i = 0; i < DISPLAY_FRAME_NUM; i++ ) {                         //FIFO显示
+   \   00000002   0x2000             MOVS     R0,#+0
+   \   00000004   0xE005             B.N      ??BSP_DispEvtProcess_0
+    593                  //标示，可以赋值，有数据显示
+    594                  if(LedDispCtrl[ dis_num_pos % DISPLAY_FRAME_NUM ].Flag != 0 ) {
+    595                      LedDispCtrl[dis_num_pos % DISPLAY_FRAME_NUM ].Flag = 0;    //可以重新赋值
+    596                      BSP_Disp(   dis_num_pos % DISPLAY_FRAME_NUM );
+    597                                  
+    598                      return 1;
+    599                  }
+    600                  
+    601                  dis_num_pos++;
+   \                     ??BSP_DispEvtProcess_1: (+1)
+   \   00000006   0x....             LDR.N    R1,??DataTable8_5
+   \   00000008   0x7809             LDRB     R1,[R1, #+0]
+   \   0000000A   0x1C49             ADDS     R1,R1,#+1
+   \   0000000C   0x....             LDR.N    R2,??DataTable8_5
+   \   0000000E   0x7011             STRB     R1,[R2, #+0]
+   \   00000010   0x1C40             ADDS     R0,R0,#+1
+   \                     ??BSP_DispEvtProcess_0: (+1)
+   \   00000012   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000014   0x2804             CMP      R0,#+4
+   \   00000016   0xDA27             BGE.N    ??BSP_DispEvtProcess_2
+   \   00000018   0x....             LDR.N    R1,??DataTable8_1
+   \   0000001A   0x....             LDR.N    R2,??DataTable8_5
+   \   0000001C   0x7812             LDRB     R2,[R2, #+0]
+   \   0000001E   0x2304             MOVS     R3,#+4
+   \   00000020   0xFB92 0xF4F3      SDIV     R4,R2,R3
+   \   00000024   0xFB04 0x2413      MLS      R4,R4,R3,R2
+   \   00000028   0x220B             MOVS     R2,#+11
+   \   0000002A   0xFB02 0x1104      MLA      R1,R2,R4,R1
+   \   0000002E   0x7809             LDRB     R1,[R1, #+0]
+   \   00000030   0x2900             CMP      R1,#+0
+   \   00000032   0xD0E8             BEQ.N    ??BSP_DispEvtProcess_1
+   \   00000034   0x2000             MOVS     R0,#+0
+   \   00000036   0x....             LDR.N    R1,??DataTable8_1
+   \   00000038   0x....             LDR.N    R2,??DataTable8_5
+   \   0000003A   0x7812             LDRB     R2,[R2, #+0]
+   \   0000003C   0x2304             MOVS     R3,#+4
+   \   0000003E   0xFB92 0xF4F3      SDIV     R4,R2,R3
+   \   00000042   0xFB04 0x2413      MLS      R4,R4,R3,R2
+   \   00000046   0x220B             MOVS     R2,#+11
+   \   00000048   0xFB02 0x1104      MLA      R1,R2,R4,R1
+   \   0000004C   0x7008             STRB     R0,[R1, #+0]
+   \   0000004E   0x....             LDR.N    R0,??DataTable8_5
+   \   00000050   0x7800             LDRB     R0,[R0, #+0]
+   \   00000052   0x2104             MOVS     R1,#+4
+   \   00000054   0xFB90 0xF2F1      SDIV     R2,R0,R1
+   \   00000058   0xFB02 0x0211      MLS      R2,R2,R1,R0
+   \   0000005C   0x0010             MOVS     R0,R2
+   \   0000005E   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000060   0x.... 0x....      BL       BSP_Disp
+   \   00000064   0x2001             MOVS     R0,#+1
+   \   00000066   0xE000             B.N      ??BSP_DispEvtProcess_3
+    602              }
+    603              return 0;
+   \                     ??BSP_DispEvtProcess_2: (+1)
+   \   00000068   0x2000             MOVS     R0,#+0
+   \                     ??BSP_DispEvtProcess_3: (+1)
+   \   0000006A   0xBD10             POP      {R4,PC}          ;; return
+    604          }
+    605          
+    606          /*******************************************************************************
+    607          * 名    称： BSP_DispClr
+    608          * 功    能： 清除显示缓冲区,包括显示标志位和显示内容
+    609          * 入口参数： 第几个显示缓冲区
+    610          * 出口参数： 
+    611          * 作    者： wumingshen.
+    612          * 创建日期： 2015-12-08
+    613          * 修    改：
+    614          * 修改日期：
+    615          * 备    注：
+    616          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    617          void BSP_DispClr(u8 order)
+    618          {
+    619              if( order < sizeof(LedDispCtrl) / sizeof(StrLedDisp) ) {
+   \                     BSP_DispClr: (+1)
+   \   00000000   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000002   0x2804             CMP      R0,#+4
+   \   00000004   0xD206             BCS.N    ??BSP_DispClr_0
+    620                  LedDispCtrl[order].Flag = 0;
+   \   00000006   0x2100             MOVS     R1,#+0
+   \   00000008   0x....             LDR.N    R2,??DataTable8_1
+   \   0000000A   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000000C   0x230B             MOVS     R3,#+11
+   \   0000000E   0xFB03 0x2000      MLA      R0,R3,R0,R2
+   \   00000012   0x7001             STRB     R1,[R0, #+0]
+    621              }
+    622          }
+   \                     ??BSP_DispClr_0: (+1)
+   \   00000014   0x4770             BX       LR               ;; return
+    623          
+    624          /*******************************************************************************
+    625          * 名    称： BSP_DispClrAll
+    626          * 功    能： 清除所有显示缓冲区内容
+    627          * 入口参数： 
+    628          * 出口参数： 
+    629          * 作    者： wumingshen.
+    630          * 创建日期： 2015-12-08
+    631          * 修    改：
+    632          * 修改日期：
+    633          * 备    注：
+    634          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    635          void BSP_DispClrAll(void)
+    636          {
+   \                     BSP_DispClrAll: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+    637              u8 i;
+    638              
+    639              BSP_OS_SemWait(&Bsp_DispSem,0);           	    // 等待信号量
+   \   00000002   0x2100             MOVS     R1,#+0
+   \   00000004   0x....             LDR.N    R0,??DataTable8_6
+   \   00000006   0x.... 0x....      BL       BSP_OS_SemWait
+    640              
+    641              //显示位置清零
+    642              dis_num_pos = 0;
+   \   0000000A   0x2000             MOVS     R0,#+0
+   \   0000000C   0x....             LDR.N    R1,??DataTable8_5
+   \   0000000E   0x7008             STRB     R0,[R1, #+0]
+    643              
+    644              for(i=0;i<sizeof(LedDispCtrl)/sizeof(StrLedDisp);i++) {
+   \   00000010   0x2000             MOVS     R0,#+0
+   \   00000012   0xE007             B.N      ??BSP_DispClrAll_0
+    645                  LedDispCtrl[i].Flag = 0;
+   \                     ??BSP_DispClrAll_1: (+1)
+   \   00000014   0x2100             MOVS     R1,#+0
+   \   00000016   0x....             LDR.N    R2,??DataTable8_1
+   \   00000018   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000001A   0x230B             MOVS     R3,#+11
+   \   0000001C   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   00000020   0x7011             STRB     R1,[R2, #+0]
+    646              }
+   \   00000022   0x1C40             ADDS     R0,R0,#+1
+   \                     ??BSP_DispClrAll_0: (+1)
+   \   00000024   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000026   0x2804             CMP      R0,#+4
+   \   00000028   0xD3F4             BCC.N    ??BSP_DispClrAll_1
+    647              BSP_OS_SemPost(&Bsp_DispSem);                   // 发送信号量
+   \   0000002A   0x....             LDR.N    R0,??DataTable8_6
+   \   0000002C   0x.... 0x....      BL       BSP_OS_SemPost
+    648          }
+   \   00000030   0xBD01             POP      {R0,PC}          ;; return
+    649          
+    650          /*******************************************************************************
+    651          * 名    称： BSP_DispSetBrightness
+    652          * 功    能： 7219设置亮度
+    653          * 入口参数： 
+    654          * 出口参数： 
+    655          * 作    者： wumingshen.
+    656          * 创建日期： 2015-12-12
+    657          * 修    改：
+    658          * 修改日期：
+    659          * 备    注：
+    660          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    661          void BSP_DispSetBrightness ( u8 bl )
+    662          {    
+   \                     BSP_DispSetBrightness: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+    663              static u8   last;
+    664              
+    665              if ( bl > 15 )
+   \   00000002   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000004   0x2810             CMP      R0,#+16
+   \   00000006   0xDB01             BLT.N    ??BSP_DispSetBrightness_0
+    666                  bl  = 15;
+   \   00000008   0x200F             MOVS     R0,#+15
+   \   0000000A   0xE003             B.N      ??BSP_DispSetBrightness_1
+    667              else if ( bl < 1 )
+   \                     ??BSP_DispSetBrightness_0: (+1)
+   \   0000000C   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000000E   0x2800             CMP      R0,#+0
+   \   00000010   0xD100             BNE.N    ??BSP_DispSetBrightness_1
+    668                  bl = 1;
+   \   00000012   0x2001             MOVS     R0,#+1
+    669              if ( last != bl ) {
+   \                     ??BSP_DispSetBrightness_1: (+1)
+   \   00000014   0x....             LDR.N    R1,??DataTable8_7
+   \   00000016   0x7809             LDRB     R1,[R1, #+0]
+   \   00000018   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000001A   0x4281             CMP      R1,R0
+   \   0000001C   0xD006             BEQ.N    ??BSP_DispSetBrightness_2
+    670                  last    = bl;
+   \   0000001E   0x....             LDR.N    R1,??DataTable8_7
+   \   00000020   0x7008             STRB     R0,[R1, #+0]
+    671                  LED_SPI_SendData( MAX7279_BRIGHTNESS,bl );      // 设置亮度
+   \   00000022   0x0001             MOVS     R1,R0
+   \   00000024   0xB2C9             UXTB     R1,R1            ;; ZeroExt  R1,R1,#+24,#+24
+   \   00000026   0x200A             MOVS     R0,#+10
+   \   00000028   0x.... 0x....      BL       LED_SPI_SendData
+    672              }
+    673          }
+   \                     ??BSP_DispSetBrightness_2: (+1)
+   \   0000002C   0xBD01             POP      {R0,PC}          ;; return
+
+   \                                 In section .bss, align 1
+   \                     ??last:
+   \   00000000                      DS8 1
+    674          
+    675          /*******************************************************************************
+    676          * 名    称： BSP_DispInit
+    677          * 功    能： 7219初始化
+    678          * 入口参数： 
+    679          * 出口参数： 
+    680          * 作    者： wumingshen.
+    681          * 创建日期： 2015-12-08
+    682          * 修    改：
+    683          * 修改日期：
+    684          * 备    注：
+    685          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    686          void BSP_DispInit (void)
+    687          {
+   \                     BSP_DispInit: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+    688              BSP_MAX7219Init();                                                  // 初始化硬件
+   \   00000002   0x.... 0x....      BL       BSP_MAX7219Init
+    689              
+    690              BSP_OS_SemCreate(&Bsp_DispSem,1, "Bsp_DispSem");                    // 创建信号量
+   \   00000006   0x....             LDR.N    R2,??DataTable8_8
+   \   00000008   0x2101             MOVS     R1,#+1
+   \   0000000A   0x....             LDR.N    R0,??DataTable8_6
+   \   0000000C   0x.... 0x....      BL       BSP_OS_SemCreate
+    691              
+    692              LED_SPI_SendData( MAX7279_DISP_TEST,0x00 );                         // 设置工作模式
+   \   00000010   0x2100             MOVS     R1,#+0
+   \   00000012   0x200F             MOVS     R0,#+15
+   \   00000014   0x.... 0x....      BL       LED_SPI_SendData
+    693              LED_SPI_SendData( MAX7279_SCAN,MAX7279_8_DIGIT_SCAN );              // 设置扫描界限
+   \   00000018   0x2107             MOVS     R1,#+7
+   \   0000001A   0x200B             MOVS     R0,#+11
+   \   0000001C   0x.... 0x....      BL       LED_SPI_SendData
+    694              LED_SPI_SendData( MAX7279_DECODE_MODE,MAX7279_DECODE_SET );         // 设置译码模式
+   \   00000020   0x2100             MOVS     R1,#+0
+   \   00000022   0x2009             MOVS     R0,#+9
+   \   00000024   0x.... 0x....      BL       LED_SPI_SendData
+    695              LED_SPI_SendData( MAX7279_BRIGHTNESS,MAX7279_BRIGHTNESS_LEVEL );    // 设置亮度
+   \   00000028   0x210A             MOVS     R1,#+10
+   \   0000002A   0x200A             MOVS     R0,#+10
+   \   0000002C   0x.... 0x....      BL       LED_SPI_SendData
+    696              LED_SPI_SendData( MAX7279_LOW_PWR,MAX7279_NORMAL_MODE );            // 设置为正常工作模式
+   \   00000030   0x2101             MOVS     R1,#+1
+   \   00000032   0x200C             MOVS     R0,#+12
+   \   00000034   0x.... 0x....      BL       LED_SPI_SendData
+    697              
+    698              BSP_DispClrAll();                                                   // 清屏
+   \   00000038   0x.... 0x....      BL       BSP_DispClrAll
+    699          }
+   \   0000003C   0xBD01             POP      {R0,PC}          ;; return
+    700          
+    701          /*******************************************************************************
+    702          * 名    称： uprintf
+    703          * 功    能： 
+    704          * 入口参数： 无
+    705          * 出口参数： 无
+    706          * 作    者： 无名沈
+    707          * 创建日期： 2017/11/17
+    708          * 修    改： 
+    709          * 修改日期： 
+    710          * 备    注： 
+    711          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    712          void uprintf(const char *fmt, ...)
+    713          {
+   \                     uprintf: (+1)
+   \   00000000   0xB40E             PUSH     {R1-R3}
+   \   00000002   0xB500             PUSH     {LR}
+   \   00000004   0xB09A             SUB      SP,SP,#+104
+    714              char printfbuf[100];    
+    715              printfbuf[99] = 0;
+   \   00000006   0x2100             MOVS     R1,#+0
+   \   00000008   0xF88D 0x1063      STRB     R1,[SP, #+99]
+    716              va_list args;
+    717              va_start(args, fmt);
+   \   0000000C   0xAB1B             ADD      R3,SP,#+108
+    718              //vsprintf(printfbuf, fmt, args);
+    719              vsnprintf(printfbuf,(sizeof(printfbuf)-1),fmt,args);
+   \   0000000E   0x0002             MOVS     R2,R0
+   \   00000010   0x2163             MOVS     R1,#+99
+   \   00000012   0x4668             MOV      R0,SP
+   \   00000014   0x.... 0x....      BL       vsnprintf
+    720              va_end(args);
+    721              printfbuf[99] = 0;
+   \   00000018   0x2000             MOVS     R0,#+0
+   \   0000001A   0xF88D 0x0063      STRB     R0,[SP, #+99]
+    722              WIN_DispMsg((const char *)printfbuf);
+   \   0000001E   0x4668             MOV      R0,SP
+   \   00000020   0x.... 0x....      BL       WIN_DispMsg
+    723              BSP_DispEvtProcess(); 
+   \   00000024   0x.... 0x....      BL       BSP_DispEvtProcess
+    724          }
+   \   00000028   0xB01A             ADD      SP,SP,#+104
+   \   0000002A   0xF85D 0xFB10      LDR      PC,[SP], #+16    ;; return
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable8:
+   \   00000000   0x........         DC32     ?_3
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable8_1:
+   \   00000000   0x........         DC32     LedDispCtrl
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable8_2:
+   \   00000000   0x........         DC32     LED_SEG_CODE
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable8_3:
+   \   00000000   0x........         DC32     ??k
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable8_4:
+   \   00000000   0x........         DC32     LedDispBuf
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable8_5:
+   \   00000000   0x........         DC32     dis_num_pos
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable8_6:
+   \   00000000   0x........         DC32     Bsp_DispSem
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable8_7:
+   \   00000000   0x........         DC32     ??last
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable8_8:
+   \   00000000   0x........         DC32     ?_4
+
+   \                                 In section .rodata, align 4
+   \   00000000   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+
+   \                                 In section .rodata, align 4
+   \   00000000   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+
+   \                                 In section .rodata, align 4
+   \   00000000   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+
+   \                                 In section .rodata, align 4
+   \                     ?_3:
+   \   00000000   0x80 0x80          DC8 128, 128, 128, 128, 128, 128, 128, 128
+   \              0x80 0x80    
+   \              0x80 0x80    
+   \              0x80 0x80    
+
+   \                                 In section .rodata, align 4
+   \                     ?_4:
+   \   00000000   0x42 0x73          DC8 "Bsp_DispSem"
+   \              0x70 0x5F    
+   \              0x44 0x69    
+   \              0x73 0x70    
+   \              0x53 0x65    
+   \              0x6D 0x00    
+    725          /*******************************************************************************
+    726          * 				                end of file                                    *
+    727          *******************************************************************************/
+    728          #endif
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+      16   BSP_Disp
+        16   -> LED_SPI_SendData
+       0   BSP_DispClr
+       8   BSP_DispClrAll
+         8   -> BSP_OS_SemPost
+         8   -> BSP_OS_SemWait
+       8   BSP_DispEvtProcess
+         8   -> BSP_Disp
+       8   BSP_DispInit
+         8   -> BSP_DispClrAll
+         8   -> BSP_MAX7219Init
+         8   -> BSP_OS_SemCreate
+         8   -> LED_SPI_SendData
+       8   BSP_DispOff
+         8   -> BSP_DispInit
+         8   -> LED_SPI_SendData
+       8   BSP_DispSetBrightness
+         8   -> LED_SPI_SendData
+      80   BSP_DispWrite
+        80   -> abs
+        80   -> strlen
+       8   BSP_MAX7219Init
+         8   -> Delay_Nus
+         8   -> GPIO_Set
+         8   -> SPI_GpioInit
+      16   LED_SPI_SendData
+        16   -> GPIO_Set
+        16   -> SPI_SendByte
+       0   SPI_GpioInit
+      16   SPI_SendByte
+        16   -> Delay_Nus
+        16   -> GPIO_Set
+      16   WIN_DispMsg
+        16   -> strlen
+     120   uprintf
+       120   -> BSP_DispEvtProcess
+       120   -> WIN_DispMsg
+       120   -> vsnprintf
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable8
+       4  ??DataTable8_1
+       4  ??DataTable8_2
+       4  ??DataTable8_3
+       4  ??DataTable8_4
+       4  ??DataTable8_5
+       4  ??DataTable8_6
+       4  ??DataTable8_7
+       4  ??DataTable8_8
+       8  ?_0
+       8  ?_1
+       8  ?_2
+       8  ?_3
+      12  ?_4
+      50  BSP_Disp
+      22  BSP_DispClr
+      50  BSP_DispClrAll
+     108  BSP_DispEvtProcess
+      62  BSP_DispInit
+      32  BSP_DispOff
+      46  BSP_DispSetBrightness
+    1172  BSP_DispWrite
+      30  BSP_MAX7219Init
+      40  Bsp_DispSem
+     132  LED_SEG_CODE
+      40  LED_SPI_SendData
+       8  LedDispBuf
+      44  LedDispCtrl
+       2  SPI_GpioInit
+      76  SPI_SendByte
+     282  WIN_DispMsg
+       1  dis_num_pos
+       1  k
+       1  last
+      46  uprintf
+
+ 
+    87 bytes in section .bss
+     8 bytes in section .data
+   176 bytes in section .rodata
+ 2 054 bytes in section .text
+ 
+ 2 054 bytes of CODE  memory
+   176 bytes of CONST memory
+    95 bytes of DATA  memory
+
+Errors: none
+Warnings: none

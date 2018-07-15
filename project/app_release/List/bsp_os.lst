@@ -1,0 +1,468 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.50.1.10123/W32 for ARM       15/Jul/2018  10:36:18
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        F:\iar\NC210\NC210-200处理板\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\OS\uCOS-III\bsp_os.c
+#    Command line =  
+#        F:\iar\NC210\NC210-200处理板\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\OS\uCOS-III\bsp_os.c
+#        -D USE_STDPERIPH_DRIVER -D APP_RELEASE -lCN
+#        F:\iar\NC210\NC210-200处理板\project\app_release\List -o
+#        F:\iar\NC210\NC210-200处理板\project\app_release\Obj --no_cse
+#        --no_unroll --no_inline --no_code_motion --no_tbaa --no_clustering
+#        --no_scheduling --debug --endian=little --cpu=Cortex-M3 -e --fpu=None
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.3\arm\INC\c\DLib_Config_Full.h" -I
+#        F:\iar\NC210\NC210-200处理板\project\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\config\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\task\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\user\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\OSAL\OS\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\OSAL\Ports\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\driver\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-LIB\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-CPU\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-CPU\ARM-Cortex-M3\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uCOS-III\Ports\ARM-Cortex-M3\Generic\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uCOS-III\Source\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\ST\STM32\inc\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\OS\uCOS-III\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Cfg\Template\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\OS\uCOS-III\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Ports\STM32\STM32F103\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Source\
+#        -Ol --use_c++_inline -I "C:\Program Files (x86)\IAR Systems\Embedded
+#        Workbench 7.3\arm\CMSIS\Include\"
+#    List file    =  
+#        F:\iar\NC210\NC210-200处理板\project\app_release\List\bsp_os.lst
+#    Object file  =  
+#        F:\iar\NC210\NC210-200处理板\project\app_release\Obj\bsp_os.o
+#
+###############################################################################
+
+F:\iar\NC210\NC210-200处理板\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\OS\uCOS-III\bsp_os.c
+      1          /*
+      2          *********************************************************************************************************
+      3          *                                     MICRIUM BOARD SUPPORT SUPPORT
+      4          *
+      5          *                          (c) Copyright 2003-2009; Micrium, Inc.; Weston, FL
+      6          *
+      7          *               All rights reserved.  Protected by international copyright laws.
+      8          *               Knowledge of the source code may NOT be used to develop a similar product.
+      9          *               Please help us continue to provide the Embedded community with the finest
+     10          *               software available.  Your honesty is greatly appreciated.
+     11          *********************************************************************************************************
+     12          */
+     13          
+     14          /*
+     15          *********************************************************************************************************
+     16          *
+     17          *                                    MICRIUM BOARD SUPPORT PACKAGE
+     18          *                                             OS LAYER
+     19          *
+     20          * Filename      : bsp_os.c
+     21          * Version       : V1.00
+     22          * Programmer(s) : FT
+     23          *                 EHS
+     24          *********************************************************************************************************
+     25          */
+     26          
+     27          
+     28          /*
+     29          *********************************************************************************************************
+     30          *                                             INCLUDE FILES
+     31          *********************************************************************************************************
+     32          */
+     33          
+     34          #define  BSP_OS_MODULE
+     35          #include <bsp.h>
+     36          
+     37          #if (APP_CFG_PROBE_COM_EN == DEF_ENABLED)
+     38          #include <app_probe.h>
+     39          #endif
+     40          
+     41          
+     42          /*
+     43          *********************************************************************************************************
+     44          *                                            LOCAL DEFINES
+     45          *********************************************************************************************************
+     46          */
+     47          
+     48          
+     49          /*
+     50          *********************************************************************************************************
+     51          *                                           LOCAL CONSTANTS
+     52          *********************************************************************************************************
+     53          */
+     54          
+     55          
+     56          /*
+     57          *********************************************************************************************************
+     58          *                                          LOCAL DATA TYPES
+     59          *********************************************************************************************************
+     60          */
+     61          
+     62          
+     63          /*
+     64          *********************************************************************************************************
+     65          *                                            LOCAL TABLES
+     66          *********************************************************************************************************
+     67          */
+     68          
+     69          
+     70          /*
+     71          *********************************************************************************************************
+     72          *                                       LOCAL GLOBAL VARIABLES
+     73          *********************************************************************************************************
+     74          */
+     75          
+     76          
+     77          /*
+     78          *********************************************************************************************************
+     79          *                                      LOCAL FUNCTION PROTOTYPES
+     80          *********************************************************************************************************
+     81          */
+     82          
+     83          
+     84          /*
+     85          *********************************************************************************************************
+     86          *                                     LOCAL CONFIGURATION ERRORS
+     87          *********************************************************************************************************
+     88          */
+     89          
+     90          /*
+     91          *********************************************************************************************************
+     92          *********************************************************************************************************
+     93          **                                         GLOBAL FUNCTIONS
+     94          *********************************************************************************************************
+     95          *********************************************************************************************************
+     96          */
+     97          
+     98          
+     99          /*
+    100          *********************************************************************************************************
+    101          *********************************************************************************************************
+    102          **                                     BSP OS LOCKS FUNCTIONS
+    103          *********************************************************************************************************
+    104          *********************************************************************************************************
+    105          */
+    106          
+    107          /*
+    108          *********************************************************************************************************
+    109          *********************************************************************************************************
+    110          **                                     BSP OS LOCKS FUNCTIONS
+    111          *********************************************************************************************************
+    112          *********************************************************************************************************
+    113          */
+    114          
+    115          /*
+    116          *********************************************************************************************************
+    117          *                                      BSP_OS_SemCreate()
+    118          *
+    119          * Description : Creates a sempahore to lock/unlock
+    120          *
+    121          * Argument(s) : p_sem        Pointer to a BSP_OS_SEM structure
+    122          *
+    123          *               sem_val      Initial value of the semaphore.
+    124          *
+    125          *               p_sem_name   Pointer to the semaphore name.
+    126          *
+    127          * Return(s)   : DEF_OK       if the semaphore was created.
+    128          *               DEF_FAIL     if the sempahore could not be created.
+    129          *
+    130          * Caller(s)   : Application.
+    131          *
+    132          * Note(s)     : none.
+    133          *
+    134          *********************************************************************************************************
+    135          */
+    136          
+
+   \                                 In section .text, align 2, keep-with-next
+    137          CPU_BOOLEAN  BSP_OS_SemCreate (BSP_OS_SEM       *p_sem,
+    138                                         BSP_OS_SEM_VAL    sem_val,
+    139                                         CPU_CHAR         *p_sem_name)
+    140          {
+   \                     BSP_OS_SemCreate: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+   \   00000002   0xB082             SUB      SP,SP,#+8
+   \   00000004   0x0014             MOVS     R4,R2
+    141              OS_ERR     err;
+    142          
+    143          
+    144              OSSemCreate((OS_SEM    *)p_sem,
+    145                          (CPU_CHAR  *)p_sem_name,
+    146                          (OS_SEM_CTR )sem_val,
+    147                          (OS_ERR    *)&err);
+   \   00000006   0x466B             MOV      R3,SP
+   \   00000008   0x000A             MOVS     R2,R1
+   \   0000000A   0x0021             MOVS     R1,R4
+   \   0000000C   0x.... 0x....      BL       OSSemCreate
+    148          
+    149              if (err != OS_ERR_NONE) {
+   \   00000010   0xF8BD 0x0000      LDRH     R0,[SP, #+0]
+   \   00000014   0x2800             CMP      R0,#+0
+   \   00000016   0xD001             BEQ.N    ??BSP_OS_SemCreate_0
+    150                  return (DEF_FAIL);
+   \   00000018   0x2000             MOVS     R0,#+0
+   \   0000001A   0xE000             B.N      ??BSP_OS_SemCreate_1
+    151              }
+    152          
+    153              return (DEF_OK);
+   \                     ??BSP_OS_SemCreate_0: (+1)
+   \   0000001C   0x2001             MOVS     R0,#+1
+   \                     ??BSP_OS_SemCreate_1: (+1)
+   \   0000001E   0xBD16             POP      {R1,R2,R4,PC}    ;; return
+    154          }
+    155          
+    156          
+    157          /*
+    158          *********************************************************************************************************
+    159          *                                     BSP_OS_SemWait()
+    160          *
+    161          * Description : Wait on a semaphore to become available
+    162          *
+    163          * Argument(s) : sem          sempahore handler
+    164          *
+    165          *               dly_ms       delay in miliseconds to wait on the semaphore
+    166          *
+    167          * Return(s)   : DEF_OK       if the semaphore was acquire
+    168          *               DEF_FAIL     if the sempahore could not be acquire
+    169          *
+    170          * Caller(s)   : Application.
+    171          *
+    172          * Note(s)     : none.
+    173          *********************************************************************************************************
+    174          */
+    175          
+
+   \                                 In section .text, align 2, keep-with-next
+    176          CPU_BOOLEAN  BSP_OS_SemWait (BSP_OS_SEM  *p_sem,
+    177                                       CPU_INT32U   dly_ms)
+    178          {
+   \                     BSP_OS_SemWait: (+1)
+   \   00000000   0xB500             PUSH     {LR}
+   \   00000002   0xB083             SUB      SP,SP,#+12
+    179              OS_ERR      err;
+    180              CPU_INT32U  dly_ticks;
+    181          
+    182          
+    183              dly_ticks  = ((dly_ms * DEF_TIME_NBR_mS_PER_SEC) / OSCfg_TickRate_Hz);
+   \   00000004   0xF44F 0x727A      MOV      R2,#+1000
+   \   00000008   0x4351             MULS     R1,R2,R1
+   \   0000000A   0x....             LDR.N    R2,??DataTable0
+   \   0000000C   0x6812             LDR      R2,[R2, #+0]
+   \   0000000E   0xFBB1 0xF1F2      UDIV     R1,R1,R2
+    184          
+    185              OSSemPend((OS_SEM *)p_sem,
+    186                        (OS_TICK )dly_ticks,
+    187                        (OS_OPT  )OS_OPT_PEND_BLOCKING,
+    188                        (CPU_TS  )0,
+    189                        (OS_ERR *)&err);
+   \   00000012   0xAA01             ADD      R2,SP,#+4
+   \   00000014   0x9200             STR      R2,[SP, #+0]
+   \   00000016   0x2300             MOVS     R3,#+0
+   \   00000018   0x2200             MOVS     R2,#+0
+   \   0000001A   0x.... 0x....      BL       OSSemPend
+    190          
+    191              if (err != OS_ERR_NONE) {
+   \   0000001E   0xF8BD 0x0004      LDRH     R0,[SP, #+4]
+   \   00000022   0x2800             CMP      R0,#+0
+   \   00000024   0xD001             BEQ.N    ??BSP_OS_SemWait_0
+    192                 return (DEF_FAIL);
+   \   00000026   0x2000             MOVS     R0,#+0
+   \   00000028   0xE000             B.N      ??BSP_OS_SemWait_1
+    193              }
+    194          
+    195              return (DEF_OK);
+   \                     ??BSP_OS_SemWait_0: (+1)
+   \   0000002A   0x2001             MOVS     R0,#+1
+   \                     ??BSP_OS_SemWait_1: (+1)
+   \   0000002C   0xBD0E             POP      {R1-R3,PC}       ;; return
+    196          }
+    197          
+    198          /*
+    199          *********************************************************************************************************
+    200          *                                      BSP_OS_SemPost()
+    201          *
+    202          * Description : Post a semaphore
+    203          *
+    204          * Argument(s) : sem          Semaphore handler
+    205          *
+    206          * Return(s)   : DEF_OK     if the semaphore was posted.
+    207          *               DEF_FAIL      if the sempahore could not be posted.
+    208          *
+    209          * Caller(s)   : Application.
+    210          *
+    211          * Note(s)     : none.
+    212          *********************************************************************************************************
+    213          */
+    214          
+
+   \                                 In section .text, align 2, keep-with-next
+    215          CPU_BOOLEAN  BSP_OS_SemPost (BSP_OS_SEM *p_sem)
+    216          {
+   \                     BSP_OS_SemPost: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+    217              OS_ERR  err;
+    218          
+    219          
+    220              OSSemPost((OS_SEM *)p_sem,
+    221                        (OS_OPT  )OS_OPT_POST_1,
+    222                        (OS_ERR *)&err);
+   \   00000002   0x466A             MOV      R2,SP
+   \   00000004   0x2100             MOVS     R1,#+0
+   \   00000006   0x.... 0x....      BL       OSSemPost
+    223          
+    224              if (err != OS_ERR_NONE) {
+   \   0000000A   0xF8BD 0x0000      LDRH     R0,[SP, #+0]
+   \   0000000E   0x2800             CMP      R0,#+0
+   \   00000010   0xD001             BEQ.N    ??BSP_OS_SemPost_0
+    225                  return (DEF_FAIL);
+   \   00000012   0x2000             MOVS     R0,#+0
+   \   00000014   0xE000             B.N      ??BSP_OS_SemPost_1
+    226              }
+    227          
+    228              return (DEF_OK);
+   \                     ??BSP_OS_SemPost_0: (+1)
+   \   00000016   0x2001             MOVS     R0,#+1
+   \                     ??BSP_OS_SemPost_1: (+1)
+   \   00000018   0xBD02             POP      {R1,PC}          ;; return
+    229          }
+    230          
+    231          
+    232          /*
+    233          *********************************************************************************************************
+    234          *********************************************************************************************************
+    235          **                                     uC/OS-II TIMER FUNCTIONS
+    236          *********************************************************************************************************
+    237          *********************************************************************************************************
+    238          */
+    239          
+    240          /*
+    241          *********************************************************************************************************
+    242          *                                    BSP_TimeDlyMs()
+    243          *
+    244          * Description : This function delay the exceution for specifi amount of miliseconds
+    245          *
+    246          * Argument(s) : dly_ms       Delay in miliseconds
+    247          *
+    248          * Return(s)   : none.
+    249          *
+    250          * Caller(s)   : Application
+    251          *
+    252          * Note(s)     : none.
+    253          *
+    254          *********************************************************************************************************
+    255          */
+    256          
+
+   \                                 In section .text, align 2, keep-with-next
+    257          void   BSP_OS_TimeDlyMs (CPU_INT32U  dly_ms)
+    258          {
+   \                     BSP_OS_TimeDlyMs: (+1)
+   \   00000000   0xB5E0             PUSH     {R5-R7,LR}
+    259              CPU_INT16U  ms;
+    260              CPU_INT16U  sec;
+    261              OS_ERR      err;
+    262          
+    263          
+    264              if (dly_ms > 10000u) {                                       /* Limit delays to 10 seconds.                        */
+   \   00000002   0xF242 0x7111      MOVW     R1,#+10001
+   \   00000006   0x4288             CMP      R0,R1
+   \   00000008   0xD301             BCC.N    ??BSP_OS_TimeDlyMs_0
+    265                  dly_ms = 10000u;
+   \   0000000A   0xF242 0x7010      MOVW     R0,#+10000
+    266              }
+    267          
+    268              if (dly_ms >= 1000u) {
+   \                     ??BSP_OS_TimeDlyMs_0: (+1)
+   \   0000000E   0xF5B0 0x7F7A      CMP      R0,#+1000
+   \   00000012   0xD30A             BCC.N    ??BSP_OS_TimeDlyMs_1
+    269                  ms  = dly_ms % 1000u;
+   \   00000014   0xF44F 0x717A      MOV      R1,#+1000
+   \   00000018   0xFBB0 0xF2F1      UDIV     R2,R0,R1
+   \   0000001C   0xFB01 0x0312      MLS      R3,R1,R2,R0
+    270                  sec = dly_ms / 1000u;
+   \   00000020   0xF44F 0x717A      MOV      R1,#+1000
+   \   00000024   0xFBB0 0xF2F1      UDIV     R2,R0,R1
+   \   00000028   0xE001             B.N      ??BSP_OS_TimeDlyMs_2
+    271              } else {
+    272                  ms  = dly_ms;
+   \                     ??BSP_OS_TimeDlyMs_1: (+1)
+   \   0000002A   0x0003             MOVS     R3,R0
+    273                  sec = 0u;
+   \   0000002C   0x2200             MOVS     R2,#+0
+    274              }
+    275                  
+    276          
+    277              OSTimeDlyHMSM((CPU_INT16U) 0u,
+    278                            (CPU_INT16U) 0u,
+    279                            (CPU_INT16U) sec,
+    280                            (CPU_INT32U) ms,
+    281                            (OS_OPT    ) OS_OPT_TIME_HMSM_STRICT,
+    282                            (OS_ERR   *)&err);
+   \                     ??BSP_OS_TimeDlyMs_2: (+1)
+   \   0000002E   0xA802             ADD      R0,SP,#+8
+   \   00000030   0x9001             STR      R0,[SP, #+4]
+   \   00000032   0x2000             MOVS     R0,#+0
+   \   00000034   0x9000             STR      R0,[SP, #+0]
+   \   00000036   0xB29B             UXTH     R3,R3            ;; ZeroExt  R3,R3,#+16,#+16
+   \   00000038   0xB292             UXTH     R2,R2            ;; ZeroExt  R2,R2,#+16,#+16
+   \   0000003A   0x2100             MOVS     R1,#+0
+   \   0000003C   0x2000             MOVS     R0,#+0
+   \   0000003E   0x.... 0x....      BL       OSTimeDlyHMSM
+    283          }
+   \   00000042   0xBD07             POP      {R0-R2,PC}       ;; return
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable0:
+   \   00000000   0x........         DC32     OSCfg_TickRate_Hz
+    284          
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+      16   BSP_OS_SemCreate
+        16   -> OSSemCreate
+       8   BSP_OS_SemPost
+         8   -> OSSemPost
+      16   BSP_OS_SemWait
+        16   -> OSSemPend
+      16   BSP_OS_TimeDlyMs
+        16   -> OSTimeDlyHMSM
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable0
+      32  BSP_OS_SemCreate
+      26  BSP_OS_SemPost
+      46  BSP_OS_SemWait
+      68  BSP_OS_TimeDlyMs
+
+ 
+ 176 bytes in section .text
+ 
+ 176 bytes of CODE memory
+
+Errors: none
+Warnings: none

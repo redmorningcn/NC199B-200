@@ -1,0 +1,290 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.50.1.10123/W32 for ARM       15/Jul/2018  10:36:21
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  F:\iar\NC210\NC210-200处理板\source\user\hook.c
+#    Command line =  
+#        F:\iar\NC210\NC210-200处理板\source\user\hook.c -D
+#        USE_STDPERIPH_DRIVER -D APP_RELEASE -lCN
+#        F:\iar\NC210\NC210-200处理板\project\app_release\List -o
+#        F:\iar\NC210\NC210-200处理板\project\app_release\Obj --no_cse
+#        --no_unroll --no_inline --no_code_motion --no_tbaa --no_clustering
+#        --no_scheduling --debug --endian=little --cpu=Cortex-M3 -e --fpu=None
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.3\arm\INC\c\DLib_Config_Full.h" -I
+#        F:\iar\NC210\NC210-200处理板\project\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\config\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\task\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\user\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\OSAL\OS\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\OSAL\Ports\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\driver\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-LIB\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-CPU\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-CPU\ARM-Cortex-M3\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uCOS-III\Ports\ARM-Cortex-M3\Generic\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uCOS-III\Source\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\ST\STM32\inc\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\OS\uCOS-III\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Cfg\Template\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\OS\uCOS-III\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Ports\STM32\STM32F103\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Source\
+#        -Ol --use_c++_inline -I "C:\Program Files (x86)\IAR Systems\Embedded
+#        Workbench 7.3\arm\CMSIS\Include\"
+#    List file    =  
+#        F:\iar\NC210\NC210-200处理板\project\app_release\List\hook.lst
+#    Object file  =  
+#        F:\iar\NC210\NC210-200处理板\project\app_release\Obj\hook.o
+#
+###############################################################################
+
+F:\iar\NC210\NC210-200处理板\source\user\hook.c
+      1          /*******************************************************************************
+      2          * Description  : 通用系统或文件中定制的内容移到此处（便于移植）
+      3          如：操作系统中的钩子函数
+      4          * Author       : 2018/5/11 星期五, by redmorningcn
+      5          *******************************************************************************/
+      6          #include <tasks.h>
+      7          
+      8          extern  void    App_ModbusInit (void);
+      9          extern  void    App_OS_SetAllHooks (void);
+     10          
+     11          /*******************************************************************************
+     12          * Description  : BSP初始化钩子函数，在任务执行前运行(不能有和操作系统有关的操作)
+     13          * Author       : 2018/5/11 星期五, by redmorningcn
+     14          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     15          void    BSP_Init_Hook(void)
+     16          {
+   \                     BSP_Init_Hook: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+     17              App_ModbusInit();                   //初始化串口及串口控制信息（启动串口Modbus接收任务）
+   \   00000002   0x.... 0x....      BL       App_ModbusInit
+     18          
+     19              OS_ERR    err;
+     20              
+     21              /***********************************************
+     22              * 描述：创建看门狗标志组
+     23              */
+     24              OSFlagCreate(( OS_FLAG_GRP  *)&Ctrl.Os.WdtEvtFlagGRP,
+     25                           ( CPU_CHAR     *)"Wdt Flag",
+     26                           ( OS_FLAGS      )0,
+     27                           ( OS_ERR       *)&err);
+   \   00000006   0x466B             MOV      R3,SP
+   \   00000008   0x2200             MOVS     R2,#+0
+   \   0000000A   0x....             LDR.N    R1,??DataTable1
+   \   0000000C   0x....             LDR.N    R0,??DataTable1_1
+   \   0000000E   0x.... 0x....      BL       OSFlagCreate
+     28          }
+   \   00000012   0xBD01             POP      {R0,PC}          ;; return
+     29          
+     30          extern  void app_init_sctrl(void);
+     31          /*******************************************************************************
+     32          * Description  : 操作系统任务创建钩子函数
+     33          * Author       : 2018/5/11 星期五, by redmorningcn
+     34          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     35          void OS_TaskCreateHook(void)
+     36          {     
+   \                     OS_TaskCreateHook: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+     37              //设备初始化
+     38              BSP_Ds3231Init();                   //初始化时钟芯片
+   \   00000002   0x.... 0x....      BL       BSP_Ds3231Init
+     39              BSP_DispInit();                     //初始化显示
+   \   00000006   0x.... 0x....      BL       BSP_DispInit
+     40              //InitFlashIO();
+     41              GPIO_Fram_Init();
+   \   0000000A   0x.... 0x....      BL       GPIO_Fram_Init
+     42              BSP_FlashOsInit(); 
+   \   0000000E   0x.... 0x....      BL       BSP_FlashOsInit
+     43              
+     44              app_init_sctrl();                   //初始化全局变量
+   \   00000012   0x.... 0x....      BL       app_init_sctrl
+     45              /***********************************************
+     46              * 描述： 设置UCOS钩子函数，
+     47              */
+     48              App_OS_SetAllHooks();
+   \   00000016   0x.... 0x....      BL       App_OS_SetAllHooks
+     49              
+     50              /**************************************************************
+     51              * Description  : 创建任务
+     52              * Author       : 2018/5/18 星期五, by redmorningcn
+     53              */
+     54              App_TaskOsalCreate();               //创建osal任务。     
+   \   0000001A   0x.... 0x....      BL       App_TaskOsalCreate
+     55              
+     56              App_TaskCommCreate();               //创建串口通讯任务。
+   \   0000001E   0x.... 0x....      BL       App_TaskCommCreate
+     57          }
+   \   00000022   0xBD01             POP      {R0,PC}          ;; return
+     58          
+     59          /*******************************************************************************
+     60          * Description  : 在创建OSA任务时，调用的钩子函数。
+     61          * Author       : 2018/5/11 星期五, by redmorningcn
+     62          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     63          void OSAL_TaskCreateHook(void)
+     64          {
+   \                     OSAL_TaskCreateHook: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+     65              osal_add_Task(TaskInitTmr,                      // 任务初始化函数指针
+     66                            TaskTmrEvtProcess,                // 任务事件处理函数指针
+     67                            OS_TASK_PRO_TMR,                  // 任务优先级
+     68                            OS_TASK_ID_TMR);                  // 任务ID
+   \   00000002   0x2302             MOVS     R3,#+2
+   \   00000004   0x2207             MOVS     R2,#+7
+   \   00000006   0x....             LDR.N    R1,??DataTable1_2
+   \   00000008   0x....             LDR.N    R0,??DataTable1_3
+   \   0000000A   0x.... 0x....      BL       osal_add_Task
+     69              
+     70              osal_add_Task(TaskInitDisp,                     // 任务初始化函数指针
+     71                            TaskDispEvtProcess,               // 任务事件处理函数指针
+     72                            OS_TASK_PRO_DISP,                 // 任务优先级
+     73                            OS_TASK_ID_DISP);                 // 任务ID 
+   \   0000000E   0x2303             MOVS     R3,#+3
+   \   00000010   0x2206             MOVS     R2,#+6
+   \   00000012   0x....             LDR.N    R1,??DataTable1_4
+   \   00000014   0x....             LDR.N    R0,??DataTable1_5
+   \   00000016   0x.... 0x....      BL       osal_add_Task
+     74              
+     75              osal_add_Task(TaskInitStore,                    // 任务初始化函数指针
+     76                            TaskStoreEvtProcess,              // 任务事件处理函数指针
+     77                            OS_TASK_PRO_STORE,                // 任务优先级
+     78                            OS_TASK_ID_STORE);                // 任务ID
+   \   0000001A   0x2304             MOVS     R3,#+4
+   \   0000001C   0x2205             MOVS     R2,#+5
+   \   0000001E   0x....             LDR.N    R1,??DataTable1_6
+   \   00000020   0x....             LDR.N    R0,??DataTable1_7
+   \   00000022   0x.... 0x....      BL       osal_add_Task
+     79              
+     80              osal_add_Task(TaskInitLed,                  // 任务初始化函数指针
+     81                            TaskLedEvtProcess,                // 任务事件处理函数指针
+     82                            OS_TASK_PRO_LED,                  // 任务优先级
+     83                            OS_TASK_ID_LED);                  // 任务ID    
+   \   00000026   0x2305             MOVS     R3,#+5
+   \   00000028   0x2204             MOVS     R2,#+4
+   \   0000002A   0x....             LDR.N    R1,??DataTable1_8
+   \   0000002C   0x....             LDR.N    R0,??DataTable1_9
+   \   0000002E   0x.... 0x....      BL       osal_add_Task
+     84          }
+   \   00000032   0xBD01             POP      {R0,PC}          ;; return
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable1:
+   \   00000000   0x........         DC32     ?_0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable1_1:
+   \   00000000   0x........         DC32     Ctrl+0x120C
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable1_2:
+   \   00000000   0x........         DC32     TaskTmrEvtProcess
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable1_3:
+   \   00000000   0x........         DC32     TaskInitTmr
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable1_4:
+   \   00000000   0x........         DC32     TaskDispEvtProcess
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable1_5:
+   \   00000000   0x........         DC32     TaskInitDisp
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable1_6:
+   \   00000000   0x........         DC32     TaskStoreEvtProcess
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable1_7:
+   \   00000000   0x........         DC32     TaskInitStore
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable1_8:
+   \   00000000   0x........         DC32     TaskLedEvtProcess
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable1_9:
+   \   00000000   0x........         DC32     TaskInitLed
+
+   \                                 In section .rodata, align 4
+   \                     ?_0:
+   \   00000000   0x57 0x64          DC8 "Wdt Flag"
+   \              0x74 0x20    
+   \              0x46 0x6C    
+   \              0x61 0x67    
+   \              0x00         
+   \   00000009   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+     85          
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       8   BSP_Init_Hook
+         8   -> App_ModbusInit
+         8   -> OSFlagCreate
+       8   OSAL_TaskCreateHook
+         8   -> osal_add_Task
+       8   OS_TaskCreateHook
+         8   -> App_OS_SetAllHooks
+         8   -> App_TaskCommCreate
+         8   -> App_TaskOsalCreate
+         8   -> BSP_DispInit
+         8   -> BSP_Ds3231Init
+         8   -> BSP_FlashOsInit
+         8   -> GPIO_Fram_Init
+         8   -> app_init_sctrl
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable1
+       4  ??DataTable1_1
+       4  ??DataTable1_2
+       4  ??DataTable1_3
+       4  ??DataTable1_4
+       4  ??DataTable1_5
+       4  ??DataTable1_6
+       4  ??DataTable1_7
+       4  ??DataTable1_8
+       4  ??DataTable1_9
+      12  ?_0
+      20  BSP_Init_Hook
+      52  OSAL_TaskCreateHook
+      36  OS_TaskCreateHook
+
+ 
+  12 bytes in section .rodata
+ 148 bytes in section .text
+ 
+ 148 bytes of CODE  memory
+  12 bytes of CONST memory
+
+Errors: none
+Warnings: none

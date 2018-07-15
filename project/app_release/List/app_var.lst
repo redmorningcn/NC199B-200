@@ -1,0 +1,655 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.50.1.10123/W32 for ARM       15/Jul/2018  10:36:17
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  F:\iar\NC210\NC210-200处理板\source\user\app_var.c
+#    Command line =  
+#        F:\iar\NC210\NC210-200处理板\source\user\app_var.c -D
+#        USE_STDPERIPH_DRIVER -D APP_RELEASE -lCN
+#        F:\iar\NC210\NC210-200处理板\project\app_release\List -o
+#        F:\iar\NC210\NC210-200处理板\project\app_release\Obj --no_cse
+#        --no_unroll --no_inline --no_code_motion --no_tbaa --no_clustering
+#        --no_scheduling --debug --endian=little --cpu=Cortex-M3 -e --fpu=None
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.3\arm\INC\c\DLib_Config_Full.h" -I
+#        F:\iar\NC210\NC210-200处理板\project\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\config\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\task\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\user\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\OSAL\OS\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\OSAL\Ports\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\driver\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-LIB\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-CPU\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-CPU\ARM-Cortex-M3\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uCOS-III\Ports\ARM-Cortex-M3\Generic\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uCOS-III\Source\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\ST\STM32\inc\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\OS\uCOS-III\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Cfg\Template\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\OS\uCOS-III\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Ports\STM32\STM32F103\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Source\
+#        -Ol --use_c++_inline -I "C:\Program Files (x86)\IAR Systems\Embedded
+#        Workbench 7.3\arm\CMSIS\Include\"
+#    List file    =  
+#        F:\iar\NC210\NC210-200处理板\project\app_release\List\app_var.lst
+#    Object file  =  
+#        F:\iar\NC210\NC210-200处理板\project\app_release\Obj\app_var.o
+#
+###############################################################################
+
+F:\iar\NC210\NC210-200处理板\source\user\app_var.c
+      1          /*******************************************************************************
+      2          * Description  : 定义及初始化全局变量
+      3          * Author       : 2018/5/10 星期四, by redmorningcn
+      4          *******************************************************************************/
+      5          #include <app_type.h>
+      6          #include <tasks.h>
+      7          #include <includes.h>
+      8          #include <app_dtu_rec.h>
+      9          #include <string.h>
+     10          
+     11          
+     12          /*******************************************************************************
+     13          * Description  : 定义全局变量  sCtrl
+     14          * Author       : 2018/5/10 星期四, by redmorningcn
+     15          *******************************************************************************/
+
+   \                                 In section .bss, align 4
+     16          Unnctrl     Ctrl;              //
+   \                     Ctrl:
+   \   00000000                      DS8 4788
+     17              
+     18          /*******************************************************************************
+     19          * Description  : 无线发送模块控制指针
+     20          * Author       : 2018/5/14 星期一, by redmorningcn
+     21          *******************************************************************************/
+
+   \                                 In section .bss, align 4
+     22          StrCOMCtrl  * DtuCom;
+   \                     DtuCom:
+   \   00000000                      DS8 4
+     23          
+     24          /*******************************************************************************
+     25          * Description  : 和检测板串口控制指针
+     26          * Author       : 2018/5/14 星期一, by redmorningcn
+     27          *******************************************************************************/
+
+   \                                 In section .bss, align 4
+     28          StrCOMCtrl  * MtrCom;
+   \                     MtrCom:
+   \   00000000                      DS8 4
+     29          
+     30          /*******************************************************************************
+     31          * Description  : 和检测板串口控制指针
+     32          * Author       : 2018/5/14 星期一, by redmorningcn
+     33          *******************************************************************************/
+
+   \                                 In section .bss, align 4
+     34          StrCOMCtrl  * TaxCom;
+   \                     TaxCom:
+   \   00000000                      DS8 4
+     35          
+     36          /*******************************************************************************
+     37          * Description  : 全局变量初始化
+     38          * Author       : 2018/5/18 星期五, by redmorningcn
+     39          */
+
+   \                                 In section .text, align 4, keep-with-next
+     40          void app_init_sctrl(void)
+     41          { 
+   \                     app_init_sctrl: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+     42          //    WdtReset();
+     43              /*******************************************************************************
+     44              * Description  : 初始化串口连接参数默认值
+     45              * Author       : 2018/5/18 星期五, by redmorningcn
+     46              */    
+     47              u8  i;
+     48              for(i = 0;i <sizeof(Ctrl.ComCtrl)/sizeof(StrCOMCtrl);i++ )
+   \   00000002   0x2000             MOVS     R0,#+0
+   \   00000004   0xE223             B.N      ??app_init_sctrl_0
+     49              {
+     50                  Ctrl.ComCtrl[i].ConnectFlag             = 0;                    //连接标识：0，该串口无连接；1，有连接。
+   \                     ??app_init_sctrl_1: (+1)
+   \   00000006   0xF8DF 0x1520      LDR.W    R1,??app_init_sctrl_2
+   \   0000000A   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000000C   0xF240 0x423E      MOVW     R2,#+1086
+   \   00000010   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   00000014   0xF8B1 0x14EC      LDRH     R1,[R1, #+1260]
+   \   00000018   0x0449             LSLS     R1,R1,#+17       ;; ZeroExtS R1,R1,#+17,#+17
+   \   0000001A   0x0C49             LSRS     R1,R1,#+17
+   \   0000001C   0xF8DF 0x2508      LDR.W    R2,??app_init_sctrl_2
+   \   00000020   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000022   0xF240 0x433E      MOVW     R3,#+1086
+   \   00000026   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   0000002A   0xF8A2 0x14EC      STRH     R1,[R2, #+1260]
+     51                  Ctrl.ComCtrl[i].ConnCtrl.TimeOut        = 5;                    //连接超时时间。（超过该时间，认为连接断开）
+   \   0000002E   0x2105             MOVS     R1,#+5
+   \   00000030   0xF8DF 0x24F4      LDR.W    R2,??app_init_sctrl_2
+   \   00000034   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000036   0xF240 0x433E      MOVW     R3,#+1086
+   \   0000003A   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   0000003E   0xF8D2 0x2506      LDR      R2,[R2, #+1286]
+   \   00000042   0xF361 0x22CF      BFI      R2,R1,#+11,#+5
+   \   00000046   0xF8DF 0x14E0      LDR.W    R1,??app_init_sctrl_2
+   \   0000004A   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000004C   0xF240 0x433E      MOVW     R3,#+1086
+   \   00000050   0xFB03 0x1100      MLA      R1,R3,R0,R1
+   \   00000054   0xF8C1 0x2506      STR      R2,[R1, #+1286]
+     52                  
+     53                  Ctrl.ComCtrl[i].ConnCtrl.Baud           = 57600;
+   \   00000058   0xF44F 0x4161      MOV      R1,#+57600
+   \   0000005C   0xF8DF 0x24C8      LDR.W    R2,??app_init_sctrl_2
+   \   00000060   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000062   0xF240 0x433E      MOVW     R3,#+1086
+   \   00000066   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   0000006A   0xF8C2 0x150A      STR      R1,[R2, #+1290]
+     54                  Ctrl.ComCtrl[i].ConnCtrl.Bits           = USART_WordLength_8b;
+   \   0000006E   0xF8DF 0x14B8      LDR.W    R1,??app_init_sctrl_2
+   \   00000072   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000074   0xF240 0x423E      MOVW     R2,#+1086
+   \   00000078   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   0000007C   0xF8D1 0x1506      LDR      R1,[R1, #+1286]
+   \   00000080   0xF031 0x6170      BICS     R1,R1,#0xF000000
+   \   00000084   0xF8DF 0x24A0      LDR.W    R2,??app_init_sctrl_2
+   \   00000088   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000008A   0xF240 0x433E      MOVW     R3,#+1086
+   \   0000008E   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   00000092   0xF8C2 0x1506      STR      R1,[R2, #+1286]
+     55                  Ctrl.ComCtrl[i].ConnCtrl.COM_Num        = 0x01;
+   \   00000096   0x2101             MOVS     R1,#+1
+   \   00000098   0xF8DF 0x248C      LDR.W    R2,??app_init_sctrl_2
+   \   0000009C   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000009E   0xF240 0x433E      MOVW     R3,#+1086
+   \   000000A2   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   000000A6   0xF8D2 0x2506      LDR      R2,[R2, #+1286]
+   \   000000AA   0xF361 0x5257      BFI      R2,R1,#+21,#+3
+   \   000000AE   0xF8DF 0x1478      LDR.W    R1,??app_init_sctrl_2
+   \   000000B2   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000000B4   0xF240 0x433E      MOVW     R3,#+1086
+   \   000000B8   0xFB03 0x1100      MLA      R1,R3,R0,R1
+   \   000000BC   0xF8C1 0x2506      STR      R2,[R1, #+1286]
+     56                  Ctrl.ComCtrl[i].ConnCtrl.Connflg        = 1;                    //默认有连接
+   \   000000C0   0xF8DF 0x1464      LDR.W    R1,??app_init_sctrl_2
+   \   000000C4   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000000C6   0xF240 0x423E      MOVW     R2,#+1086
+   \   000000CA   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   000000CE   0xF8D1 0x1506      LDR      R1,[R1, #+1286]
+   \   000000D2   0xF051 0x0110      ORRS     R1,R1,#0x10
+   \   000000D6   0xF8DF 0x2450      LDR.W    R2,??app_init_sctrl_2
+   \   000000DA   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000000DC   0xF240 0x433E      MOVW     R3,#+1086
+   \   000000E0   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   000000E4   0xF8C2 0x1506      STR      R1,[R2, #+1286]
+     57                  Ctrl.ComCtrl[i].ConnCtrl.ConnType       = RECORD_SEND_COMM;     //默认为数据发送
+   \   000000E8   0xF8DF 0x143C      LDR.W    R1,??app_init_sctrl_2
+   \   000000EC   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000000EE   0xF240 0x423E      MOVW     R2,#+1086
+   \   000000F2   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   000000F6   0xF8D1 0x1506      LDR      R1,[R1, #+1286]
+   \   000000FA   0xF031 0x01E0      BICS     R1,R1,#0xE0
+   \   000000FE   0xF8DF 0x2428      LDR.W    R2,??app_init_sctrl_2
+   \   00000102   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000104   0xF240 0x433E      MOVW     R3,#+1086
+   \   00000108   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   0000010C   0xF8C2 0x1506      STR      R1,[R2, #+1286]
+     58                  Ctrl.ComCtrl[i].ConnCtrl.DataCode       = 0;
+   \   00000110   0x2100             MOVS     R1,#+0
+   \   00000112   0xF8DF 0x2414      LDR.W    R2,??app_init_sctrl_2
+   \   00000116   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000118   0xF240 0x433E      MOVW     R3,#+1086
+   \   0000011C   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   00000120   0xF8C2 0x150E      STR      R1,[R2, #+1294]
+     59                  Ctrl.ComCtrl[i].ConnCtrl.datalen        = 0;
+   \   00000124   0x2100             MOVS     R1,#+0
+   \   00000126   0xF8DF 0x2400      LDR.W    R2,??app_init_sctrl_2
+   \   0000012A   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000012C   0xF240 0x433E      MOVW     R3,#+1086
+   \   00000130   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   00000134   0xF882 0x151A      STRB     R1,[R2, #+1306]
+     60                  Ctrl.ComCtrl[i].ConnCtrl.DestAddr       = DTU_ADDR;             //DTU模块
+   \   00000138   0x21CA             MOVS     R1,#+202
+   \   0000013A   0xF8DF 0x23EC      LDR.W    R2,??app_init_sctrl_2
+   \   0000013E   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000140   0xF240 0x433E      MOVW     R3,#+1086
+   \   00000144   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   00000148   0xF882 0x1516      STRB     R1,[R2, #+1302]
+     61                  Ctrl.ComCtrl[i].ConnCtrl.EnableConnFlg  = 1;                    //该连接允许
+   \   0000014C   0xF8DF 0x13D8      LDR.W    R1,??app_init_sctrl_2
+   \   00000150   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000152   0xF240 0x423E      MOVW     R2,#+1086
+   \   00000156   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   0000015A   0xF8D1 0x1506      LDR      R1,[R1, #+1286]
+   \   0000015E   0xF051 0x0101      ORRS     R1,R1,#0x1
+   \   00000162   0xF8DF 0x23C4      LDR.W    R2,??app_init_sctrl_2
+   \   00000166   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000168   0xF240 0x433E      MOVW     R3,#+1086
+   \   0000016C   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   00000170   0xF8C2 0x1506      STR      R1,[R2, #+1286]
+     62                  Ctrl.ComCtrl[i].ConnCtrl.ErrFlg         = 0;                    //连接正常
+   \   00000174   0xF8DF 0x13B0      LDR.W    R1,??app_init_sctrl_2
+   \   00000178   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000017A   0xF240 0x423E      MOVW     R2,#+1086
+   \   0000017E   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   00000182   0xF8D1 0x1506      LDR      R1,[R1, #+1286]
+   \   00000186   0xF031 0x0108      BICS     R1,R1,#0x8
+   \   0000018A   0xF8DF 0x239C      LDR.W    R2,??app_init_sctrl_2
+   \   0000018E   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000190   0xF240 0x433E      MOVW     R3,#+1086
+   \   00000194   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   00000198   0xF8C2 0x1506      STR      R1,[R2, #+1286]
+     63                  Ctrl.ComCtrl[i].ConnCtrl.FrameCode      = RECORD_FRAME_CODE;    //数据通讯
+   \   0000019C   0x2100             MOVS     R1,#+0
+   \   0000019E   0xF8DF 0x2388      LDR.W    R2,??app_init_sctrl_2
+   \   000001A2   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000001A4   0xF240 0x433E      MOVW     R3,#+1086
+   \   000001A8   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   000001AC   0xF882 0x1519      STRB     R1,[R2, #+1305]
+     64                  Ctrl.ComCtrl[i].ConnCtrl.FramNum        = 1;                    //序号从1开始
+   \   000001B0   0x2101             MOVS     R1,#+1
+   \   000001B2   0xF8DF 0x2374      LDR.W    R2,??app_init_sctrl_2
+   \   000001B6   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000001B8   0xF240 0x433E      MOVW     R3,#+1086
+   \   000001BC   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   000001C0   0xF882 0x1518      STRB     R1,[R2, #+1304]
+     65                  Ctrl.ComCtrl[i].ConnCtrl.MB_Node        = 1;
+   \   000001C4   0x2101             MOVS     R1,#+1
+   \   000001C6   0x4AD8             LDR.N    R2,??app_init_sctrl_2
+   \   000001C8   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000001CA   0xF240 0x433E      MOVW     R3,#+1086
+   \   000001CE   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   000001D2   0xF8D2 0x2506      LDR      R2,[R2, #+1286]
+   \   000001D6   0xF361 0x4214      BFI      R2,R1,#+16,#+5
+   \   000001DA   0x49D3             LDR.N    R1,??app_init_sctrl_2
+   \   000001DC   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000001DE   0xF240 0x433E      MOVW     R3,#+1086
+   \   000001E2   0xFB03 0x1100      MLA      R1,R3,R0,R1
+   \   000001E6   0xF8C1 0x2506      STR      R2,[R1, #+1286]
+     66                  Ctrl.ComCtrl[i].ConnCtrl.Parity         = USART_Parity_No;      //无校验
+   \   000001EA   0x49CF             LDR.N    R1,??app_init_sctrl_2
+   \   000001EC   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000001EE   0xF240 0x423E      MOVW     R2,#+1086
+   \   000001F2   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   000001F6   0xF8D1 0x1506      LDR      R1,[R1, #+1286]
+   \   000001FA   0xF031 0x5140      BICS     R1,R1,#0x30000000
+   \   000001FE   0x4ACA             LDR.N    R2,??app_init_sctrl_2
+   \   00000200   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000202   0xF240 0x433E      MOVW     R3,#+1086
+   \   00000206   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   0000020A   0xF8C2 0x1506      STR      R1,[R2, #+1286]
+     67                  Ctrl.ComCtrl[i].ConnCtrl.protocol       = CSNC_PROTOCOL;        //CSNC协议 
+   \   0000020E   0x2101             MOVS     R1,#+1
+   \   00000210   0x4AC5             LDR.N    R2,??app_init_sctrl_2
+   \   00000212   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000214   0xF240 0x433E      MOVW     R3,#+1086
+   \   00000218   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   0000021C   0xF8D2 0x2506      LDR      R2,[R2, #+1286]
+   \   00000220   0xF361 0x2209      BFI      R2,R1,#+8,#+2
+   \   00000224   0x49C0             LDR.N    R1,??app_init_sctrl_2
+   \   00000226   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000228   0xF240 0x433E      MOVW     R3,#+1086
+   \   0000022C   0xFB03 0x1100      MLA      R1,R3,R0,R1
+   \   00000230   0xF8C1 0x2506      STR      R2,[R1, #+1286]
+     68                  //Ctrl.ComCtrl[i].ConnCtrl.rec             
+     69                  Ctrl.ComCtrl[i].ConnCtrl.RecordSendFlg  = 0;                    //暂无记录发送
+   \   00000234   0x49BC             LDR.N    R1,??app_init_sctrl_2
+   \   00000236   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000238   0xF240 0x423E      MOVW     R2,#+1086
+   \   0000023C   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   00000240   0xF8D1 0x1506      LDR      R1,[R1, #+1286]
+   \   00000244   0xF031 0x0104      BICS     R1,R1,#0x4
+   \   00000248   0x4AB7             LDR.N    R2,??app_init_sctrl_2
+   \   0000024A   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000024C   0xF240 0x433E      MOVW     R3,#+1086
+   \   00000250   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   00000254   0xF8C2 0x1506      STR      R1,[R2, #+1286]
+     70                  Ctrl.ComCtrl[i].ConnCtrl.RecvEndFlg     = 0;                    //无数据接收
+   \   00000258   0x49B3             LDR.N    R1,??app_init_sctrl_2
+   \   0000025A   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000025C   0xF240 0x423E      MOVW     R2,#+1086
+   \   00000260   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   00000264   0xF8D1 0x1506      LDR      R1,[R1, #+1286]
+   \   00000268   0xF031 0x0102      BICS     R1,R1,#0x2
+   \   0000026C   0x4AAE             LDR.N    R2,??app_init_sctrl_2
+   \   0000026E   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000270   0xF240 0x433E      MOVW     R3,#+1086
+   \   00000274   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   00000278   0xF8C2 0x1506      STR      R1,[R2, #+1286]
+     71                  Ctrl.ComCtrl[i].ConnCtrl.SendRecordNum  = 1;                    //记录 同步用（确认）
+   \   0000027C   0x2101             MOVS     R1,#+1
+   \   0000027E   0x4AAA             LDR.N    R2,??app_init_sctrl_2
+   \   00000280   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000282   0xF240 0x433E      MOVW     R3,#+1086
+   \   00000286   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   0000028A   0xF882 0x1512      STRB     R1,[R2, #+1298]
+     72                  Ctrl.ComCtrl[i].ConnCtrl.SourceAddr     = LKJ_MAINBOARD_ADDR;   //本机地址
+   \   0000028E   0x2184             MOVS     R1,#+132
+   \   00000290   0x4AA5             LDR.N    R2,??app_init_sctrl_2
+   \   00000292   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000294   0xF240 0x433E      MOVW     R3,#+1086
+   \   00000298   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   0000029C   0xF882 0x1517      STRB     R1,[R2, #+1303]
+     73                  Ctrl.ComCtrl[i].ConnCtrl.Stops          = USART_StopBits_1;
+   \   000002A0   0x49A1             LDR.N    R1,??app_init_sctrl_2
+   \   000002A2   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000002A4   0xF240 0x423E      MOVW     R2,#+1086
+   \   000002A8   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   000002AC   0xF8D1 0x1506      LDR      R1,[R1, #+1286]
+   \   000002B0   0x0089             LSLS     R1,R1,#+2        ;; ZeroExtS R1,R1,#+2,#+2
+   \   000002B2   0x0889             LSRS     R1,R1,#+2
+   \   000002B4   0x4A9C             LDR.N    R2,??app_init_sctrl_2
+   \   000002B6   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000002B8   0xF240 0x433E      MOVW     R3,#+1086
+   \   000002BC   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   000002C0   0xF8C2 0x1506      STR      R1,[R2, #+1286]
+     74                  Ctrl.ComCtrl[i].ConnectTimeOut          = 5;                    //超时时间：5秒内，该串口无连接（数据接收），则串口断开。
+   \   000002C4   0x4998             LDR.N    R1,??app_init_sctrl_2
+   \   000002C6   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000002C8   0xF240 0x423E      MOVW     R2,#+1086
+   \   000002CC   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   000002D0   0xF8B1 0x14EC      LDRH     R1,[R1, #+1260]
+   \   000002D4   0xF411 0x4140      ANDS     R1,R1,#0xC000
+   \   000002D8   0xF051 0x0105      ORRS     R1,R1,#0x5
+   \   000002DC   0x4A92             LDR.N    R2,??app_init_sctrl_2
+   \   000002DE   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000002E0   0xF240 0x433E      MOVW     R3,#+1086
+   \   000002E4   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   000002E8   0xF8A2 0x14EC      STRH     R1,[R2, #+1260]
+     75                  Ctrl.ComCtrl[i].TimeoutEn               = 0;                    //超时计数停止。（发送数据时启动）
+   \   000002EC   0x498E             LDR.N    R1,??app_init_sctrl_2
+   \   000002EE   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000002F0   0xF240 0x423E      MOVW     R2,#+1086
+   \   000002F4   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   000002F8   0xF8B1 0x14EC      LDRH     R1,[R1, #+1260]
+   \   000002FC   0xF64B 0x72FF      MOVW     R2,#+49151
+   \   00000300   0x4011             ANDS     R1,R2,R1
+   \   00000302   0x4A89             LDR.N    R2,??app_init_sctrl_2
+   \   00000304   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000306   0xF240 0x433E      MOVW     R3,#+1086
+   \   0000030A   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   0000030E   0xF8A2 0x14EC      STRH     R1,[R2, #+1260]
+     76          
+     77                  Ctrl.ComCtrl[i].ConnCtrl.sCsnc.databuf  = (u8 *)&Ctrl.ComCtrl[i].Wr;
+   \   00000312   0x4985             LDR.N    R1,??app_init_sctrl_2
+   \   00000314   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000316   0xF240 0x423E      MOVW     R2,#+1086
+   \   0000031A   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   0000031E   0xF511 0x713A      ADDS     R1,R1,#+744
+   \   00000322   0x4A81             LDR.N    R2,??app_init_sctrl_2
+   \   00000324   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000326   0xF240 0x433E      MOVW     R3,#+1086
+   \   0000032A   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   0000032E   0xF8C2 0x151A      STR      R1,[R2, #+1306]
+     78                  Ctrl.ComCtrl[i].ConnCtrl.sCsnc.datalen  = 0;
+   \   00000332   0x2100             MOVS     R1,#+0
+   \   00000334   0x4A7C             LDR.N    R2,??app_init_sctrl_2
+   \   00000336   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000338   0xF240 0x433E      MOVW     R3,#+1086
+   \   0000033C   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   00000340   0xF882 0x1522      STRB     R1,[R2, #+1314]
+     79                  Ctrl.ComCtrl[i].ConnCtrl.sCsnc.destaddr = Ctrl.ComCtrl[i].ConnCtrl.DestAddr;
+   \   00000344   0x4978             LDR.N    R1,??app_init_sctrl_2
+   \   00000346   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000348   0xF240 0x423E      MOVW     R2,#+1086
+   \   0000034C   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   00000350   0xF891 0x1516      LDRB     R1,[R1, #+1302]
+   \   00000354   0x4A74             LDR.N    R2,??app_init_sctrl_2
+   \   00000356   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000358   0xF240 0x433E      MOVW     R3,#+1086
+   \   0000035C   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   00000360   0xF882 0x1517      STRB     R1,[R2, #+1303]
+     80                  Ctrl.ComCtrl[i].ConnCtrl.sCsnc.framcode = Ctrl.ComCtrl[i].ConnCtrl.FrameCode;
+   \   00000364   0x4970             LDR.N    R1,??app_init_sctrl_2
+   \   00000366   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000368   0xF240 0x423E      MOVW     R2,#+1086
+   \   0000036C   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   00000370   0xF891 0x1519      LDRB     R1,[R1, #+1305]
+   \   00000374   0x4A6C             LDR.N    R2,??app_init_sctrl_2
+   \   00000376   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000378   0xF240 0x433E      MOVW     R3,#+1086
+   \   0000037C   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   00000380   0xF882 0x1519      STRB     R1,[R2, #+1305]
+     81                  Ctrl.ComCtrl[i].ConnCtrl.sCsnc.framnum  = Ctrl.ComCtrl[i].ConnCtrl.FramNum;
+   \   00000384   0x4968             LDR.N    R1,??app_init_sctrl_2
+   \   00000386   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000388   0xF240 0x423E      MOVW     R2,#+1086
+   \   0000038C   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   00000390   0xF891 0x1518      LDRB     R1,[R1, #+1304]
+   \   00000394   0x4A64             LDR.N    R2,??app_init_sctrl_2
+   \   00000396   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000398   0xF240 0x433E      MOVW     R3,#+1086
+   \   0000039C   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   000003A0   0xF882 0x1518      STRB     R1,[R2, #+1304]
+     82                  Ctrl.ComCtrl[i].ConnCtrl.sCsnc.rxtxbuf  = Ctrl.ComCtrl[i].pch->TxBuf;
+   \   000003A4   0x4960             LDR.N    R1,??app_init_sctrl_2
+   \   000003A6   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000003A8   0xF240 0x423E      MOVW     R2,#+1086
+   \   000003AC   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   000003B0   0xF8D1 0x14E8      LDR      R1,[R1, #+1256]
+   \   000003B4   0xF511 0x7111      ADDS     R1,R1,#+580
+   \   000003B8   0x4A5B             LDR.N    R2,??app_init_sctrl_2
+   \   000003BA   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000003BC   0xF240 0x433E      MOVW     R3,#+1086
+   \   000003C0   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   000003C4   0xF8C2 0x151E      STR      R1,[R2, #+1310]
+     83                  Ctrl.ComCtrl[i].ConnCtrl.sCsnc.rxtxlen  = 0;
+   \   000003C8   0x2100             MOVS     R1,#+0
+   \   000003CA   0x4A57             LDR.N    R2,??app_init_sctrl_2
+   \   000003CC   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000003CE   0xF240 0x433E      MOVW     R3,#+1086
+   \   000003D2   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   000003D6   0xF882 0x1523      STRB     R1,[R2, #+1315]
+     84                  Ctrl.ComCtrl[i].ConnCtrl.sCsnc.sourceaddr = Ctrl.ComCtrl[i].ConnCtrl.SourceAddr;
+   \   000003DA   0x4953             LDR.N    R1,??app_init_sctrl_2
+   \   000003DC   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000003DE   0xF240 0x423E      MOVW     R2,#+1086
+   \   000003E2   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   000003E6   0xF891 0x1517      LDRB     R1,[R1, #+1303]
+   \   000003EA   0x4A4F             LDR.N    R2,??app_init_sctrl_2
+   \   000003EC   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000003EE   0xF240 0x433E      MOVW     R3,#+1086
+   \   000003F2   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   000003F6   0xF882 0x1516      STRB     R1,[R2, #+1302]
+     85                  //Ctrl.ComCtrl[i].ConnCtrl.sCsnc.tmp      =
+     86          
+     87                  Ctrl.ComCtrl[i].RxCtrl.sCsnc.databuf    = (u8 *)&Ctrl.ComCtrl[i].Rd;    
+   \   000003FA   0x494B             LDR.N    R1,??app_init_sctrl_2
+   \   000003FC   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000003FE   0xF240 0x423E      MOVW     R2,#+1086
+   \   00000402   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   00000406   0x31E8             ADDS     R1,R1,#+232
+   \   00000408   0x4A47             LDR.N    R2,??app_init_sctrl_2
+   \   0000040A   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000040C   0xF240 0x433E      MOVW     R3,#+1086
+   \   00000410   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   00000414   0xF8C2 0x14F2      STR      R1,[R2, #+1266]
+     88                  Ctrl.ComCtrl[i].RxCtrl.sCsnc.rxtxbuf    = (u8 *)&Ctrl.ComCtrl[i].pch->RxBuf;  
+   \   00000418   0x4943             LDR.N    R1,??app_init_sctrl_2
+   \   0000041A   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000041C   0xF240 0x423E      MOVW     R2,#+1086
+   \   00000420   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   00000424   0xF8D1 0x14E8      LDR      R1,[R1, #+1256]
+   \   00000428   0x3138             ADDS     R1,R1,#+56
+   \   0000042A   0x4A3F             LDR.N    R2,??app_init_sctrl_2
+   \   0000042C   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000042E   0xF240 0x433E      MOVW     R3,#+1086
+   \   00000432   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   00000436   0xF8C2 0x14F6      STR      R1,[R2, #+1270]
+     89                  Ctrl.ComCtrl[i].RxCtrl.protocol         =  CSNC_PROTOCOL;
+   \   0000043A   0x2101             MOVS     R1,#+1
+   \   0000043C   0x4A3A             LDR.N    R2,??app_init_sctrl_2
+   \   0000043E   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000440   0xF240 0x433E      MOVW     R3,#+1086
+   \   00000444   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   00000448   0xF882 0x14FF      STRB     R1,[R2, #+1279]
+     90              }
+   \   0000044C   0x1C40             ADDS     R0,R0,#+1
+   \                     ??app_init_sctrl_0: (+1)
+   \   0000044E   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000450   0x2804             CMP      R0,#+4
+   \   00000452   0xF4FF 0xADD8      BCC.W    ??app_init_sctrl_1
+     91          
+     92              /*****************************************************************
+     93              * Description  : 从FRAM中分别读出head、NumMgr、Porduct、RunPara
+     94              * Author       : 2018/5/17 星期四, by redmorningcn
+     95              */
+     96              Ctrl.sRunPara.FramFlg.RdHead    = 1;
+   \   00000456   0x4834             LDR.N    R0,??app_init_sctrl_2
+   \   00000458   0xF8B0 0x004C      LDRH     R0,[R0, #+76]
+   \   0000045C   0xF050 0x0010      ORRS     R0,R0,#0x10
+   \   00000460   0x4931             LDR.N    R1,??app_init_sctrl_2
+   \   00000462   0xF8A1 0x004C      STRH     R0,[R1, #+76]
+     97              Ctrl.sRunPara.FramFlg.RdNumMgr  = 1;
+   \   00000466   0x4830             LDR.N    R0,??app_init_sctrl_2
+   \   00000468   0xF8B0 0x004C      LDRH     R0,[R0, #+76]
+   \   0000046C   0xF050 0x0020      ORRS     R0,R0,#0x20
+   \   00000470   0x492D             LDR.N    R1,??app_init_sctrl_2
+   \   00000472   0xF8A1 0x004C      STRH     R0,[R1, #+76]
+     98              Ctrl.sRunPara.FramFlg.RdProduct = 1;
+   \   00000476   0x482C             LDR.N    R0,??app_init_sctrl_2
+   \   00000478   0xF8B0 0x004C      LDRH     R0,[R0, #+76]
+   \   0000047C   0xF050 0x0040      ORRS     R0,R0,#0x40
+   \   00000480   0x4929             LDR.N    R1,??app_init_sctrl_2
+   \   00000482   0xF8A1 0x004C      STRH     R0,[R1, #+76]
+     99              Ctrl.sRunPara.FramFlg.RdRunPara = 1;
+   \   00000486   0x4828             LDR.N    R0,??app_init_sctrl_2
+   \   00000488   0xF8B0 0x004C      LDRH     R0,[R0, #+76]
+   \   0000048C   0xF050 0x0080      ORRS     R0,R0,#0x80
+   \   00000490   0x4925             LDR.N    R1,??app_init_sctrl_2
+   \   00000492   0xF8A1 0x004C      STRH     R0,[R1, #+76]
+    100              
+    101              App_FramPara();
+   \   00000496   0x.... 0x....      BL       App_FramPara
+    102              
+    103              Ctrl.sRunPara.Err.Flags         = 0;                // 清零故障代码
+   \   0000049A   0x2000             MOVS     R0,#+0
+   \   0000049C   0x4922             LDR.N    R1,??app_init_sctrl_2
+   \   0000049E   0x6588             STR      R0,[R1, #+88]
+    104              
+    105              if(Ctrl.sHeadInfo.Password != MODBUS_PASSWORD){     // 通讯密码
+   \   000004A0   0x4821             LDR.N    R0,??app_init_sctrl_2
+   \   000004A2   0x8800             LDRH     R0,[R0, #+0]
+   \   000004A4   0xF641 0x015D      MOVW     R1,#+6237
+   \   000004A8   0x4288             CMP      R0,R1
+   \   000004AA   0xD00B             BEQ.N    ??app_init_sctrl_3
+    106                  Ctrl.sHeadInfo.Password = MODBUS_PASSWORD; 
+   \   000004AC   0xF641 0x005D      MOVW     R0,#+6237
+   \   000004B0   0x491D             LDR.N    R1,??app_init_sctrl_2
+   \   000004B2   0x8008             STRH     R0,[R1, #+0]
+    107                  Ctrl.sRunPara.Err.FramErr   = 1;                // 铁电故障（指定地址读出的值错误）
+   \   000004B4   0x481C             LDR.N    R0,??app_init_sctrl_2
+   \   000004B6   0xF8B0 0x0058      LDRH     R0,[R0, #+88]
+   \   000004BA   0xF450 0x6000      ORRS     R0,R0,#0x800
+   \   000004BE   0x491A             LDR.N    R1,??app_init_sctrl_2
+   \   000004C0   0xF8A1 0x0058      STRH     R0,[R1, #+88]
+    108              }
+    109             
+    110              Ctrl.sRunPara.SysSts.StartFlg   = 1;                // 开始标示(开机置位，存储完第一条数据记录后置零) 
+   \                     ??app_init_sctrl_3: (+1)
+   \   000004C4   0x4818             LDR.N    R0,??app_init_sctrl_2
+   \   000004C6   0xF8B0 0x0056      LDRH     R0,[R0, #+86]
+   \   000004CA   0xF450 0x7080      ORRS     R0,R0,#0x100
+   \   000004CE   0x4916             LDR.N    R1,??app_init_sctrl_2
+   \   000004D0   0xF8A1 0x0056      STRH     R0,[R1, #+86]
+    111              Ctrl.sRunPara.SysSts.SetBitFlg  = 0;                // 正常时，未进行参数设置
+   \   000004D4   0x4814             LDR.N    R0,??app_init_sctrl_2
+   \   000004D6   0xF8B0 0x0056      LDRH     R0,[R0, #+86]
+   \   000004DA   0xF24F 0x71FF      MOVW     R1,#+63487
+   \   000004DE   0x4008             ANDS     R0,R1,R0
+   \   000004E0   0x4911             LDR.N    R1,??app_init_sctrl_2
+   \   000004E2   0xF8A1 0x0056      STRH     R0,[R1, #+86]
+    112              Ctrl.sRunPara.SetOutTimes       = 0;
+   \   000004E6   0x2000             MOVS     R0,#+0
+   \   000004E8   0x490F             LDR.N    R1,??app_init_sctrl_2
+   \   000004EA   0xF881 0x0060      STRB     R0,[R1, #+96]
+    113              Ctrl.sRunPara.WdtOutTimes       = 120;              // 喂狗超时时间         
+   \   000004EE   0x2078             MOVS     R0,#+120
+   \   000004F0   0x490D             LDR.N    R1,??app_init_sctrl_2
+   \   000004F2   0xF881 0x0061      STRB     R0,[R1, #+97]
+    114          
+    115              
+    116              if ( ( Ctrl.sRunPara.StoreTime < 5 ) ||             //数据存储周期
+    117                   ( Ctrl.sRunPara.StoreTime > 10*60 ) ) {
+   \   000004F6   0x480C             LDR.N    R0,??app_init_sctrl_2
+   \   000004F8   0xF8B0 0x0044      LDRH     R0,[R0, #+68]
+   \   000004FC   0x1F40             SUBS     R0,R0,#+5
+   \   000004FE   0xF5B0 0x7F15      CMP      R0,#+596
+   \   00000502   0xD303             BCC.N    ??app_init_sctrl_4
+    118                  Ctrl.sRunPara.StoreTime    = 60;
+   \   00000504   0x203C             MOVS     R0,#+60
+   \   00000506   0x4908             LDR.N    R1,??app_init_sctrl_2
+   \   00000508   0xF8A1 0x0044      STRH     R0,[R1, #+68]
+    119              }
+    120              
+    121              /**************************************************************
+    122              * Description  : 初始化rec中默认值
+    123              * Author       : 2018/6/4 星期一, by redmorningcn
+    124              */
+    125              Ctrl.Rec.CmdTpye    = 0;                            //默认值为0
+   \                     ??app_init_sctrl_4: (+1)
+   \   0000050C   0x2000             MOVS     R0,#+0
+   \   0000050E   0x4906             LDR.N    R1,??app_init_sctrl_2
+   \   00000510   0xF881 0x0068      STRB     R0,[R1, #+104]
+    126              memset((u8 *)Ctrl.Rec.rsvbyte,0,sizeof(Ctrl.Rec.rsvbyte));    //预留数值置零
+   \   00000514   0x2101             MOVS     R1,#+1
+   \   00000516   0x2200             MOVS     R2,#+0
+   \   00000518   0x4C04             LDR.N    R4,??app_init_sctrl_2+0x4
+   \   0000051A   0x0020             MOVS     R0,R4
+   \   0000051C   0x.... 0x....      BL       __aeabi_memset
+    127              
+    128              Ctrl.sProductInfo.SwVer = SOFT_VERSION;             //软件版本，和程序一起，写死。
+   \   00000520   0x2066             MOVS     R0,#+102
+   \   00000522   0x4901             LDR.N    R1,??app_init_sctrl_2
+   \   00000524   0x85C8             STRH     R0,[R1, #+46]
+    129          
+    130          }
+   \   00000526   0xBD10             POP      {R4,PC}          ;; return
+   \                     ??app_init_sctrl_2:
+   \   00000528   0x........         DC32     Ctrl
+   \   0000052C   0x........         DC32     Ctrl+0xE1
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       8   app_init_sctrl
+         8   -> App_FramPara
+         8   -> __aeabi_memset
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+    4788  Ctrl
+       4  DtuCom
+       4  MtrCom
+       4  TaxCom
+    1328  app_init_sctrl
+
+ 
+ 4 800 bytes in section .bss
+ 1 328 bytes in section .text
+ 
+ 1 328 bytes of CODE memory
+ 4 800 bytes of DATA memory
+
+Errors: none
+Warnings: none

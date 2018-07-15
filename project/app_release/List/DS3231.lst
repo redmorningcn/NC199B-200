@@ -1,0 +1,896 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.50.1.10123/W32 for ARM       15/Jul/2018  10:36:21
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  F:\iar\NC210\NC210-200处理板\source\driver\DS3231.c
+#    Command line =  
+#        F:\iar\NC210\NC210-200处理板\source\driver\DS3231.c -D
+#        USE_STDPERIPH_DRIVER -D APP_RELEASE -lCN
+#        F:\iar\NC210\NC210-200处理板\project\app_release\List -o
+#        F:\iar\NC210\NC210-200处理板\project\app_release\Obj --no_cse
+#        --no_unroll --no_inline --no_code_motion --no_tbaa --no_clustering
+#        --no_scheduling --debug --endian=little --cpu=Cortex-M3 -e --fpu=None
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.3\arm\INC\c\DLib_Config_Full.h" -I
+#        F:\iar\NC210\NC210-200处理板\project\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\config\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\task\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\user\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\OSAL\OS\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\OSAL\Ports\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\driver\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-LIB\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-CPU\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-CPU\ARM-Cortex-M3\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uCOS-III\Ports\ARM-Cortex-M3\Generic\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uCOS-III\Source\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\ST\STM32\inc\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\OS\uCOS-III\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Cfg\Template\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\OS\uCOS-III\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Ports\STM32\STM32F103\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Source\
+#        -Ol --use_c++_inline -I "C:\Program Files (x86)\IAR Systems\Embedded
+#        Workbench 7.3\arm\CMSIS\Include\"
+#    List file    =  
+#        F:\iar\NC210\NC210-200处理板\project\app_release\List\DS3231.lst
+#    Object file  =  
+#        F:\iar\NC210\NC210-200处理板\project\app_release\Obj\DS3231.o
+#
+###############################################################################
+
+F:\iar\NC210\NC210-200处理板\source\driver\DS3231.c
+      1          /*******************************************************************************
+      2          * Description  : DS3231驱动
+      3          * Author       : 2018/5/15 星期二, by redmorningcn
+      4          *******************************************************************************/
+      5          
+      6          /*******************************************************************************
+      7           * INCLUDES
+      8           */
+      9          #include <includes.h>
+     10          #include <ds3231.h>
+     11          #include <bsp_time.h>
+     12          #include <bsp_IIC.h>
+     13          
+     14               
+     15          /*******************************************************************************
+     16           * CONSTANTS
+     17           */
+     18          #define DS3231_ADDR     		    0xd0
+     19          #define DS3231_SEC      		    0x00
+     20          #define DS3231_MIN      		    0x01
+     21          #define DS3231_HOUR     		    0x02
+     22          #define DS3231_DAY      		    0x03
+     23          #define DS3231_DATA     		    0x04
+     24          #define DS3231_MONTH    		    0x05
+     25          #define DS3231_YEAR     		    0x06
+     26          
+     27          #define DS3231_CONTROL      	    0x0E
+     28          #define DS3231_STATUS       	    0x0F
+     29          #define DS3231_AGING_OFFSET         0x10
+     30          #define DS3231_TEMP_MSB     	    0x11
+     31          #define DS3231_TEMP_LSB     	    0x12
+     32          
+     33          /*******************************************************************************
+     34           * TYPEDEFS
+     35           */
+     36           
+     37          /*******************************************************************************
+     38           * LOCOAL VARIABLES
+     39           */
+     40          /***********************************************
+     41          * 描述: OS接口
+     42          */
+     43          
+     44          
+     45          /*******************************************************************************
+     46           * LOCOAL FUNCTIONS
+     47           */
+     48           
+     49          /*******************************************************************************
+     50           * GLOBAL VARIABLES
+     51           */
+     52          
+     53          /*******************************************************************************
+     54           * GLOBAL FUNCTIONS
+     55           */
+     56          
+     57          /*******************************************************************************
+     58           * EXTERN VARIABLES
+     59           */
+     60           
+     61          /*******************************************************************************
+     62           * EXTERN FUNCTIONS
+     63           */
+     64           
+     65          /*******************************************************************************
+     66           * 				                    延时函数                                   *
+     67           *******************************************************************************/
+     68          /*******************************************************************************
+     69          * 名    称： Delay_Nus()
+     70          * 功    能： 延时大概1us
+     71          * 入口参数： dly		延时参数，值越大，延时越久
+     72          * 出口参数： 无
+     73          * 作    者： 无名沈
+     74          * 创建日期： 2009-01-03
+     75          * 修    改：
+     76          * 修改日期：
+     77          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     78          OPTIMIZE_NONE void  Delay_Nus( INT32U  dly )
+     79          {
+     80              /***********************************************
+     81              * 描述：定时器初始化
+     82              *       72000000次循环  = 6.9999999583333333333333333333333秒
+     83              *       一次循环 = 6.9999999583333333333333333333333 / 72000000
+     84              *       = 97.222221643518518518518518518519 ns
+     85              *       ~= 0.1 us
+     86              *       延时1us  dly  = 9
+     87              *       dly = 0时，循环一次
+     88              *
+     89              while(dly--);
+     90              *//***********************************************
+     91              * 描述：定时器初始化
+     92              *       1000000次循环  = 1027.7778611111111111111111111111ms
+     93              *       平均一次循环 = 1.02777786111111111111111111111us
+     94              *       dly = 1时，= 1.1111111111111111111111111111111us
+     95              *       dly = 2时  = 2.1388888888888888888888888888889us
+     96              *       dly 每增加1 增加-1.0277777777777777777777777777778us
+     97              */
+     98              INT32U  i;
+     99          
+    100              while(dly--) {
+   \                     Delay_Nus: (+1)
+   \                     ??Delay_Nus_0: (+1)
+   \   00000000   0x0002             MOVS     R2,R0
+   \   00000002   0x1E50             SUBS     R0,R2,#+1
+   \   00000004   0x2A00             CMP      R2,#+0
+   \   00000006   0xD005             BEQ.N    ??Delay_Nus_1
+    101                  for(i=0; i<10; i++);             // clk = 72000000 1027.7778611111111111111111111111
+   \   00000008   0x2200             MOVS     R2,#+0
+   \   0000000A   0x0011             MOVS     R1,R2
+   \                     ??Delay_Nus_2: (+1)
+   \   0000000C   0x290A             CMP      R1,#+10
+   \   0000000E   0xD2F7             BCS.N    ??Delay_Nus_0
+   \   00000010   0x1C49             ADDS     R1,R1,#+1
+   \   00000012   0xE7FB             B.N      ??Delay_Nus_2
+    102              }
+    103          }
+   \                     ??Delay_Nus_1: (+1)
+   \   00000014   0x4770             BX       LR               ;; return
+    104          
+    105          /*******************************************************************************
+    106          * 名    称： bcd2Hex
+    107          * 功    能： 将BCD码变为二进制码
+    108          * 入口参数： BCD码数据
+    109          * 出口参数： 二进行制数
+    110          * 作　　者： 无名沈
+    111          * 创建日期： 2009-01-08
+    112          * 修    改：
+    113          * 修改日期：
+    114          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    115          BYTE Bcd2Hex(BYTE val)
+    116          {
+    117              return ((val&0x0f)+(val >> 4)*10);
+   \                     Bcd2Hex: (+1)
+   \   00000000   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000002   0xF010 0x010F      ANDS     R1,R0,#0xF
+   \   00000006   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000008   0x0900             LSRS     R0,R0,#+4
+   \   0000000A   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000000C   0x220A             MOVS     R2,#+10
+   \   0000000E   0xFB02 0x1000      MLA      R0,R2,R0,R1
+   \   00000012   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000014   0x4770             BX       LR               ;; return
+    118          }
+    119          
+    120          /*******************************************************************************
+    121          * 名    称： hex2Bcd
+    122          * 功    能： 
+    123          * 入口参数：
+    124          * 出口参数： 无
+    125          * 作　　者： 无名沈
+    126          * 创建日期： 2009-01-08
+    127          * 修    改：
+    128          * 修改日期：
+    129          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    130          BYTE Hex2Bcd(BYTE val)
+    131          {
+    132              return ((val / 10) << 4) + val % 10;
+   \                     Hex2Bcd: (+1)
+   \   00000000   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000002   0x0001             MOVS     R1,R0
+   \   00000004   0x220A             MOVS     R2,#+10
+   \   00000006   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000008   0x230A             MOVS     R3,#+10
+   \   0000000A   0xFB90 0xF0F3      SDIV     R0,R0,R3
+   \   0000000E   0xEB11 0x1000      ADDS     R0,R1,R0, LSL #+4
+   \   00000012   0xFB91 0xF1F2      SDIV     R1,R1,R2
+   \   00000016   0xFB02 0x0011      MLS      R0,R2,R1,R0
+   \   0000001A   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000001C   0x4770             BX       LR               ;; return
+    133          }
+    134          
+    135          /*******************************************************************************
+    136           * 名    称： ReadDS3231Byte
+    137           * 功    能： 从DS3231中读出一个字节
+    138           * 入口参数： DS3231设备号， 读取数据的地址
+    139           * 出口参数： 返回读出的值
+    140           * 作    者： 无名沈
+    141           * 创建日期： 2018/1/1
+    142           * 修    改： 
+    143           * 修改日期： 
+    144           * 备    注： 
+    145           *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    146          uint8 ReadDS3231Byte(uint8 addr)  
+    147          {
+   \                     ReadDS3231Byte: (+1)
+   \   00000000   0xB570             PUSH     {R4-R6,LR}
+   \   00000002   0x0004             MOVS     R4,R0
+    148              uint8   SlaveAddr;
+    149              uint8   RecData;
+    150              uint8   ack = 1;
+   \   00000004   0x2001             MOVS     R0,#+1
+    151              
+    152              SlaveAddr = DS3231_ADDR & (~(0x01));            //从机地址
+   \   00000006   0x25D0             MOVS     R5,#+208
+    153              
+    154              StartI2C();                                     //启动IIC总线
+   \   00000008   0x.... 0x....      BL       StartI2C
+    155              
+    156              WriteByteWithI2C(SlaveAddr);                    //写DS3231读取
+   \   0000000C   0x0028             MOVS     R0,R5
+   \   0000000E   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000010   0x.... 0x....      BL       WriteByteWithI2C
+    157              
+    158              ack = CheckSlaveAckI2C();                       //读从机应答信号
+   \   00000014   0x.... 0x....      BL       CheckSlaveAckI2C
+    159              if ( ack )
+   \   00000018   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000001A   0x2800             CMP      R0,#+0
+   \   0000001C   0xD119             BNE.N    ??ReadDS3231Byte_0
+    160                  goto exit;
+    161              
+    162              WriteByteWithI2C(addr);                         //写DS3231读取
+   \                     ??ReadDS3231Byte_1: (+1)
+   \   0000001E   0x0020             MOVS     R0,R4
+   \   00000020   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000022   0x.... 0x....      BL       WriteByteWithI2C
+    163              
+    164              ack = CheckSlaveAckI2C();                       //读从机应答信号
+   \   00000026   0x.... 0x....      BL       CheckSlaveAckI2C
+    165              if ( ack )
+   \   0000002A   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000002C   0x2800             CMP      R0,#+0
+   \   0000002E   0xD110             BNE.N    ??ReadDS3231Byte_0
+    166                  goto exit;
+    167              
+    168              StartI2C();                                     //启动IIC总线
+   \                     ??ReadDS3231Byte_2: (+1)
+   \   00000030   0x.... 0x....      BL       StartI2C
+    169              
+    170              SlaveAddr = DS3231_ADDR | 0x01;             	//从机地址
+   \   00000034   0x25D1             MOVS     R5,#+209
+    171              
+    172              WriteByteWithI2C(SlaveAddr);                    //写DS3231设备地址
+   \   00000036   0x0028             MOVS     R0,R5
+   \   00000038   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000003A   0x.... 0x....      BL       WriteByteWithI2C
+    173              
+    174              ack = CheckSlaveAckI2C();                       //读从机应答信号
+   \   0000003E   0x.... 0x....      BL       CheckSlaveAckI2C
+    175              if ( ack )
+   \   00000042   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000044   0x2800             CMP      R0,#+0
+   \   00000046   0xD104             BNE.N    ??ReadDS3231Byte_0
+    176                  goto exit;
+    177              
+    178              RecData = ReadByteWithI2C();                	//接收到的数据
+   \                     ??ReadDS3231Byte_3: (+1)
+   \   00000048   0x.... 0x....      BL       ReadByteWithI2C
+   \   0000004C   0x0006             MOVS     R6,R0
+    179              
+    180              MasterNoAckI2C();                               //主机应答从机
+   \   0000004E   0x.... 0x....      BL       MasterNoAckI2C
+    181          exit:
+    182              StopI2C();                          			//结束IIC总线
+   \                     ??ReadDS3231Byte_0: (+1)
+   \   00000052   0x.... 0x....      BL       StopI2C
+    183              
+    184              return  RecData;
+   \   00000056   0x0030             MOVS     R0,R6
+   \   00000058   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000005A   0xBD70             POP      {R4-R6,PC}       ;; return
+    185          }
+    186          
+    187          /*******************************************************************************
+    188           * 名    称： WriteDS3231Byte
+    189           * 功    能： 写一个字节到DS3231中
+    190           * 入口参数： addr:DS3231地址， Data:要写入的数据
+    191           * 出口参数： 无
+    192           * 作    者： 无名沈
+    193           * 创建日期： 2018/1/1
+    194           * 修    改： 
+    195           * 修改日期： 
+    196           * 备    注： 
+    197           *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    198          void WriteDS3231Byte(uint8 Addr,uint8   Data)  
+    199          {
+   \                     WriteDS3231Byte: (+1)
+   \   00000000   0xB538             PUSH     {R3-R5,LR}
+   \   00000002   0x0004             MOVS     R4,R0
+   \   00000004   0x000D             MOVS     R5,R1
+    200              uint8   SlaveAddr;
+    201              uint8   ack = 1;
+   \   00000006   0x2001             MOVS     R0,#+1
+    202              
+    203              StartI2C();                                     //启动IIC总线
+   \   00000008   0x.... 0x....      BL       StartI2C
+    204              
+    205              SlaveAddr = DS3231_ADDR & (~(0x01));            //从机地址
+   \   0000000C   0x20D0             MOVS     R0,#+208
+    206              
+    207              WriteByteWithI2C(SlaveAddr);                    //写DS3231读取
+   \   0000000E   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000010   0x.... 0x....      BL       WriteByteWithI2C
+    208              
+    209              ack = CheckSlaveAckI2C();                       //读从机应答信号(低为应答)
+   \   00000014   0x.... 0x....      BL       CheckSlaveAckI2C
+    210              if ( ack )
+   \   00000018   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000001A   0x2800             CMP      R0,#+0
+   \   0000001C   0xD110             BNE.N    ??WriteDS3231Byte_0
+    211                  goto exit;
+    212              
+    213              WriteByteWithI2C(Addr);                         //写DS3231操作地址
+   \                     ??WriteDS3231Byte_1: (+1)
+   \   0000001E   0x0020             MOVS     R0,R4
+   \   00000020   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000022   0x.... 0x....      BL       WriteByteWithI2C
+    214              
+    215              ack = CheckSlaveAckI2C();                       //读从机应答信号
+   \   00000026   0x.... 0x....      BL       CheckSlaveAckI2C
+    216              if ( ack )
+   \   0000002A   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000002C   0x2800             CMP      R0,#+0
+   \   0000002E   0xD107             BNE.N    ??WriteDS3231Byte_0
+    217                  goto exit;
+    218              
+    219              WriteByteWithI2C(Data);                         //写DS3231数据
+   \                     ??WriteDS3231Byte_2: (+1)
+   \   00000030   0x0028             MOVS     R0,R5
+   \   00000032   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000034   0x.... 0x....      BL       WriteByteWithI2C
+    220              
+    221              ack = CheckSlaveAckI2C();                       //读从机应答信号
+   \   00000038   0x.... 0x....      BL       CheckSlaveAckI2C
+    222              if ( ack )
+   \   0000003C   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000003E   0x2800             CMP      R0,#+0
+    223                  goto exit;
+    224              
+    225          exit:
+    226              StopI2C();                          			//结束IIC总线
+   \                     ??WriteDS3231Byte_0: (+1)
+   \   00000040   0x.... 0x....      BL       StopI2C
+    227          }      
+   \   00000044   0xBD31             POP      {R0,R4,R5,PC}    ;; return
+    228          
+    229          /*******************************************************************************
+    230          * Description  : 读内部温度值，返回值°
+    231          * Author       : 2018/5/15 星期二, by redmorningcn
+    232          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    233          s8  BSP_RTC_ReadTemp(void)  
+    234          {
+   \                     BSP_RTC_ReadTemp: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+    235              s8          TempMsb;
+    236          
+    237              RTC_WaitEvent();
+   \   00000002   0x.... 0x....      BL       RTC_WaitEvent
+    238              
+    239              TempMsb     = ReadDS3231Byte(DS3231_TEMP_MSB);      //读高位
+   \   00000006   0x2011             MOVS     R0,#+17
+   \   00000008   0x.... 0x....      BL       ReadDS3231Byte
+   \   0000000C   0x0004             MOVS     R4,R0
+    240              
+    241              RTC_SendEvent();
+   \   0000000E   0x.... 0x....      BL       RTC_SendEvent
+    242              
+    243              return  TempMsb;
+   \   00000012   0x0020             MOVS     R0,R4
+   \   00000014   0xB240             SXTB     R0,R0            ;; SignExt  R0,R0,#+24,#+24
+   \   00000016   0xBD10             POP      {R4,PC}          ;; return
+    244          }
+    245          
+    246          /*******************************************************************************
+    247           * 名    称： ReadTime
+    248           * 功    能： 从DS3231中读出时间
+    249           * 入口参数： 顾虑读出来的时间数据
+    250           * 出口参数： 返回读出的时间
+    251           * 作    者： 无名沈
+    252           * 创建日期： 2018/1/1
+    253           * 修    改： 
+    254           * 修改日期： 
+    255           * 备    注： 
+    256           *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    257          uint8 BSP_RTC_ReadTime(stcTime  *sTime)  
+    258          {    
+   \                     BSP_RTC_ReadTime: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+   \   00000002   0x0004             MOVS     R4,R0
+    259              RTC_WaitEvent();
+   \   00000004   0x.... 0x....      BL       RTC_WaitEvent
+    260              
+    261              sTime->Sec      = Bcd2Hex(ReadDS3231Byte(DS3231_SEC));
+   \   00000008   0x2000             MOVS     R0,#+0
+   \   0000000A   0x.... 0x....      BL       ReadDS3231Byte
+   \   0000000E   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000010   0x.... 0x....      BL       Bcd2Hex
+   \   00000014   0x7020             STRB     R0,[R4, #+0]
+    262              sTime->Min      = Bcd2Hex(ReadDS3231Byte(DS3231_MIN));
+   \   00000016   0x2001             MOVS     R0,#+1
+   \   00000018   0x.... 0x....      BL       ReadDS3231Byte
+   \   0000001C   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000001E   0x.... 0x....      BL       Bcd2Hex
+   \   00000022   0x7060             STRB     R0,[R4, #+1]
+    263              sTime->Hour     = Bcd2Hex(ReadDS3231Byte(DS3231_HOUR));
+   \   00000024   0x2002             MOVS     R0,#+2
+   \   00000026   0x.... 0x....      BL       ReadDS3231Byte
+   \   0000002A   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000002C   0x.... 0x....      BL       Bcd2Hex
+   \   00000030   0x70A0             STRB     R0,[R4, #+2]
+    264              sTime->Day      = Bcd2Hex(ReadDS3231Byte(DS3231_DATA));
+   \   00000032   0x2004             MOVS     R0,#+4
+   \   00000034   0x.... 0x....      BL       ReadDS3231Byte
+   \   00000038   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000003A   0x.... 0x....      BL       Bcd2Hex
+   \   0000003E   0x70E0             STRB     R0,[R4, #+3]
+    265              sTime->Mon      = Bcd2Hex(ReadDS3231Byte(DS3231_MONTH)); 
+   \   00000040   0x2005             MOVS     R0,#+5
+   \   00000042   0x.... 0x....      BL       ReadDS3231Byte
+   \   00000046   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000048   0x.... 0x....      BL       Bcd2Hex
+   \   0000004C   0x7120             STRB     R0,[R4, #+4]
+    266              sTime->Year     = Bcd2Hex(ReadDS3231Byte(DS3231_YEAR));
+   \   0000004E   0x2006             MOVS     R0,#+6
+   \   00000050   0x.... 0x....      BL       ReadDS3231Byte
+   \   00000054   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000056   0x.... 0x....      BL       Bcd2Hex
+   \   0000005A   0x7160             STRB     R0,[R4, #+5]
+    267              
+    268              RTC_SendEvent();
+   \   0000005C   0x.... 0x....      BL       RTC_SendEvent
+    269              
+    270              return  1;
+   \   00000060   0x2001             MOVS     R0,#+1
+   \   00000062   0xBD10             POP      {R4,PC}          ;; return
+    271          }
+    272          
+    273          /*******************************************************************************
+    274           * 名    称： WriteTime
+    275           * 功    能： 写DS3231时间
+    276           * 入口参数： 无
+    277           * 出口参数： 无
+    278           * 作    者： 无名沈
+    279           * 创建日期： 2018/1/1
+    280           * 修    改： 
+    281           * 修改日期： 
+    282           * 备    注： 
+    283           *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    284          void BSP_RTC_WriteTime(stcTime  sTime)  
+    285          {
+   \                     BSP_RTC_WriteTime: (+1)
+   \   00000000   0xB503             PUSH     {R0,R1,LR}
+   \   00000002   0xB081             SUB      SP,SP,#+4
+    286              RTC_WaitEvent();
+   \   00000004   0x.... 0x....      BL       RTC_WaitEvent
+    287              
+    288              WriteDS3231Byte(DS3231_SEC,     Hex2Bcd(sTime.Sec));     
+   \   00000008   0xF89D 0x0004      LDRB     R0,[SP, #+4]
+   \   0000000C   0x.... 0x....      BL       Hex2Bcd
+   \   00000010   0x0001             MOVS     R1,R0
+   \   00000012   0xB2C9             UXTB     R1,R1            ;; ZeroExt  R1,R1,#+24,#+24
+   \   00000014   0x2000             MOVS     R0,#+0
+   \   00000016   0x.... 0x....      BL       WriteDS3231Byte
+    289              WriteDS3231Byte(DS3231_MIN,     Hex2Bcd(sTime.Min));        
+   \   0000001A   0xF89D 0x0005      LDRB     R0,[SP, #+5]
+   \   0000001E   0x.... 0x....      BL       Hex2Bcd
+   \   00000022   0x0001             MOVS     R1,R0
+   \   00000024   0xB2C9             UXTB     R1,R1            ;; ZeroExt  R1,R1,#+24,#+24
+   \   00000026   0x2001             MOVS     R0,#+1
+   \   00000028   0x.... 0x....      BL       WriteDS3231Byte
+    290              WriteDS3231Byte(DS3231_HOUR,    Hex2Bcd(sTime.Hour));
+   \   0000002C   0xF89D 0x0006      LDRB     R0,[SP, #+6]
+   \   00000030   0x.... 0x....      BL       Hex2Bcd
+   \   00000034   0x0001             MOVS     R1,R0
+   \   00000036   0xB2C9             UXTB     R1,R1            ;; ZeroExt  R1,R1,#+24,#+24
+   \   00000038   0x2002             MOVS     R0,#+2
+   \   0000003A   0x.... 0x....      BL       WriteDS3231Byte
+    291              WriteDS3231Byte(DS3231_DATA,    Hex2Bcd(sTime.Day));    
+   \   0000003E   0xF89D 0x0007      LDRB     R0,[SP, #+7]
+   \   00000042   0x.... 0x....      BL       Hex2Bcd
+   \   00000046   0x0001             MOVS     R1,R0
+   \   00000048   0xB2C9             UXTB     R1,R1            ;; ZeroExt  R1,R1,#+24,#+24
+   \   0000004A   0x2004             MOVS     R0,#+4
+   \   0000004C   0x.... 0x....      BL       WriteDS3231Byte
+    292              WriteDS3231Byte(DS3231_MONTH,   Hex2Bcd(sTime.Mon));  
+   \   00000050   0xF89D 0x0008      LDRB     R0,[SP, #+8]
+   \   00000054   0x.... 0x....      BL       Hex2Bcd
+   \   00000058   0x0001             MOVS     R1,R0
+   \   0000005A   0xB2C9             UXTB     R1,R1            ;; ZeroExt  R1,R1,#+24,#+24
+   \   0000005C   0x2005             MOVS     R0,#+5
+   \   0000005E   0x.... 0x....      BL       WriteDS3231Byte
+    293              WriteDS3231Byte(DS3231_YEAR,    Hex2Bcd(sTime.Year));
+   \   00000062   0xF89D 0x0009      LDRB     R0,[SP, #+9]
+   \   00000066   0x.... 0x....      BL       Hex2Bcd
+   \   0000006A   0x0001             MOVS     R1,R0
+   \   0000006C   0xB2C9             UXTB     R1,R1            ;; ZeroExt  R1,R1,#+24,#+24
+   \   0000006E   0x2006             MOVS     R0,#+6
+   \   00000070   0x.... 0x....      BL       WriteDS3231Byte
+    294              
+    295              RTC_SendEvent();
+   \   00000074   0x.... 0x....      BL       RTC_SendEvent
+    296          }
+   \   00000078   0xBD07             POP      {R0-R2,PC}       ;; return
+    297          
+    298          /*******************************************************************************
+    299           * 名    称： BSP_Ds3231Init
+    300           * 功    能： 初始化DS3231设备模式
+    301           * 入口参数： 无
+    302           * 出口参数： 无
+    303           * 作    者： 无名沈
+    304           * 创建日期： 2018/1/1
+    305           * 修    改： 
+    306           * 修改日期： 
+    307           * 备    注： 
+    308           *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    309          void BSP_Ds3231Init(void)  
+    310          {
+   \                     BSP_Ds3231Init: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+    311              //总线初始化在在bsp中完成。
+    312              //
+    313              GPIO_RTC_Init();                //RtC实时时钟出事化
+   \   00000002   0x.... 0x....      BL       GPIO_RTC_Init
+    314              
+    315              WriteDS3231Byte(DS3231_CONTROL,0); 
+   \   00000006   0x2100             MOVS     R1,#+0
+   \   00000008   0x200E             MOVS     R0,#+14
+   \   0000000A   0x.... 0x....      BL       WriteDS3231Byte
+    316              //初始化状态寄存器
+    317              WriteDS3231Byte(DS3231_STATUS,0);
+   \   0000000E   0x2100             MOVS     R1,#+0
+   \   00000010   0x200F             MOVS     R0,#+15
+   \   00000012   0x.... 0x....      BL       WriteDS3231Byte
+    318          }
+   \   00000016   0xBD01             POP      {R0,PC}          ;; return
+    319          
+    320          /*******************************************************************************
+    321          * 名    称： BSP_RX8025T_SetDate()
+    322          * 功    能： 初始化RTC设备
+    323          * 入口参数：
+    324          * 出口参数：
+    325          * 作　　者： 无名沈
+    326          * 创建日期： 2015-01-26
+    327          * 修    改：
+    328          * 修改日期：
+    329          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    330          BOOL BSP_RTC_Init(void)  
+    331          {
+   \                     BSP_RTC_Init: (+1)
+   \   00000000   0xB500             PUSH     {LR}
+   \   00000002   0xB08B             SUB      SP,SP,#+44
+    332              BSP_Ds3231Init();
+   \   00000004   0x.... 0x....      BL       BSP_Ds3231Init
+    333              tm_now  = TIME_GetCalendarTime(); 
+   \   00000008   0x4668             MOV      R0,SP
+   \   0000000A   0x.... 0x....      BL       TIME_GetCalendarTime
+   \   0000000E   0x....             LDR.N    R0,??DataTable0
+   \   00000010   0x4669             MOV      R1,SP
+   \   00000012   0x222C             MOVS     R2,#+44
+   \   00000014   0x.... 0x....      BL       __aeabi_memcpy4
+    334              return TRUE;
+   \   00000018   0x2001             MOVS     R0,#+1
+   \   0000001A   0xB00B             ADD      SP,SP,#+44
+   \   0000001C   0xBD00             POP      {PC}             ;; return
+    335          }
+    336          
+    337          /*******************************************************************************
+    338          * 名    称： BSP_RX8025T_SetDate()
+    339          * 功    能： 设置时期：年，月，时，星期，时，分，秒
+    340          * 入口参数：
+    341          * 出口参数：
+    342          * 作　　者： 无名沈
+    343          * 创建日期： 2015-01-26
+    344          * 修    改：
+    345          * 修改日期：
+    346          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    347          BOOL BSP_SetTime(struct tm t_tm)
+    348          {
+   \                     BSP_SetTime: (+1)
+   \   00000000   0xB40F             PUSH     {R0-R3}
+   \   00000002   0xB51C             PUSH     {R2-R4,LR}
+    349              INT08U  time[7];
+    350              INT08U  i;
+    351              
+    352              RTC_WaitEvent();
+   \   00000004   0x.... 0x....      BL       RTC_WaitEvent
+    353              /***********************************************
+    354              * 描述： 判断年是否合法
+    355              */
+    356              if ( t_tm.tm_year > 2000 )
+   \   00000008   0x9809             LDR      R0,[SP, #+36]
+   \   0000000A   0xF5B0 0x6FFA      CMP      R0,#+2000
+   \   0000000E   0xDD03             BLE.N    ??BSP_SetTime_0
+    357                  t_tm.tm_year -= 2000;
+   \   00000010   0x9809             LDR      R0,[SP, #+36]
+   \   00000012   0xF5B0 0x60FA      SUBS     R0,R0,#+2000
+   \   00000016   0x9009             STR      R0,[SP, #+36]
+    358              
+    359              /***********************************************
+    360              * 描述： 先读取设置
+    361              */        
+    362              time[0]     = Hex2Bcd(t_tm.tm_sec);
+   \                     ??BSP_SetTime_0: (+1)
+   \   00000018   0x9804             LDR      R0,[SP, #+16]
+   \   0000001A   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000001C   0x.... 0x....      BL       Hex2Bcd
+   \   00000020   0xF88D 0x0000      STRB     R0,[SP, #+0]
+    363              time[1]     = Hex2Bcd(t_tm.tm_min);
+   \   00000024   0x9805             LDR      R0,[SP, #+20]
+   \   00000026   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000028   0x.... 0x....      BL       Hex2Bcd
+   \   0000002C   0xF88D 0x0001      STRB     R0,[SP, #+1]
+    364              time[2]     = Hex2Bcd(t_tm.tm_hour);
+   \   00000030   0x9806             LDR      R0,[SP, #+24]
+   \   00000032   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000034   0x.... 0x....      BL       Hex2Bcd
+   \   00000038   0xF88D 0x0002      STRB     R0,[SP, #+2]
+    365              time[3]     = Hex2Bcd(t_tm.tm_wday);
+   \   0000003C   0x980A             LDR      R0,[SP, #+40]
+   \   0000003E   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000040   0x.... 0x....      BL       Hex2Bcd
+   \   00000044   0xF88D 0x0003      STRB     R0,[SP, #+3]
+    366              time[4]     = Hex2Bcd(t_tm.tm_mday);
+   \   00000048   0x9807             LDR      R0,[SP, #+28]
+   \   0000004A   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000004C   0x.... 0x....      BL       Hex2Bcd
+   \   00000050   0xF88D 0x0004      STRB     R0,[SP, #+4]
+    367              time[5]     = Hex2Bcd(t_tm.tm_mon);
+   \   00000054   0x9808             LDR      R0,[SP, #+32]
+   \   00000056   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000058   0x.... 0x....      BL       Hex2Bcd
+   \   0000005C   0xF88D 0x0005      STRB     R0,[SP, #+5]
+    368              time[6]     = Hex2Bcd(t_tm.tm_year);
+   \   00000060   0x9809             LDR      R0,[SP, #+36]
+   \   00000062   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000064   0x.... 0x....      BL       Hex2Bcd
+   \   00000068   0xF88D 0x0006      STRB     R0,[SP, #+6]
+    369              
+    370              /***********************************************
+    371              * 描述： 写入时间
+    372              */
+    373              for ( i = 0; i < 7; i++ ) {
+   \   0000006C   0x2400             MOVS     R4,#+0
+   \   0000006E   0xE007             B.N      ??BSP_SetTime_1
+    374                  WriteDS3231Byte(i,time[i]);
+   \                     ??BSP_SetTime_2: (+1)
+   \   00000070   0x4668             MOV      R0,SP
+   \   00000072   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   00000074   0x5C21             LDRB     R1,[R4, R0]
+   \   00000076   0x0020             MOVS     R0,R4
+   \   00000078   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000007A   0x.... 0x....      BL       WriteDS3231Byte
+    375              }  
+   \   0000007E   0x1C64             ADDS     R4,R4,#+1
+   \                     ??BSP_SetTime_1: (+1)
+   \   00000080   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   00000082   0x2C07             CMP      R4,#+7
+   \   00000084   0xDBF4             BLT.N    ??BSP_SetTime_2
+    376              RTC_SendEvent();
+   \   00000086   0x.... 0x....      BL       RTC_SendEvent
+    377              return TRUE;
+   \   0000008A   0x2001             MOVS     R0,#+1
+   \   0000008C   0xBC16             POP      {R1,R2,R4}
+   \   0000008E   0xF85D 0xFB14      LDR      PC,[SP], #+20    ;; return
+    378          }
+    379          
+    380          /*******************************************************************************
+    381          * 名    称： BSP_RX8025T_GetTime()
+    382          * 功    能： 读取时间：年，月，日，星期，时，分，秒
+    383          * 入口参数： *t_tm - 时间接收结构体
+    384          * 出口参数：
+    385          * 作　　者： 无名沈
+    386          * 创建日期： 2015-01-26
+    387          * 修    改：
+    388          * 修改日期：
+    389          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    390          BOOL BSP_GetTime(struct tm *t_tm)
+    391          {
+   \                     BSP_GetTime: (+1)
+   \   00000000   0xB530             PUSH     {R4,R5,LR}
+   \   00000002   0xB083             SUB      SP,SP,#+12
+   \   00000004   0x0004             MOVS     R4,R0
+    392              u8 time[7];
+    393              INT08U  i;
+    394              RTC_WaitEvent();
+   \   00000006   0x.... 0x....      BL       RTC_WaitEvent
+    395              
+    396              for ( i = 0; i < 7; i++ ) {
+   \   0000000A   0x2500             MOVS     R5,#+0
+   \   0000000C   0xE007             B.N      ??BSP_GetTime_0
+    397                  time[i]    = ReadDS3231Byte(i);
+   \                     ??BSP_GetTime_1: (+1)
+   \   0000000E   0x0028             MOVS     R0,R5
+   \   00000010   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000012   0x.... 0x....      BL       ReadDS3231Byte
+   \   00000016   0x4669             MOV      R1,SP
+   \   00000018   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   0000001A   0x5468             STRB     R0,[R5, R1]
+    398              }
+   \   0000001C   0x1C6D             ADDS     R5,R5,#+1
+   \                     ??BSP_GetTime_0: (+1)
+   \   0000001E   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   00000020   0x2D07             CMP      R5,#+7
+   \   00000022   0xDBF4             BLT.N    ??BSP_GetTime_1
+    399              t_tm->tm_sec     = Bcd2Hex(time[0]);
+   \   00000024   0xF89D 0x0000      LDRB     R0,[SP, #+0]
+   \   00000028   0x.... 0x....      BL       Bcd2Hex
+   \   0000002C   0x6020             STR      R0,[R4, #+0]
+    400              t_tm->tm_min     = Bcd2Hex(time[1]);
+   \   0000002E   0xF89D 0x0001      LDRB     R0,[SP, #+1]
+   \   00000032   0x.... 0x....      BL       Bcd2Hex
+   \   00000036   0x6060             STR      R0,[R4, #+4]
+    401              t_tm->tm_hour    = Bcd2Hex(time[2]);
+   \   00000038   0xF89D 0x0002      LDRB     R0,[SP, #+2]
+   \   0000003C   0x.... 0x....      BL       Bcd2Hex
+   \   00000040   0x60A0             STR      R0,[R4, #+8]
+    402              t_tm->tm_wday    =         time[3];
+   \   00000042   0xF89D 0x0003      LDRB     R0,[SP, #+3]
+   \   00000046   0x61A0             STR      R0,[R4, #+24]
+    403              t_tm->tm_mday    = Bcd2Hex(time[4]);
+   \   00000048   0xF89D 0x0004      LDRB     R0,[SP, #+4]
+   \   0000004C   0x.... 0x....      BL       Bcd2Hex
+   \   00000050   0x60E0             STR      R0,[R4, #+12]
+    404              t_tm->tm_mon     = Bcd2Hex(time[5]);
+   \   00000052   0xF89D 0x0005      LDRB     R0,[SP, #+5]
+   \   00000056   0x.... 0x....      BL       Bcd2Hex
+   \   0000005A   0x6120             STR      R0,[R4, #+16]
+    405              t_tm->tm_year    = Bcd2Hex(time[6]) + 2000;
+   \   0000005C   0xF89D 0x0006      LDRB     R0,[SP, #+6]
+   \   00000060   0x.... 0x....      BL       Bcd2Hex
+   \   00000064   0xF510 0x60FA      ADDS     R0,R0,#+2000
+   \   00000068   0x6160             STR      R0,[R4, #+20]
+    406              
+    407              RTC_SendEvent();
+   \   0000006A   0x.... 0x....      BL       RTC_SendEvent
+    408              
+    409              return TRUE;
+   \   0000006E   0x2001             MOVS     R0,#+1
+   \   00000070   0xBD3E             POP      {R1-R5,PC}       ;; return
+    410          }
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable0:
+   \   00000000   0x........         DC32     tm_now
+    411          /*******************************************************************************
+    412           * 				end of file                                                    *
+    413           *******************************************************************************/
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       8   BSP_Ds3231Init
+         8   -> GPIO_RTC_Init
+         8   -> WriteDS3231Byte
+      24   BSP_GetTime
+        24   -> Bcd2Hex
+        24   -> RTC_SendEvent
+        24   -> RTC_WaitEvent
+        24   -> ReadDS3231Byte
+      48   BSP_RTC_Init
+        48   -> BSP_Ds3231Init
+        48   -> TIME_GetCalendarTime
+        48   -> __aeabi_memcpy4
+       8   BSP_RTC_ReadTemp
+         8   -> RTC_SendEvent
+         8   -> RTC_WaitEvent
+         8   -> ReadDS3231Byte
+       8   BSP_RTC_ReadTime
+         8   -> Bcd2Hex
+         8   -> RTC_SendEvent
+         8   -> RTC_WaitEvent
+         8   -> ReadDS3231Byte
+      16   BSP_RTC_WriteTime
+        16   -> Hex2Bcd
+        16   -> RTC_SendEvent
+        16   -> RTC_WaitEvent
+        16   -> WriteDS3231Byte
+      32   BSP_SetTime
+        32   -> Hex2Bcd
+        32   -> RTC_SendEvent
+        32   -> RTC_WaitEvent
+        32   -> WriteDS3231Byte
+       0   Bcd2Hex
+       0   Delay_Nus
+       0   Hex2Bcd
+      16   ReadDS3231Byte
+        16   -> CheckSlaveAckI2C
+        16   -> MasterNoAckI2C
+        16   -> ReadByteWithI2C
+        16   -> StartI2C
+        16   -> StopI2C
+        16   -> WriteByteWithI2C
+      16   WriteDS3231Byte
+        16   -> CheckSlaveAckI2C
+        16   -> StartI2C
+        16   -> StopI2C
+        16   -> WriteByteWithI2C
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable0
+      24  BSP_Ds3231Init
+     114  BSP_GetTime
+      30  BSP_RTC_Init
+      24  BSP_RTC_ReadTemp
+     100  BSP_RTC_ReadTime
+     122  BSP_RTC_WriteTime
+     146  BSP_SetTime
+      22  Bcd2Hex
+      22  Delay_Nus
+      30  Hex2Bcd
+      92  ReadDS3231Byte
+      70  WriteDS3231Byte
+
+ 
+ 800 bytes in section .text
+ 
+ 800 bytes of CODE memory
+
+Errors: none
+Warnings: none

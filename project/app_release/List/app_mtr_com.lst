@@ -1,0 +1,688 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.50.1.10123/W32 for ARM       15/Jul/2018  10:36:15
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  F:\iar\NC210\NC210-200处理板\source\task\app_mtr_com.c
+#    Command line =  
+#        F:\iar\NC210\NC210-200处理板\source\task\app_mtr_com.c -D
+#        USE_STDPERIPH_DRIVER -D APP_RELEASE -lCN
+#        F:\iar\NC210\NC210-200处理板\project\app_release\List -o
+#        F:\iar\NC210\NC210-200处理板\project\app_release\Obj --no_cse
+#        --no_unroll --no_inline --no_code_motion --no_tbaa --no_clustering
+#        --no_scheduling --debug --endian=little --cpu=Cortex-M3 -e --fpu=None
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.3\arm\INC\c\DLib_Config_Full.h" -I
+#        F:\iar\NC210\NC210-200处理板\project\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\config\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\task\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\user\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\OSAL\OS\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\OSAL\Ports\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\driver\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-LIB\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-CPU\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-CPU\ARM-Cortex-M3\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uCOS-III\Ports\ARM-Cortex-M3\Generic\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uCOS-III\Source\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\ST\STM32\inc\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\OS\uCOS-III\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Cfg\Template\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\OS\uCOS-III\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Ports\STM32\STM32F103\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Source\
+#        -Ol --use_c++_inline -I "C:\Program Files (x86)\IAR Systems\Embedded
+#        Workbench 7.3\arm\CMSIS\Include\"
+#    List file    =  
+#        F:\iar\NC210\NC210-200处理板\project\app_release\List\app_mtr_com.lst
+#    Object file  =  
+#        F:\iar\NC210\NC210-200处理板\project\app_release\Obj\app_mtr_com.o
+#
+###############################################################################
+
+F:\iar\NC210\NC210-200处理板\source\task\app_mtr_com.c
+      1          /**************************************************************
+      2          * Description  : 处理板和速度检测板及工况检测板通讯
+      3          (采用modbus协议，处理板为主机，其他为从。速度检测板地址：1-3，工况检测板地址为：4)
+      4          * Author       : 2018/5/21 星期一, by redmorningcn
+      5          */
+      6          
+      7          /*******************************************************************************
+      8          * INCLUDES
+      9          */
+     10          #include    <includes.h>
+     11          #include    <app_mtr_com.h>
+     12          #include    <string.h>
+     13          
+     14          /**************************************************************
+     15          * Description  : 通讯状态指示
+     16          * Author       : 2018/5/22 星期二, by redmorningcn
+     17          */
+
+   \                                 In section .text, align 2, keep-with-next
+     18          void    MtrCommErrjudge(u8   node,u16    sta)
+     19          {
+     20              u8  err = 0;            //正常
+   \                     MtrCommErrjudge: (+1)
+   \   00000000   0x2200             MOVS     R2,#+0
+     21              
+     22              if(sta == 0)
+   \   00000002   0xB289             UXTH     R1,R1            ;; ZeroExt  R1,R1,#+16,#+16
+   \   00000004   0x2900             CMP      R1,#+0
+   \   00000006   0xD100             BNE.N    ??MtrCommErrjudge_0
+     23                  err = 1;            //故障
+   \   00000008   0x2201             MOVS     R2,#+1
+     24              
+     25              switch(node)
+   \                     ??MtrCommErrjudge_0: (+1)
+   \   0000000A   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000000C   0x2801             CMP      R0,#+1
+   \   0000000E   0xD006             BEQ.N    ??MtrCommErrjudge_1
+   \   00000010   0xD334             BCC.N    ??MtrCommErrjudge_2
+   \   00000012   0x2803             CMP      R0,#+3
+   \   00000014   0xD01B             BEQ.N    ??MtrCommErrjudge_3
+   \   00000016   0xD30E             BCC.N    ??MtrCommErrjudge_4
+   \   00000018   0x2804             CMP      R0,#+4
+   \   0000001A   0xD024             BEQ.N    ??MtrCommErrjudge_5
+   \   0000001C   0xE02E             B.N      ??MtrCommErrjudge_2
+     26              {
+     27              case 1:
+     28                  Ctrl.sRunPara.Err.Speed1Comm= err;
+   \                     ??MtrCommErrjudge_1: (+1)
+   \   0000001E   0xB2D2             UXTB     R2,R2            ;; ZeroExt  R2,R2,#+24,#+24
+   \   00000020   0x.... 0x....      LDR.W    R0,??DataTable3
+   \   00000024   0xF8B0 0x0058      LDRH     R0,[R0, #+88]
+   \   00000028   0xF362 0x0000      BFI      R0,R2,#+0,#+1
+   \   0000002C   0x.... 0x....      LDR.W    R1,??DataTable3
+   \   00000030   0xF8A1 0x0058      STRH     R0,[R1, #+88]
+     29                  break;
+   \   00000034   0xE022             B.N      ??MtrCommErrjudge_6
+     30              case 2:
+     31                  Ctrl.sRunPara.Err.Speed2Comm= err;
+   \                     ??MtrCommErrjudge_4: (+1)
+   \   00000036   0xB2D2             UXTB     R2,R2            ;; ZeroExt  R2,R2,#+24,#+24
+   \   00000038   0x.... 0x....      LDR.W    R0,??DataTable3
+   \   0000003C   0xF8B0 0x0058      LDRH     R0,[R0, #+88]
+   \   00000040   0xF362 0x0041      BFI      R0,R2,#+1,#+1
+   \   00000044   0x.... 0x....      LDR.W    R1,??DataTable3
+   \   00000048   0xF8A1 0x0058      STRH     R0,[R1, #+88]
+     32                  break;
+   \   0000004C   0xE016             B.N      ??MtrCommErrjudge_6
+     33              case 3:
+     34                  Ctrl.sRunPara.Err.Speed3Comm= err;
+   \                     ??MtrCommErrjudge_3: (+1)
+   \   0000004E   0xB2D2             UXTB     R2,R2            ;; ZeroExt  R2,R2,#+24,#+24
+   \   00000050   0x.... 0x....      LDR.W    R0,??DataTable3
+   \   00000054   0xF8B0 0x0058      LDRH     R0,[R0, #+88]
+   \   00000058   0xF362 0x0082      BFI      R0,R2,#+2,#+1
+   \   0000005C   0x.... 0x....      LDR.W    R1,??DataTable3
+   \   00000060   0xF8A1 0x0058      STRH     R0,[R1, #+88]
+     35                  break;
+   \   00000064   0xE00A             B.N      ??MtrCommErrjudge_6
+     36              case 4:
+     37                  Ctrl.sRunPara.Err.LocoComm  = err;
+   \                     ??MtrCommErrjudge_5: (+1)
+   \   00000066   0xB2D2             UXTB     R2,R2            ;; ZeroExt  R2,R2,#+24,#+24
+   \   00000068   0x.... 0x....      LDR.W    R0,??DataTable3
+   \   0000006C   0xF8B0 0x0058      LDRH     R0,[R0, #+88]
+   \   00000070   0xF362 0x1086      BFI      R0,R2,#+6,#+1
+   \   00000074   0x....             LDR.N    R1,??DataTable3
+   \   00000076   0xF8A1 0x0058      STRH     R0,[R1, #+88]
+     38                  break;
+   \   0000007A   0xE7FF             B.N      ??MtrCommErrjudge_6
+     39              default:
+     40                  break;
+     41              }
+     42              
+     43              
+     44          }
+   \                     ??MtrCommErrjudge_2: (+1)
+   \                     ??MtrCommErrjudge_6: (+1)
+   \   0000007C   0x4770             BX       LR               ;; return
+     45                                                  
+     46          /**************************************************************
+     47          * Description  : 处理板读指定地址值。读取得值存在MtrCom->Rd中。
+     48          * Author       : 2018/5/22 星期二, by redmorningcn
+     49          */
+
+   \                                 In section .text, align 2, keep-with-next
+     50          void    MtrRdSpecial(u16 addr,u8  len)
+     51          {
+   \                     MtrRdSpecial: (+1)
+   \   00000000   0xB538             PUSH     {R3-R5,LR}
+     52              u8      node = MtrCom->ConnCtrl.MB_Node;    //modbus地址
+   \   00000002   0x....             LDR.N    R2,??DataTable3_1
+   \   00000004   0x6812             LDR      R2,[R2, #+0]
+   \   00000006   0xF8D2 0x241E      LDR      R2,[R2, #+1054]
+   \   0000000A   0x0C12             LSRS     R2,R2,#+16
+   \   0000000C   0xF012 0x041F      ANDS     R4,R2,#0x1F
+     53              u16     sta;
+     54              
+     55              sta  = MBM_FC03_HoldingRegRd(   MtrCom->pch,
+     56                                              node,
+     57                                              addr,
+     58                                              (u16 *)&MtrCom->Rd,
+     59                                              len);
+   \   00000010   0xB2C9             UXTB     R1,R1            ;; ZeroExt  R1,R1,#+24,#+24
+   \   00000012   0xB289             UXTH     R1,R1            ;; ZeroExt  R1,R1,#+16,#+16
+   \   00000014   0x9100             STR      R1,[SP, #+0]
+   \   00000016   0x....             LDR.N    R1,??DataTable3_1
+   \   00000018   0x680B             LDR      R3,[R1, #+0]
+   \   0000001A   0x0002             MOVS     R2,R0
+   \   0000001C   0xB292             UXTH     R2,R2            ;; ZeroExt  R2,R2,#+16,#+16
+   \   0000001E   0x0021             MOVS     R1,R4
+   \   00000020   0xB2C9             UXTB     R1,R1            ;; ZeroExt  R1,R1,#+24,#+24
+   \   00000022   0x....             LDR.N    R0,??DataTable3_1
+   \   00000024   0x6800             LDR      R0,[R0, #+0]
+   \   00000026   0xF8D0 0x0400      LDR      R0,[R0, #+1024]
+   \   0000002A   0x.... 0x....      BL       MBM_FC03_HoldingRegRd
+   \   0000002E   0x0005             MOVS     R5,R0
+     60          
+     61              MtrCommErrjudge(node,sta);              //故障判断，置runpara中的故障标识位。异常置1，正常置0    
+   \   00000030   0x0029             MOVS     R1,R5
+   \   00000032   0xB289             UXTH     R1,R1            ;; ZeroExt  R1,R1,#+16,#+16
+   \   00000034   0x0020             MOVS     R0,R4
+   \   00000036   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000038   0x.... 0x....      BL       MtrCommErrjudge
+     62              
+     63              MtrCom->RxCtrl.Len      = sta;            //置数据长度。（长度控制在255以内）
+   \   0000003C   0x....             LDR.N    R0,??DataTable3_1
+   \   0000003E   0x6800             LDR      R0,[R0, #+0]
+   \   00000040   0xF880 0x5416      STRB     R5,[R0, #+1046]
+     64              MtrCom->RxCtrl.RecvFlg  = 1;             //置接收完成标识。协调其他任务。
+   \   00000044   0x....             LDR.N    R0,??DataTable3_1
+   \   00000046   0x6800             LDR      R0,[R0, #+0]
+   \   00000048   0xF890 0x0419      LDRB     R0,[R0, #+1049]
+   \   0000004C   0xF050 0x0001      ORRS     R0,R0,#0x1
+   \   00000050   0x....             LDR.N    R1,??DataTable3_1
+   \   00000052   0x6809             LDR      R1,[R1, #+0]
+   \   00000054   0xF881 0x0419      STRB     R0,[R1, #+1049]
+     65          }                                        
+   \   00000058   0xBD31             POP      {R0,R4,R5,PC}    ;; return
+     66          
+     67          /**************************************************************
+     68          * Description  : 处理板写指定位置。写前数据存在MtrCom->Wr中。
+     69          * Author       : 2018/5/22 星期二, by redmorningcn
+     70          */
+
+   \                                 In section .text, align 2, keep-with-next
+     71          void    MtrWrSpecial(u16 addr,u8  len)
+     72          {
+   \                     MtrWrSpecial: (+1)
+   \   00000000   0xB538             PUSH     {R3-R5,LR}
+     73              u8      node = MtrCom->ConnCtrl.MB_Node;    //modbus地址
+   \   00000002   0x....             LDR.N    R2,??DataTable3_1
+   \   00000004   0x6812             LDR      R2,[R2, #+0]
+   \   00000006   0xF8D2 0x241E      LDR      R2,[R2, #+1054]
+   \   0000000A   0x0C12             LSRS     R2,R2,#+16
+   \   0000000C   0xF012 0x041F      ANDS     R4,R2,#0x1F
+     74              u16     sta = 0;
+   \   00000010   0x2500             MOVS     R5,#+0
+     75              
+     76              sta  = MBM_FC16_HoldingRegWrN ( MtrCom->pch,
+     77                                              node,
+     78                                              addr,
+     79                                              (u16 *)&MtrCom->Wr,
+     80                                              len);
+   \   00000012   0xB2C9             UXTB     R1,R1            ;; ZeroExt  R1,R1,#+24,#+24
+   \   00000014   0xB289             UXTH     R1,R1            ;; ZeroExt  R1,R1,#+16,#+16
+   \   00000016   0x9100             STR      R1,[SP, #+0]
+   \   00000018   0x....             LDR.N    R1,??DataTable3_1
+   \   0000001A   0x6809             LDR      R1,[R1, #+0]
+   \   0000001C   0xF511 0x7300      ADDS     R3,R1,#+512
+   \   00000020   0x0002             MOVS     R2,R0
+   \   00000022   0xB292             UXTH     R2,R2            ;; ZeroExt  R2,R2,#+16,#+16
+   \   00000024   0x0021             MOVS     R1,R4
+   \   00000026   0xB2C9             UXTB     R1,R1            ;; ZeroExt  R1,R1,#+24,#+24
+   \   00000028   0x....             LDR.N    R0,??DataTable3_1
+   \   0000002A   0x6800             LDR      R0,[R0, #+0]
+   \   0000002C   0xF8D0 0x0400      LDR      R0,[R0, #+1024]
+   \   00000030   0x.... 0x....      BL       MBM_FC16_HoldingRegWrN
+   \   00000034   0x0005             MOVS     R5,R0
+     81          
+     82              MtrCommErrjudge(node,sta);                  //故障判断，置runpara中的故障标识位。异常置1，正常置0    
+   \   00000036   0x0029             MOVS     R1,R5
+   \   00000038   0xB289             UXTH     R1,R1            ;; ZeroExt  R1,R1,#+16,#+16
+   \   0000003A   0x0020             MOVS     R0,R4
+   \   0000003C   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000003E   0x.... 0x....      BL       MtrCommErrjudge
+     83              
+     84              MtrCom->ConnCtrl.datalen      = sta;        //置数据长度。（长度控制在255以内）
+   \   00000042   0x....             LDR.N    R0,??DataTable3_1
+   \   00000044   0x6800             LDR      R0,[R0, #+0]
+   \   00000046   0xF880 0x5432      STRB     R5,[R0, #+1074]
+     85              MtrCom->ConnCtrl.RecvEndFlg   = 1;          //置接收完成标识。协调其他任务。
+   \   0000004A   0x....             LDR.N    R0,??DataTable3_1
+   \   0000004C   0x6800             LDR      R0,[R0, #+0]
+   \   0000004E   0xF8D0 0x041E      LDR      R0,[R0, #+1054]
+   \   00000052   0xF050 0x0002      ORRS     R0,R0,#0x2
+   \   00000056   0x....             LDR.N    R1,??DataTable3_1
+   \   00000058   0x6809             LDR      R1,[R1, #+0]
+   \   0000005A   0xF8C1 0x041E      STR      R0,[R1, #+1054]
+     86          }
+   \   0000005E   0xBD31             POP      {R0,R4,R5,PC}    ;; return
+     87          
+     88          
+     89          #define MTR_READ_FLG  2
+     90          #define MTR_WRITE_FLG 1
+     91          /**************************************************************
+     92          * Description  : 处理板和检测板通讯
+     93          * Author       : 2018/5/22 星期二, by redmorningcn
+     94          */
+
+   \                                 In section .text, align 2, keep-with-next
+     95          void app_mtr_com(void)
+     96          {
+   \                     app_mtr_com: (+1)
+   \   00000000   0xB538             PUSH     {R3-R5,LR}
+     97              u8      i = 0;
+   \   00000002   0x2000             MOVS     R0,#+0
+     98              u8      node = MtrCom->ConnCtrl.MB_Node;            //modbus地址
+   \   00000004   0x....             LDR.N    R0,??DataTable3_1
+   \   00000006   0x6800             LDR      R0,[R0, #+0]
+   \   00000008   0xF8D0 0x041E      LDR      R0,[R0, #+1054]
+   \   0000000C   0x0C00             LSRS     R0,R0,#+16
+   \   0000000E   0xF010 0x041F      ANDS     R4,R0,#0x1F
+     99          
+    100              if(MtrCom->ConnCtrl.protocol == MODBUS_PROTOCOL)    //modbus协议
+   \   00000012   0x....             LDR.N    R0,??DataTable3_1
+   \   00000014   0x6800             LDR      R0,[R0, #+0]
+   \   00000016   0xF8D0 0x041E      LDR      R0,[R0, #+1054]
+   \   0000001A   0xF3C0 0x2001      UBFX     R0,R0,#+8,#+2
+   \   0000001E   0x2800             CMP      R0,#+0
+   \   00000020   0xF040 0x8140      BNE.W    ??app_mtr_com_0
+    101              {
+    102                  u8      conntype = MtrCom->ConnCtrl.ConnType;
+   \   00000024   0x....             LDR.N    R0,??DataTable3_1
+   \   00000026   0x6800             LDR      R0,[R0, #+0]
+   \   00000028   0xF8D0 0x041E      LDR      R0,[R0, #+1054]
+   \   0000002C   0xF3C0 0x1042      UBFX     R0,R0,#+5,#+3
+    103                  u16     addr;
+    104                  u8      len;
+    105                  u16     freq[2];
+    106                  switch(conntype)
+   \   00000030   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000032   0x2800             CMP      R0,#+0
+   \   00000034   0xF040 0x8136      BNE.W    ??app_mtr_com_1
+    107                  {
+    108                      
+    109                  case MTR_RD_DETECT:
+    110                      /**************************************************************
+    111                      * Description  : 读取速度信号
+    112                      * Author       : 2018/5/31 星期四, by redmorningcn
+    113                      */
+    114                      if(node < 4){
+   \   00000038   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   0000003A   0x2C04             CMP      R4,#+4
+   \   0000003C   0xF280 0x8117      BGE.W    ??app_mtr_com_2
+    115                          len  = sizeof(strSpeed)/2 ;                                         //速度检测板有效参数长度
+   \   00000040   0x2518             MOVS     R5,#+24
+    116                          addr = sizeof(strSpeedSys)/2 + sizeof(strCoupleChannel)/2 - len;   //有效参数存储在结构体后部
+   \   00000042   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   00000044   0xF5D5 0x60AF      RSBS     R0,R5,#+1400
+    117                          
+    118                          MtrRdSpecial(addr,len);
+   \   00000048   0x0029             MOVS     R1,R5
+   \   0000004A   0xB2C9             UXTB     R1,R1            ;; ZeroExt  R1,R1,#+24,#+24
+   \   0000004C   0xB280             UXTH     R0,R0            ;; ZeroExt  R0,R0,#+16,#+16
+   \   0000004E   0x.... 0x....      BL       MtrRdSpecial
+    119                          
+    120                          if(MtrCom->RxCtrl.Len == len)
+   \   00000052   0x....             LDR.N    R0,??DataTable3_1
+   \   00000054   0x6800             LDR      R0,[R0, #+0]
+   \   00000056   0xF890 0x0416      LDRB     R0,[R0, #+1046]
+   \   0000005A   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   0000005C   0x42A8             CMP      R0,R5
+   \   0000005E   0xF040 0x8106      BNE.W    ??app_mtr_com_2
+    121                          {   
+    122                              for(i = 0;i < 2;i++){
+   \   00000062   0x2000             MOVS     R0,#+0
+   \   00000064   0xE075             B.N      ??app_mtr_com_3
+    123                                  Ctrl.Rec.speed[node-1].ch[i].fail   =  MtrCom->Rd.speed.para[i].fail;
+   \                     ??app_mtr_com_4: (+1)
+   \   00000066   0x....             LDR.N    R1,??DataTable3
+   \   00000068   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   0000006A   0x221C             MOVS     R2,#+28
+   \   0000006C   0xFB02 0x1104      MLA      R1,R2,R4,R1
+   \   00000070   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000072   0x220A             MOVS     R2,#+10
+   \   00000074   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   00000078   0x....             LDR.N    R2,??DataTable3_1
+   \   0000007A   0x6812             LDR      R2,[R2, #+0]
+   \   0000007C   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000007E   0x2314             MOVS     R3,#+20
+   \   00000080   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   00000084   0x8952             LDRH     R2,[R2, #+10]
+   \   00000086   0xF8A1 0x2064      STRH     R2,[R1, #+100]
+    124                                  Ctrl.Rec.speed[node-1].ch[i].hig    =  MtrCom->Rd.speed.para[i].Voh;
+   \   0000008A   0x....             LDR.N    R1,??DataTable3
+   \   0000008C   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   0000008E   0x221C             MOVS     R2,#+28
+   \   00000090   0xFB02 0x1104      MLA      R1,R2,R4,R1
+   \   00000094   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000096   0x220A             MOVS     R2,#+10
+   \   00000098   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   0000009C   0x....             LDR.N    R2,??DataTable3_1
+   \   0000009E   0x6812             LDR      R2,[R2, #+0]
+   \   000000A0   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000000A2   0x2314             MOVS     R3,#+20
+   \   000000A4   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   000000A8   0x8A12             LDRH     R2,[R2, #+16]
+   \   000000AA   0xF8A1 0x2068      STRH     R2,[R1, #+104]
+    125                                  Ctrl.Rec.speed[node-1].ch[i].low    =  MtrCom->Rd.speed.para[i].Vol;
+   \   000000AE   0x....             LDR.N    R1,??DataTable3
+   \   000000B0   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   000000B2   0x221C             MOVS     R2,#+28
+   \   000000B4   0xFB02 0x1104      MLA      R1,R2,R4,R1
+   \   000000B8   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000000BA   0x220A             MOVS     R2,#+10
+   \   000000BC   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   000000C0   0x....             LDR.N    R2,??DataTable3_1
+   \   000000C2   0x6812             LDR      R2,[R2, #+0]
+   \   000000C4   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000000C6   0x2314             MOVS     R3,#+20
+   \   000000C8   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   000000CC   0x89D2             LDRH     R2,[R2, #+14]
+   \   000000CE   0xF8A1 0x206A      STRH     R2,[R1, #+106]
+    126                                  Ctrl.Rec.speed[node-1].ch[i].raise  =  MtrCom->Rd.speed.para[i].raise;
+   \   000000D2   0x....             LDR.N    R1,??DataTable3
+   \   000000D4   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   000000D6   0x221C             MOVS     R2,#+28
+   \   000000D8   0xFB02 0x1104      MLA      R1,R2,R4,R1
+   \   000000DC   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000000DE   0x220A             MOVS     R2,#+10
+   \   000000E0   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   000000E4   0x....             LDR.N    R2,??DataTable3_1
+   \   000000E6   0x6812             LDR      R2,[R2, #+0]
+   \   000000E8   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000000EA   0x2314             MOVS     R3,#+20
+   \   000000EC   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   000000F0   0x8912             LDRH     R2,[R2, #+8]
+   \   000000F2   0xF8A1 0x2062      STRH     R2,[R1, #+98]
+    127                                  Ctrl.Rec.speed[node-1].ch[i].ratio  =  MtrCom->Rd.speed.para[i].ratio;
+   \   000000F6   0x....             LDR.N    R1,??DataTable3
+   \   000000F8   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   000000FA   0x221C             MOVS     R2,#+28
+   \   000000FC   0xFB02 0x1104      MLA      R1,R2,R4,R1
+   \   00000100   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000102   0x220A             MOVS     R2,#+10
+   \   00000104   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   00000108   0x....             LDR.N    R2,??DataTable3_1
+   \   0000010A   0x6812             LDR      R2,[R2, #+0]
+   \   0000010C   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000010E   0x2314             MOVS     R3,#+20
+   \   00000110   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   00000114   0x8992             LDRH     R2,[R2, #+12]
+   \   00000116   0xF8A1 0x2066      STRH     R2,[R1, #+102]
+    128                                  Ctrl.Rec.speed[node-1].sta.flgs[i]  =  (u8)MtrCom->Rd.speed.para[i].status;
+   \   0000011A   0x....             LDR.N    R1,??DataTable3
+   \   0000011C   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   0000011E   0x221C             MOVS     R2,#+28
+   \   00000120   0xFB02 0x1104      MLA      R1,R2,R4,R1
+   \   00000124   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000126   0x1841             ADDS     R1,R0,R1
+   \   00000128   0x....             LDR.N    R2,??DataTable3_1
+   \   0000012A   0x6812             LDR      R2,[R2, #+0]
+   \   0000012C   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000012E   0x2314             MOVS     R3,#+20
+   \   00000130   0xFB03 0x2200      MLA      R2,R3,R0,R2
+   \   00000134   0x8A52             LDRH     R2,[R2, #+18]
+   \   00000136   0xF881 0x205A      STRB     R2,[R1, #+90]
+    129                                  freq[i]                             =  MtrCom->Rd.speed.para[i].freq;
+   \   0000013A   0x....             LDR.N    R1,??DataTable3_1
+   \   0000013C   0x6809             LDR      R1,[R1, #+0]
+   \   0000013E   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000140   0x2214             MOVS     R2,#+20
+   \   00000142   0xFB02 0x1100      MLA      R1,R2,R0,R1
+   \   00000146   0x6849             LDR      R1,[R1, #+4]
+   \   00000148   0x466A             MOV      R2,SP
+   \   0000014A   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000014C   0xF822 0x1010      STRH     R1,[R2, R0, LSL #+1]
+    130                              }
+   \   00000150   0x1C40             ADDS     R0,R0,#+1
+   \                     ??app_mtr_com_3: (+1)
+   \   00000152   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000154   0x2802             CMP      R0,#+2
+   \   00000156   0xDB86             BLT.N    ??app_mtr_com_4
+    131                              
+    132                              if(fabs(freq[1]-freq[0]) < 5){
+   \   00000158   0xF8BD 0x0002      LDRH     R0,[SP, #+2]
+   \   0000015C   0xF8BD 0x1000      LDRH     R1,[SP, #+0]
+   \   00000160   0x1A40             SUBS     R0,R0,R1
+   \   00000162   0x.... 0x....      BL       __aeabi_i2d
+   \   00000166   0xF031 0x4100      BICS     R1,R1,#0x80000000
+   \   0000016A   0x2200             MOVS     R2,#+0
+   \   0000016C   0x....             LDR.N    R3,??DataTable3_2  ;; 0x40140000
+   \   0000016E   0x.... 0x....      BL       __aeabi_cdcmple
+   \   00000172   0xD20F             BCS.N    ??app_mtr_com_5
+    133                                  Ctrl.Rec.speed[node-1].freq     =   (freq[1] + freq[0])/2;
+   \   00000174   0xF8BD 0x0002      LDRH     R0,[SP, #+2]
+   \   00000178   0xF8BD 0x1000      LDRH     R1,[SP, #+0]
+   \   0000017C   0x1808             ADDS     R0,R1,R0
+   \   0000017E   0x2102             MOVS     R1,#+2
+   \   00000180   0xFB90 0xF0F1      SDIV     R0,R0,R1
+   \   00000184   0x....             LDR.N    R1,??DataTable3
+   \   00000186   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   00000188   0x221C             MOVS     R2,#+28
+   \   0000018A   0xFB02 0x1104      MLA      R1,R2,R4,R1
+   \   0000018E   0xF8A1 0x0060      STRH     R0,[R1, #+96]
+   \   00000192   0xE058             B.N      ??app_mtr_com_6
+    134                              }else {
+    135                                  if(freq[1] > freq[0]){
+   \                     ??app_mtr_com_5: (+1)
+   \   00000194   0xF8BD 0x0000      LDRH     R0,[SP, #+0]
+   \   00000198   0xF8BD 0x1002      LDRH     R1,[SP, #+2]
+   \   0000019C   0x4288             CMP      R0,R1
+   \   0000019E   0xD229             BCS.N    ??app_mtr_com_7
+    136                                      Ctrl.Rec.speed[node-1].freq     =   freq[1];
+   \   000001A0   0xF8BD 0x0002      LDRH     R0,[SP, #+2]
+   \   000001A4   0x....             LDR.N    R1,??DataTable3
+   \   000001A6   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   000001A8   0x221C             MOVS     R2,#+28
+   \   000001AA   0xFB02 0x1104      MLA      R1,R2,R4,R1
+   \   000001AE   0xF8A1 0x0060      STRH     R0,[R1, #+96]
+    137                                      Ctrl.Rec.speed[node-1].sta.Err[0].FreqLess  = 1;    //通道0，频率小
+   \   000001B2   0x....             LDR.N    R0,??DataTable3
+   \   000001B4   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   000001B6   0x211C             MOVS     R1,#+28
+   \   000001B8   0xFB01 0x0004      MLA      R0,R1,R4,R0
+   \   000001BC   0xF890 0x005A      LDRB     R0,[R0, #+90]
+   \   000001C0   0xF050 0x0040      ORRS     R0,R0,#0x40
+   \   000001C4   0x....             LDR.N    R1,??DataTable3
+   \   000001C6   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   000001C8   0x221C             MOVS     R2,#+28
+   \   000001CA   0xFB02 0x1104      MLA      R1,R2,R4,R1
+   \   000001CE   0xF881 0x005A      STRB     R0,[R1, #+90]
+    138                                      Ctrl.Rec.speed[node-1].sta.Err[1].FreqMore  = 1;    //通道1，频率大
+   \   000001D2   0x....             LDR.N    R0,??DataTable3
+   \   000001D4   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   000001D6   0x211C             MOVS     R1,#+28
+   \   000001D8   0xFB01 0x0004      MLA      R0,R1,R4,R0
+   \   000001DC   0xF890 0x005B      LDRB     R0,[R0, #+91]
+   \   000001E0   0xF050 0x0080      ORRS     R0,R0,#0x80
+   \   000001E4   0x....             LDR.N    R1,??DataTable3
+   \   000001E6   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   000001E8   0x221C             MOVS     R2,#+28
+   \   000001EA   0xFB02 0x1104      MLA      R1,R2,R4,R1
+   \   000001EE   0xF881 0x005B      STRB     R0,[R1, #+91]
+   \   000001F2   0xE028             B.N      ??app_mtr_com_6
+    139                                  }else{
+    140                                      Ctrl.Rec.speed[node-1].freq     =   freq[0];
+   \                     ??app_mtr_com_7: (+1)
+   \   000001F4   0xF8BD 0x0000      LDRH     R0,[SP, #+0]
+   \   000001F8   0x....             LDR.N    R1,??DataTable3
+   \   000001FA   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   000001FC   0x221C             MOVS     R2,#+28
+   \   000001FE   0xFB02 0x1104      MLA      R1,R2,R4,R1
+   \   00000202   0xF8A1 0x0060      STRH     R0,[R1, #+96]
+    141                                      Ctrl.Rec.speed[node-1].sta.Err[1].FreqLess  = 1;    //通道0，频率小
+   \   00000206   0x....             LDR.N    R0,??DataTable3
+   \   00000208   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   0000020A   0x211C             MOVS     R1,#+28
+   \   0000020C   0xFB01 0x0004      MLA      R0,R1,R4,R0
+   \   00000210   0xF890 0x005B      LDRB     R0,[R0, #+91]
+   \   00000214   0xF050 0x0040      ORRS     R0,R0,#0x40
+   \   00000218   0x....             LDR.N    R1,??DataTable3
+   \   0000021A   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   0000021C   0x221C             MOVS     R2,#+28
+   \   0000021E   0xFB02 0x1104      MLA      R1,R2,R4,R1
+   \   00000222   0xF881 0x005B      STRB     R0,[R1, #+91]
+    142                                      Ctrl.Rec.speed[node-1].sta.Err[0].FreqMore  = 1;    //通道1，频率大
+   \   00000226   0x....             LDR.N    R0,??DataTable3
+   \   00000228   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   0000022A   0x211C             MOVS     R1,#+28
+   \   0000022C   0xFB01 0x0004      MLA      R0,R1,R4,R0
+   \   00000230   0xF890 0x005A      LDRB     R0,[R0, #+90]
+   \   00000234   0xF050 0x0080      ORRS     R0,R0,#0x80
+   \   00000238   0x....             LDR.N    R1,??DataTable3
+   \   0000023A   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   0000023C   0x221C             MOVS     R2,#+28
+   \   0000023E   0xFB02 0x1104      MLA      R1,R2,R4,R1
+   \   00000242   0xF881 0x005A      STRB     R0,[R1, #+90]
+    143                                  }
+    144                              }
+    145                              
+    146                              
+    147                              Ctrl.Rec.speed[node-1].phase    =   MtrCom->Rd.speed.ch1_2phase;
+   \                     ??app_mtr_com_6: (+1)
+   \   00000246   0x....             LDR.N    R0,??DataTable3_1
+   \   00000248   0x6800             LDR      R0,[R0, #+0]
+   \   0000024A   0x6A80             LDR      R0,[R0, #+40]
+   \   0000024C   0x....             LDR.N    R1,??DataTable3
+   \   0000024E   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   00000250   0x221C             MOVS     R2,#+28
+   \   00000252   0xFB02 0x1104      MLA      R1,R2,R4,R1
+   \   00000256   0xF8A1 0x005C      STRH     R0,[R1, #+92]
+    148                              Ctrl.Rec.speed[node-1].vcc      =   MtrCom->Rd.speed.vcc_vol;
+   \   0000025A   0x....             LDR.N    R0,??DataTable3_1
+   \   0000025C   0x6800             LDR      R0,[R0, #+0]
+   \   0000025E   0x8D80             LDRH     R0,[R0, #+44]
+   \   00000260   0x....             LDR.N    R1,??DataTable3
+   \   00000262   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   00000264   0x221C             MOVS     R2,#+28
+   \   00000266   0xFB02 0x1104      MLA      R1,R2,R4,R1
+   \   0000026A   0xF8A1 0x005E      STRH     R0,[R1, #+94]
+    149                          }
+    150                      }
+    151                      
+    152                      /**************************************************************
+    153                      * Description  : 读取工况检测信号
+    154                      * Author       : 2018/5/31 星期四, by redmorningcn
+    155                      */
+    156                      if(node == NODE_LOCO){
+   \                     ??app_mtr_com_2: (+1)
+   \   0000026E   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   00000270   0x2C04             CMP      R4,#+4
+   \   00000272   0xD116             BNE.N    ??app_mtr_com_8
+    157                          len  = sizeof(strlocoVol)/2 ;                                         //工况检测板有效参数长度
+   \   00000274   0x2506             MOVS     R5,#+6
+    158                          addr = sizeof(strLocoSysPara)/2 + sizeof(strLocoRunStatus)/2 - len;   //有效参数存储在结构体后部
+   \   00000276   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   00000278   0xF1D5 0x00AA      RSBS     R0,R5,#+170
+    159                          
+    160                          MtrRdSpecial(addr,len);                 
+   \   0000027C   0x0029             MOVS     R1,R5
+   \   0000027E   0xB2C9             UXTB     R1,R1            ;; ZeroExt  R1,R1,#+24,#+24
+   \   00000280   0xB280             UXTH     R0,R0            ;; ZeroExt  R0,R0,#+16,#+16
+   \   00000282   0x.... 0x....      BL       MtrRdSpecial
+    161                          
+    162                          if(MtrCom->RxCtrl.Len == len){
+   \   00000286   0x....             LDR.N    R0,??DataTable3_1
+   \   00000288   0x6800             LDR      R0,[R0, #+0]
+   \   0000028A   0xF890 0x0416      LDRB     R0,[R0, #+1046]
+   \   0000028E   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   00000290   0x42A8             CMP      R0,R5
+   \   00000292   0xD106             BNE.N    ??app_mtr_com_8
+    163                              memcpy((u8 *)&Ctrl.Rec.Vol,(u8 *)&MtrCom->Rd.loco,sizeof(Ctrl.Rec.Vol));   //取工况信号
+   \   00000294   0x220C             MOVS     R2,#+12
+   \   00000296   0x....             LDR.N    R0,??DataTable3_1
+   \   00000298   0x6801             LDR      R1,[R0, #+0]
+   \   0000029A   0x....             LDR.N    R4,??DataTable3_3
+   \   0000029C   0x0020             MOVS     R0,R4
+   \   0000029E   0x.... 0x....      BL       __aeabi_memcpy
+    164                          }
+    165                      }
+    166                      
+    167                      break;
+   \                     ??app_mtr_com_8: (+1)
+   \   000002A2   0xE7FF             B.N      ??app_mtr_com_0
+    168                  default:
+    169                      break;
+    170                  }
+    171              }
+    172          }
+   \                     ??app_mtr_com_1: (+1)
+   \                     ??app_mtr_com_0: (+1)
+   \   000002A4   0xBD31             POP      {R0,R4,R5,PC}    ;; return
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable3:
+   \   00000000   0x........         DC32     Ctrl
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable3_1:
+   \   00000000   0x........         DC32     MtrCom
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable3_2:
+   \   00000000   0x40140000         DC32     0x40140000
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable3_3:
+   \   00000000   0x........         DC32     Ctrl+0xCA
+    173          
+    174          
+    175          
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       0   MtrCommErrjudge
+      16   MtrRdSpecial
+        16   -> MBM_FC03_HoldingRegRd
+        16   -> MtrCommErrjudge
+      16   MtrWrSpecial
+        16   -> MBM_FC16_HoldingRegWrN
+        16   -> MtrCommErrjudge
+      16   app_mtr_com
+        16   -> MtrRdSpecial
+        16   -> __aeabi_i2d
+        16   -> __aeabi_memcpy
+        16 __aeabi_cdcmple
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable3
+       4  ??DataTable3_1
+       4  ??DataTable3_2
+       4  ??DataTable3_3
+     126  MtrCommErrjudge
+      90  MtrRdSpecial
+      96  MtrWrSpecial
+     678  app_mtr_com
+
+ 
+ 1 006 bytes in section .text
+ 
+ 1 006 bytes of CODE memory
+
+Errors: none
+Warnings: none

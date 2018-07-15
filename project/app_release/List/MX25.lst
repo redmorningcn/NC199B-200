@@ -1,0 +1,1260 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.50.1.10123/W32 for ARM       15/Jul/2018  10:36:24
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  F:\iar\NC210\NC210-200处理板\source\driver\MX25.c
+#    Command line =  
+#        F:\iar\NC210\NC210-200处理板\source\driver\MX25.c -D
+#        USE_STDPERIPH_DRIVER -D APP_RELEASE -lCN
+#        F:\iar\NC210\NC210-200处理板\project\app_release\List -o
+#        F:\iar\NC210\NC210-200处理板\project\app_release\Obj --no_cse
+#        --no_unroll --no_inline --no_code_motion --no_tbaa --no_clustering
+#        --no_scheduling --debug --endian=little --cpu=Cortex-M3 -e --fpu=None
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.3\arm\INC\c\DLib_Config_Full.h" -I
+#        F:\iar\NC210\NC210-200处理板\project\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\config\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\task\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\user\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\OSAL\OS\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\OSAL\Ports\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\driver\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-LIB\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-CPU\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-CPU\ARM-Cortex-M3\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uCOS-III\Ports\ARM-Cortex-M3\Generic\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uCOS-III\Source\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\ST\STM32\inc\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\OS\uCOS-III\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Cfg\Template\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\OS\uCOS-III\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Ports\STM32\STM32F103\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Source\
+#        -Ol --use_c++_inline -I "C:\Program Files (x86)\IAR Systems\Embedded
+#        Workbench 7.3\arm\CMSIS\Include\"
+#    List file    =  
+#        F:\iar\NC210\NC210-200处理板\project\app_release\List\MX25.lst
+#    Object file  =  
+#        F:\iar\NC210\NC210-200处理板\project\app_release\Obj\MX25.o
+#
+###############################################################################
+
+F:\iar\NC210\NC210-200处理板\source\driver\MX25.c
+      1          /*******************************************************************************
+      2          * Description  : Flash的driver函数
+      3          * Author       : 2018/5/15 星期二, by redmorningcn
+      4          *******************************************************************************/
+      5          #include  <mx25.h>
+      6          
+      7          
+      8          #define SPI_FLASH_SPI                   SPI1
+      9          #define SPI_FLASH_SPI_CLK               RCC_APB2Periph_SPI1
+     10          
+     11          #define SPI_FLASH_SPI_SCK_PIN           GPIO_Pin_5              /* PB.13 */
+     12          #define SPI_FLASH_SPI_SCK_GPIO_PORT     GPIOA
+     13          #define SPI_FLASH_SPI_SCK_GPIO_CLK      RCC_APB2Periph_GPIOA
+     14          
+     15          #define SPI_FLASH_SPI_MISO_PIN          GPIO_Pin_6              /* PB.14 */
+     16          #define SPI_FLASH_SPI_MISO_GPIO_PORT    GPIOA
+     17          #define SPI_FLASH_SPI_MISO_GPIO_CLK     RCC_APB2Periph_GPIOA
+     18          
+     19          #define SPI_FLASH_SPI_MOSI_PIN          GPIO_Pin_7              /* PB.15 */
+     20          #define SPI_FLASH_SPI_MOSI_GPIO_PORT    GPIOA
+     21          #define SPI_FLASH_SPI_MOSI_GPIO_CLK     RCC_APB2Periph_GPIOA
+     22          
+     23          #define SPI_FLASH_CS_PIN_NUM            4                       /* PB.12 */
+     24          #define SPI_FLASH_CS_PIN                GPIO_Pin_4  
+     25          #define SPI_FLASH_CS_GPIO_PORT          GPIOA
+     26          #define SPI_FLASH_CS_GPIO_CLK           RCC_APB2Periph_GPIOA
+     27          
+     28          /* Private typedef -----------------------------------------------------------*/
+     29          #define SPI_FLASH_PageSize              256
+     30          #define SPI_FLASH_PerWritePageSize      256
+     31          
+     32          
+     33          /* Private define ------------------------------------------------------------*/
+     34          #define W25X_WriteEnable                0x06 
+     35          #define W25X_WriteDisable               0x04 
+     36          #define W25X_ReadStatusReg              0x05 
+     37          #define W25X_WriteStatusReg             0x01 
+     38          #define W25X_ReadData                   0x03 
+     39          #define W25X_FastReadData               0x0B 
+     40          #define W25X_FastReadDual               0x3B 
+     41          #define W25X_PageProgram                0x02 
+     42          #define W25X_BlockErase                 0xD8 
+     43          #define W25X_SectorErase                0x20 
+     44          #define W25X_ChipErase                  0xC7 
+     45          #define W25X_PowerDown                  0xB9 
+     46          #define W25X_ReleasePowerDown           0xAB 
+     47          #define W25X_DeviceID                   0xAB 
+     48          #define W25X_ManufactDeviceID           0x90 
+     49          #define W25X_JedecDeviceID              0x9F 
+     50          
+     51          #define WIP_FlagMask                    0x01  /* Write In Progress (WIP) flag */
+     52          
+     53          #define Dummy_Byte1                     0xA5
+     54          
+     55          
+     56          /* Private macro -------------------------------------------------------------*/
+     57          /* Select SPI FLASH: Chip Select pin low  */
+     58          #define CE_Low()       GPIO_ResetBits(SPI_FLASH_CS_GPIO_PORT, SPI_FLASH_CS_PIN)//(Periph_BB((u32)&SPI_FLASH_CS_GPIO_PORT->ODR, SPI_FLASH_CS_PIN_NUM) = 0)
+     59          
+     60          /* Deselect SPI FLASH: Chip Select pin high */
+     61          #define CE_High()      GPIO_SetBits(SPI_FLASH_CS_GPIO_PORT, SPI_FLASH_CS_PIN)//(Periph_BB((u32)&SPI_FLASH_CS_GPIO_PORT->ODR, SPI_FLASH_CS_PIN_NUM) = 1)
+     62          
+     63          #define  UCOS_EN        DEF_ENABLED
+     64          
+     65          /***********************************************
+     66          * 描述： OS接口
+     67          */
+     68          #if UCOS_EN     == DEF_ENABLED
+     69              #if OS_VERSION > 30000U
+
+   \                                 In section .bss, align 4
+     70              static  OS_SEM                   Bsp_EepSem;    // 信号量
+   \                     Bsp_EepSem:
+   \   00000000                      DS8 40
+     71              #else
+     72              static  OS_EVENT                *Bsp_EepSem;    // 信号量
+     73              #endif
+     74          #endif
+     75            
+     76              
+     77          /*******************************************************************************
+     78          * 名    称： EEP_WaitEvent
+     79          * 功    能： 等待信号量
+     80          * 入口参数： 无
+     81          * 出口参数：  0（操作有误），1（操作成功）
+     82          * 作　 　者： 无名沈
+     83          * 创建日期： 2015-08-18
+     84          * 修    改：
+     85          * 修改日期：
+     86          * 备    注： 仅在使用UCOS操作系统时使用
+     87          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     88          static u8 EEP_WaitEvent(void)
+     89          {
+   \                     EEP_WaitEvent: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+     90              /***********************************************
+     91              * 描述： OS接口
+     92              */
+     93          #if OS_VERSION > 30000U
+     94              return BSP_OS_SemWait(&Bsp_EepSem,0);           // 等待信号量
+   \   00000002   0x2100             MOVS     R1,#+0
+   \   00000004   0x.... 0x....      LDR.W    R0,??DataTable8
+   \   00000008   0x.... 0x....      BL       BSP_OS_SemWait
+   \   0000000C   0xBD02             POP      {R1,PC}          ;; return
+     95          #else
+     96              u8       err;
+     97              OSSemPend(Bsp_EepSem,0,&err);                   // 等待信号量
+     98              if ( err = OS_ERR_NONE )
+     99                return TRUE;
+    100              else
+    101                return FALSE;
+    102          #endif
+    103          }
+    104          
+    105          
+    106          /*******************************************************************************
+    107          * 名    称： EEP_SendEvent
+    108          * 功    能： 释放信号量
+    109          * 入口参数： 无
+    110          * 出口参数： 无
+    111          * 作　 　者： 无名沈
+    112          * 创建日期： 2015-08-18
+    113          * 修    改：
+    114          * 修改日期：
+    115          * 备    注： 仅在使用UCOS操作系统时使用
+    116          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    117          static void EEP_SendEvent(void)
+    118          {
+   \                     EEP_SendEvent: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+    119              /***********************************************
+    120              * 描述： OS接口
+    121              */
+    122          #if OS_VERSION > 30000U
+    123              BSP_OS_SemPost(&Bsp_EepSem);                        // 发送信号量
+   \   00000002   0x.... 0x....      LDR.W    R0,??DataTable8
+   \   00000006   0x.... 0x....      BL       BSP_OS_SemPost
+    124          #else
+    125              u8       err;
+    126              OSSemPost(Bsp_EepSem);                              // 发送信号量
+    127          #endif
+    128          }
+   \   0000000A   0xBD01             POP      {R0,PC}          ;; return
+    129          
+    130          /**-----------------------------------------------------------------
+    131            * @函数名 SPI_FLASH_Init
+    132            * @功能   初始化与外部SPI FLASH接口的驱动函数
+    133            *         Initializes the peripherals used by the SPI FLASH driver.
+    134            * @参数   无
+    135            * @返回值 无
+    136          ***----------------------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    137          void SPI_FLASH_Init(void)
+    138          {
+   \                     SPI_FLASH_Init: (+1)
+   \   00000000   0xB500             PUSH     {LR}
+   \   00000002   0xB087             SUB      SP,SP,#+28
+    139              SPI_InitTypeDef  SPI_InitStructure;
+    140              GPIO_InitTypeDef GPIO_InitStructure;
+    141          
+    142              /* Enable SPI2 and GPIO clocks */
+    143              /*!< SPI_FLASH_SPI_CS_GPIO, SPI_FLASH_SPI_MOSI_GPIO, 
+    144                 SPI_FLASH_SPI_MISO_GPIO, SPI_FLASH_SPI_DETECT_GPIO 
+    145                 and SPI_FLASH_SPI_SCK_GPIO Periph clock enable */
+    146              RCC_APB2PeriphClockCmd(SPI_FLASH_CS_GPIO_CLK | SPI_FLASH_SPI_MOSI_GPIO_CLK |
+    147                                   SPI_FLASH_SPI_MISO_GPIO_CLK | SPI_FLASH_SPI_SCK_GPIO_CLK, ENABLE);
+   \   00000004   0x2101             MOVS     R1,#+1
+   \   00000006   0x2004             MOVS     R0,#+4
+   \   00000008   0x.... 0x....      BL       RCC_APB2PeriphClockCmd
+    148          
+    149              /*!< SPI_FLASH_SPI Periph clock enable */
+    150              RCC_APB2PeriphClockCmd(SPI_FLASH_SPI_CLK, ENABLE);
+   \   0000000C   0x2101             MOVS     R1,#+1
+   \   0000000E   0xF44F 0x5080      MOV      R0,#+4096
+   \   00000012   0x.... 0x....      BL       RCC_APB2PeriphClockCmd
+    151              
+    152              /*!< AFIO Periph clock enable */
+    153              RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+   \   00000016   0x2101             MOVS     R1,#+1
+   \   00000018   0x2001             MOVS     R0,#+1
+   \   0000001A   0x.... 0x....      BL       RCC_APB2PeriphClockCmd
+    154          
+    155              /*!< Configure SPI_FLASH_SPI pins: SCK */
+    156              GPIO_InitStructure.GPIO_Pin = SPI_FLASH_SPI_SCK_PIN;
+   \   0000001E   0x2020             MOVS     R0,#+32
+   \   00000020   0xF8AD 0x0000      STRH     R0,[SP, #+0]
+    157              GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+   \   00000024   0x2003             MOVS     R0,#+3
+   \   00000026   0xF88D 0x0002      STRB     R0,[SP, #+2]
+    158              GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+   \   0000002A   0x2018             MOVS     R0,#+24
+   \   0000002C   0xF88D 0x0003      STRB     R0,[SP, #+3]
+    159          	//GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;			   //不能设置为推挽输出，？？
+    160              GPIO_Init(SPI_FLASH_SPI_SCK_GPIO_PORT, &GPIO_InitStructure);
+   \   00000030   0x4669             MOV      R1,SP
+   \   00000032   0x.... 0x....      LDR.W    R0,??DataTable8_1  ;; 0x40010800
+   \   00000036   0x.... 0x....      BL       GPIO_Init
+    161          
+    162              /*!< Configure SPI_FLASH_SPI pins: MOSI */
+    163              GPIO_InitStructure.GPIO_Pin = SPI_FLASH_SPI_MOSI_PIN;
+   \   0000003A   0x2080             MOVS     R0,#+128
+   \   0000003C   0xF8AD 0x0000      STRH     R0,[SP, #+0]
+    164              GPIO_Init(SPI_FLASH_SPI_MOSI_GPIO_PORT, &GPIO_InitStructure);
+   \   00000040   0x4669             MOV      R1,SP
+   \   00000042   0x.... 0x....      LDR.W    R0,??DataTable8_1  ;; 0x40010800
+   \   00000046   0x.... 0x....      BL       GPIO_Init
+    165          
+    166              /*!< Configure SPI_FLASH_SPI pins: MISO */
+    167              GPIO_InitStructure.GPIO_Pin = SPI_FLASH_SPI_MISO_PIN;
+   \   0000004A   0x2040             MOVS     R0,#+64
+   \   0000004C   0xF8AD 0x0000      STRH     R0,[SP, #+0]
+    168              GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;                       //GPIO_Mode_IN_FLOATING;
+   \   00000050   0x2048             MOVS     R0,#+72
+   \   00000052   0xF88D 0x0003      STRB     R0,[SP, #+3]
+    169          	//GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;				    //设置为复用PP或OD均可
+    170              GPIO_Init(SPI_FLASH_SPI_MISO_GPIO_PORT, &GPIO_InitStructure);
+   \   00000056   0x4669             MOV      R1,SP
+   \   00000058   0x.... 0x....      LDR.W    R0,??DataTable8_1  ;; 0x40010800
+   \   0000005C   0x.... 0x....      BL       GPIO_Init
+    171          
+    172              /*!< Configure SPI_FLASH_SPI_CS_PIN pin: SPI_FLASH Card CS pin */
+    173              GPIO_InitStructure.GPIO_Pin = SPI_FLASH_CS_PIN;
+   \   00000060   0x2010             MOVS     R0,#+16
+   \   00000062   0xF8AD 0x0000      STRH     R0,[SP, #+0]
+    174              GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+   \   00000066   0x2010             MOVS     R0,#+16
+   \   00000068   0xF88D 0x0003      STRB     R0,[SP, #+3]
+    175              GPIO_Init(SPI_FLASH_CS_GPIO_PORT, &GPIO_InitStructure);
+   \   0000006C   0x4669             MOV      R1,SP
+   \   0000006E   0x.... 0x....      LDR.W    R0,??DataTable8_1  ;; 0x40010800
+   \   00000072   0x.... 0x....      BL       GPIO_Init
+    176          
+    177              /* Deselect the FLASH: Chip Select high */
+    178              CE_High();
+   \   00000076   0x2110             MOVS     R1,#+16
+   \   00000078   0x.... 0x....      LDR.W    R0,??DataTable8_1  ;; 0x40010800
+   \   0000007C   0x.... 0x....      BL       GPIO_SetBits
+    179          
+    180              /* SPI2 configuration */
+    181              // W25X16: data input on the DIO pin is sampled on the rising edge of the CLK. 
+    182              // Data on the DO and DIO pins are clocked out on the falling edge of CLK.
+    183              SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+   \   00000080   0x2000             MOVS     R0,#+0
+   \   00000082   0xF8AD 0x0004      STRH     R0,[SP, #+4]
+    184              SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
+   \   00000086   0xF44F 0x7082      MOV      R0,#+260
+   \   0000008A   0xF8AD 0x0006      STRH     R0,[SP, #+6]
+    185              SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
+   \   0000008E   0x2000             MOVS     R0,#+0
+   \   00000090   0xF8AD 0x0008      STRH     R0,[SP, #+8]
+    186              SPI_InitStructure.SPI_CPOL = SPI_CPOL_High;
+   \   00000094   0x2002             MOVS     R0,#+2
+   \   00000096   0xF8AD 0x000A      STRH     R0,[SP, #+10]
+    187              SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;
+   \   0000009A   0x2001             MOVS     R0,#+1
+   \   0000009C   0xF8AD 0x000C      STRH     R0,[SP, #+12]
+    188              SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
+   \   000000A0   0xF44F 0x7000      MOV      R0,#+512
+   \   000000A4   0xF8AD 0x000E      STRH     R0,[SP, #+14]
+    189              SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8;
+   \   000000A8   0x2010             MOVS     R0,#+16
+   \   000000AA   0xF8AD 0x0010      STRH     R0,[SP, #+16]
+    190              SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
+   \   000000AE   0x2000             MOVS     R0,#+0
+   \   000000B0   0xF8AD 0x0012      STRH     R0,[SP, #+18]
+    191              SPI_InitStructure.SPI_CRCPolynomial = 7;
+   \   000000B4   0x2007             MOVS     R0,#+7
+   \   000000B6   0xF8AD 0x0014      STRH     R0,[SP, #+20]
+    192              SPI_Init(SPI1, &SPI_InitStructure);
+   \   000000BA   0xA901             ADD      R1,SP,#+4
+   \   000000BC   0x.... 0x....      LDR.W    R0,??DataTable8_2  ;; 0x40013000
+   \   000000C0   0x.... 0x....      BL       SPI_Init
+    193          
+    194              /* Enable SPI2  */
+    195              SPI_Cmd(SPI1, ENABLE);
+   \   000000C4   0x2101             MOVS     R1,#+1
+   \   000000C6   0x.... 0x....      LDR.W    R0,??DataTable8_2  ;; 0x40013000
+   \   000000CA   0x.... 0x....      BL       SPI_Cmd
+    196          
+    197              SPI_Flash_WAKEUP();
+   \   000000CE   0x.... 0x....      BL       SPI_Flash_WAKEUP
+    198              
+    199              /***********************************************
+    200              * 描述： OS接口
+    201              */
+    202          #if (UCOS_EN     == DEF_ENABLED)
+    203          #if OS_VERSION > 30000U
+    204              BSP_OS_SemCreate(&Bsp_EepSem,1, "Bsp EepSem");      // 创建信号量
+   \   000000D2   0x.... 0x....      LDR.W    R2,??DataTable8_3
+   \   000000D6   0x2101             MOVS     R1,#+1
+   \   000000D8   0x.... 0x....      LDR.W    R0,??DataTable8
+   \   000000DC   0x.... 0x....      BL       BSP_OS_SemCreate
+    205          #else
+    206              Bsp_EepSem     = OSSemCreate(1);                    // 创建信号量
+    207          #endif
+    208          #endif
+    209          }
+   \   000000E0   0xB007             ADD      SP,SP,#+28
+   \   000000E2   0xBD00             POP      {PC}             ;; return
+    210          
+    211          /**-----------------------------------------------------------------
+    212            * @函数名 Send_Byte
+    213            * @功能   通过SPI总线发送一个字节数据(顺便接收一个字节数据)
+    214            *         Sends a byte through the SPI interface and return the byte
+    215            *         received from the SPI bus.
+    216            * @参数   要写入的一个字节数据
+    217            * @返回值 在发数据时，MISO信号线上接收的一个字节
+    218          ***----------------------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    219          u8 Send_Byte(u8 byte)
+    220          {
+   \                     Send_Byte: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+   \   00000002   0x0004             MOVS     R4,R0
+    221              /* Loop while DR register in not empty */
+    222              while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+   \                     ??Send_Byte_0: (+1)
+   \   00000004   0x2102             MOVS     R1,#+2
+   \   00000006   0x.... 0x....      LDR.W    R0,??DataTable8_2  ;; 0x40013000
+   \   0000000A   0x.... 0x....      BL       SPI_I2S_GetFlagStatus
+   \   0000000E   0x2800             CMP      R0,#+0
+   \   00000010   0xD0F8             BEQ.N    ??Send_Byte_0
+    223          
+    224              /* Send byte through the SPI2 peripheral */
+    225              SPI_I2S_SendData(SPI1, byte);
+   \   00000012   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   00000014   0x0021             MOVS     R1,R4
+   \   00000016   0xB289             UXTH     R1,R1            ;; ZeroExt  R1,R1,#+16,#+16
+   \   00000018   0x.... 0x....      LDR.W    R0,??DataTable8_2  ;; 0x40013000
+   \   0000001C   0x.... 0x....      BL       SPI_I2S_SendData
+    226          
+    227              /* Wait to receive a byte */
+    228              while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET);
+   \                     ??Send_Byte_1: (+1)
+   \   00000020   0x2101             MOVS     R1,#+1
+   \   00000022   0x.... 0x....      LDR.W    R0,??DataTable8_2  ;; 0x40013000
+   \   00000026   0x.... 0x....      BL       SPI_I2S_GetFlagStatus
+   \   0000002A   0x2800             CMP      R0,#+0
+   \   0000002C   0xD0F8             BEQ.N    ??Send_Byte_1
+    229          
+    230              /* Return the byte read from the SPI bus */
+    231              return SPI_I2S_ReceiveData(SPI1);
+   \   0000002E   0x.... 0x....      LDR.W    R0,??DataTable8_2  ;; 0x40013000
+   \   00000032   0x.... 0x....      BL       SPI_I2S_ReceiveData
+   \   00000036   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000038   0xBD10             POP      {R4,PC}          ;; return
+    232          }
+    233          
+    234          /**-----------------------------------------------------------------
+    235            * @函数名 Get_Byte
+    236            * @功能   读取SPI FLASH的一个字节，未包含发送读命令和起始地址
+    237            * @参数   无
+    238            * @返回值 从SPI_FLASH读取的一个字节
+    239          ***----------------------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    240          u8 Get_Byte(void)
+    241          {
+   \                     Get_Byte: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+    242              return (Send_Byte(Dummy_Byte1));
+   \   00000002   0x20A5             MOVS     R0,#+165
+   \   00000004   0x.... 0x....      BL       Send_Byte
+   \   00000008   0xBD02             POP      {R1,PC}          ;; return
+    243          }
+    244          
+    245          /**-----------------------------------------------------------------
+    246            * @函数名 SPI_Flash_WAKEUP
+    247            * @功能   唤醒SPI FLASH
+    248            * @参数   无
+    249            * @返回值 无
+    250          ***----------------------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    251          void SPI_Flash_WAKEUP(void)   
+    252          {
+   \                     SPI_Flash_WAKEUP: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+    253            /* Select the FLASH: Chip Select low */
+    254            CE_Low();
+   \   00000002   0x2110             MOVS     R1,#+16
+   \   00000004   0x.... 0x....      LDR.W    R0,??DataTable8_1  ;; 0x40010800
+   \   00000008   0x.... 0x....      BL       GPIO_ResetBits
+    255          
+    256            /* Send "Power Down" instruction */
+    257            Send_Byte(W25X_ReleasePowerDown);
+   \   0000000C   0x20AB             MOVS     R0,#+171
+   \   0000000E   0x.... 0x....      BL       Send_Byte
+    258          
+    259            /* Deselect the FLASH: Chip Select high */
+    260            CE_High();
+   \   00000012   0x2110             MOVS     R1,#+16
+   \   00000014   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   00000016   0x.... 0x....      BL       GPIO_SetBits
+    261          }   
+   \   0000001A   0xBD01             POP      {R0,PC}          ;; return
+    262           
+    263          /* 以下函数在移植时无需修改 */
+    264          /************************************************************************
+    265          ** 函数名称:MX25L1602_RD                                                                                                        
+    266          ** 函数功能:MX25L1602的读函数,可选择读ID和读数据操作                
+    267          ** 入口参数:
+    268          **            u32 Dst：目标地址,范围 0x0 - MAX_ADDR（MAX_ADDR = 0x1FFFFF）                
+    269          **            u32 NByte:    要读取的数据字节数
+    270          **            u8* RcvBufPt:接收缓存的指针            
+    271          ** 出口参数:操作成功则返回OK,失败则返回ERROR        
+    272          ** 注     意:若某功能下,某一入口参数无效,可在该入口参数处填Invalid，该参数将被忽略
+    273          ************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    274          u8 MX25L3206_RD(u32 Dst, u32 NByte,u8* RcvBufPt)
+    275          {
+   \                     MX25L3206_RD: (+1)
+   \   00000000   0xB5F8             PUSH     {R3-R7,LR}
+   \   00000002   0x0004             MOVS     R4,R0
+   \   00000004   0x000D             MOVS     R5,R1
+   \   00000006   0x0016             MOVS     R6,R2
+    276              u32 i = 0;
+   \   00000008   0x2700             MOVS     R7,#+0
+    277          	u32 adr;
+    278              
+    279              EEP_WaitEvent();
+   \   0000000A   0x.... 0x....      BL       EEP_WaitEvent
+    280              
+    281          	//adr=Dst&MAX_ADDR ;
+    282              adr=Dst ;
+    283              CE_Low();            
+   \   0000000E   0x2110             MOVS     R1,#+16
+   \   00000010   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   00000012   0x.... 0x....      BL       GPIO_ResetBits
+    284              Send_Byte(0x0B);                                // 发送读命令
+   \   00000016   0x200B             MOVS     R0,#+11
+   \   00000018   0x.... 0x....      BL       Send_Byte
+    285              Send_Byte(((adr & 0xFFFFFF) >> 16));            // 发送地址信息:该地址由3个字节组成
+   \   0000001C   0x0C20             LSRS     R0,R4,#+16
+   \   0000001E   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000020   0x.... 0x....      BL       Send_Byte
+    286              Send_Byte(((adr & 0xFFFF) >> 8));
+   \   00000024   0x0A20             LSRS     R0,R4,#+8
+   \   00000026   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000028   0x.... 0x....      BL       Send_Byte
+    287              Send_Byte(adr & 0xFF);
+   \   0000002C   0x0020             MOVS     R0,R4
+   \   0000002E   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000030   0x.... 0x....      BL       Send_Byte
+    288              Send_Byte(0xFF);                                // 发送一个哑字节以读取数据
+   \   00000034   0x20FF             MOVS     R0,#+255
+   \   00000036   0x.... 0x....      BL       Send_Byte
+    289              for (i = 0; i < NByte; i++)        
+   \   0000003A   0x2700             MOVS     R7,#+0
+   \   0000003C   0xE003             B.N      ??MX25L3206_RD_0
+    290              {
+    291                  RcvBufPt[i] = Get_Byte();        
+   \                     ??MX25L3206_RD_1: (+1)
+   \   0000003E   0x.... 0x....      BL       Get_Byte
+   \   00000042   0x55B8             STRB     R0,[R7, R6]
+    292              }
+   \   00000044   0x1C7F             ADDS     R7,R7,#+1
+   \                     ??MX25L3206_RD_0: (+1)
+   \   00000046   0x42AF             CMP      R7,R5
+   \   00000048   0xD3F9             BCC.N    ??MX25L3206_RD_1
+    293              CE_High();   
+   \   0000004A   0x2110             MOVS     R1,#+16
+   \   0000004C   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   0000004E   0x.... 0x....      BL       GPIO_SetBits
+    294              EEP_SendEvent();
+   \   00000052   0x.... 0x....      BL       EEP_SendEvent
+    295              return (1);
+   \   00000056   0x2001             MOVS     R0,#+1
+   \   00000058   0xBDF2             POP      {R1,R4-R7,PC}    ;; return
+    296          }
+    297          
+    298          /************************************************************************
+    299          ** 函数名称:MX25L1602_RdID                                                                                                        
+    300          ** 函数功能:MX25L1602的读ID函数,可选择读ID和读数据操作                
+    301          ** 入口参数:
+    302          **            idtype IDType:ID类型。用户可在Jedec_ID,Dev_ID,Manu_ID三者里选择
+    303          **            u32* RcvbufPt:存储ID变量的指针
+    304          ** 出口参数:操作成功则返回OK,失败则返回ERROR        
+    305          ** 注     意:若填入的参数不符合要求，则返回ERROR
+    306          ************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    307          u32 MX25L3206_RdID(void)
+    308          {
+   \                     MX25L3206_RdID: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+    309              u32 temp = 0;
+   \   00000002   0x2400             MOVS     R4,#+0
+    310              CE_Low();            
+   \   00000004   0x2110             MOVS     R1,#+16
+   \   00000006   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   00000008   0x.... 0x....      BL       GPIO_ResetBits
+    311              Send_Byte(0x9F);                            // 发送读JEDEC ID命令(9Fh)
+   \   0000000C   0x209F             MOVS     R0,#+159
+   \   0000000E   0x.... 0x....      BL       Send_Byte
+    312              temp = (temp | Get_Byte()) << 8;            // 接收数据 
+   \   00000012   0x.... 0x....      BL       Get_Byte
+   \   00000016   0x4320             ORRS     R0,R0,R4
+   \   00000018   0x0204             LSLS     R4,R0,#+8
+    313              temp = (temp | Get_Byte()) << 8;    
+   \   0000001A   0x.... 0x....      BL       Get_Byte
+   \   0000001E   0x4320             ORRS     R0,R0,R4
+   \   00000020   0x0204             LSLS     R4,R0,#+8
+    314              temp = (temp | Get_Byte());                 // 在本例中,temp的值应为0xBF2541
+   \   00000022   0x.... 0x....      BL       Get_Byte
+   \   00000026   0x4304             ORRS     R4,R0,R4
+    315              CE_High();            
+   \   00000028   0x2110             MOVS     R1,#+16
+   \   0000002A   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   0000002C   0x.... 0x....      BL       GPIO_SetBits
+    316          	return temp;
+   \   00000030   0x0020             MOVS     R0,R4
+   \   00000032   0xBD10             POP      {R4,PC}          ;; return
+    317          }
+    318          
+    319          /************************************************************************
+    320          ** 函数名称:MX25L1602_WR                                            
+    321          ** 函数功能:MX25L1602的写函数，可写1个和多个数据到指定地址                                    
+    322          ** 入口参数:
+    323          **            u32 Dst：目标地址,范围 0x0 - MAX_ADDR（MAX_ADDR = 0x1FFFFF）                
+    324          **            u8* SndbufPt:发送缓存区指针
+    325          **          u32 NByte:要写的数据字节数
+    326          ** 出口参数:操作成功则返回OK,失败则返回ERROR        
+    327          ** 注     意:若某功能下,某一入口参数无效,可在该入口参数处填Invalid，该参数将被忽略
+    328          ************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    329          u8 MX25L3206_WR(u32 Dst, u8* SndbufPt, u32 NByte)
+    330          {
+   \                     MX25L3206_WR: (+1)
+   \   00000000   0xB5F8             PUSH     {R3-R7,LR}
+   \   00000002   0x0004             MOVS     R4,R0
+   \   00000004   0x000D             MOVS     R5,R1
+   \   00000006   0x0016             MOVS     R6,R2
+    331              u8 StatRgVal = 0;
+   \   00000008   0x2700             MOVS     R7,#+0
+    332              u32 i = 0;
+   \   0000000A   0x2700             MOVS     R7,#+0
+    333          	u32 adr;
+    334              
+    335              EEP_WaitEvent();
+   \   0000000C   0x.... 0x....      BL       EEP_WaitEvent
+    336              
+    337          	//adr=Dst&MAX_ADDR ;
+    338              adr=Dst ;
+    339              
+    340              CE_Low();            
+   \   00000010   0x2110             MOVS     R1,#+16
+   \   00000012   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   00000014   0x.... 0x....      BL       GPIO_ResetBits
+    341              Send_Byte(0x06);                                                    /* 发送写使能命令               */
+   \   00000018   0x2006             MOVS     R0,#+6
+   \   0000001A   0x.... 0x....      BL       Send_Byte
+    342              CE_High();        
+   \   0000001E   0x2110             MOVS     R1,#+16
+   \   00000020   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   00000022   0x.... 0x....      BL       GPIO_SetBits
+    343              //写数据 
+    344              CE_Low();            
+   \   00000026   0x2110             MOVS     R1,#+16
+   \   00000028   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   0000002A   0x.... 0x....      BL       GPIO_ResetBits
+    345              Send_Byte(0x02);                                                    /* 发送字节数据烧写命令         */
+   \   0000002E   0x2002             MOVS     R0,#+2
+   \   00000030   0x.... 0x....      BL       Send_Byte
+    346              Send_Byte((((adr+i) & 0xFFFFFF) >> 16));                            /* 发送3个字节的地址信息        */
+   \   00000034   0x1938             ADDS     R0,R7,R4
+   \   00000036   0x0C00             LSRS     R0,R0,#+16
+   \   00000038   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000003A   0x.... 0x....      BL       Send_Byte
+    347              Send_Byte((((adr+i) & 0xFFFF) >> 8));
+   \   0000003E   0x1938             ADDS     R0,R7,R4
+   \   00000040   0x0A00             LSRS     R0,R0,#+8
+   \   00000042   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000044   0x.... 0x....      BL       Send_Byte
+    348              Send_Byte((adr+i) & 0xFF);
+   \   00000048   0x1938             ADDS     R0,R7,R4
+   \   0000004A   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000004C   0x.... 0x....      BL       Send_Byte
+    349              for(i = 0; i < NByte; i++)
+   \   00000050   0x2700             MOVS     R7,#+0
+   \   00000052   0xE003             B.N      ??MX25L3206_WR_0
+    350              {
+    351                  Send_Byte(SndbufPt[i]);                                     /* 发送被烧写的数据             */
+   \                     ??MX25L3206_WR_1: (+1)
+   \   00000054   0x5D78             LDRB     R0,[R7, R5]
+   \   00000056   0x.... 0x....      BL       Send_Byte
+    352              }
+   \   0000005A   0x1C7F             ADDS     R7,R7,#+1
+   \                     ??MX25L3206_WR_0: (+1)
+   \   0000005C   0x42B7             CMP      R7,R6
+   \   0000005E   0xD3F9             BCC.N    ??MX25L3206_WR_1
+    353              CE_High();    
+   \   00000060   0x2110             MOVS     R1,#+16
+   \   00000062   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   00000064   0x.... 0x....      BL       GPIO_SetBits
+    354              
+    355              do
+    356              {
+    357                  CE_Low();             
+   \                     ??MX25L3206_WR_2: (+1)
+   \   00000068   0x2110             MOVS     R1,#+16
+   \   0000006A   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   0000006C   0x.... 0x....      BL       GPIO_ResetBits
+    358                  Send_Byte(0x05);                                                /* 发送读状态寄存器命令         */
+   \   00000070   0x2005             MOVS     R0,#+5
+   \   00000072   0x.... 0x....      BL       Send_Byte
+    359                  StatRgVal = Get_Byte();                                         /* 保存读得的状态寄存器值       */
+   \   00000076   0x.... 0x....      BL       Get_Byte
+   \   0000007A   0x0007             MOVS     R7,R0
+    360                  CE_High();                                
+   \   0000007C   0x2110             MOVS     R1,#+16
+   \   0000007E   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   00000080   0x.... 0x....      BL       GPIO_SetBits
+    361              }
+    362              while (StatRgVal == 0x03);                                          /* 一直等待，直到芯片空闲       */
+   \   00000084   0xB2FF             UXTB     R7,R7            ;; ZeroExt  R7,R7,#+24,#+24
+   \   00000086   0x2F03             CMP      R7,#+3
+   \   00000088   0xD0EE             BEQ.N    ??MX25L3206_WR_2
+    363              EEP_SendEvent();
+   \   0000008A   0x.... 0x....      BL       EEP_SendEvent
+    364              return (1);        
+   \   0000008E   0x2001             MOVS     R0,#+1
+   \   00000090   0xBDF2             POP      {R1,R4-R7,PC}    ;; return
+    365          }
+    366          
+    367          /************************************************************************
+    368          ** 函数名称:MX25L1602_Erase                                                
+    369          ** 函数功能:根据指定的扇区号选取最高效的算法擦除                                
+    370          ** 入口参数:
+    371          **            u32 sec1：起始扇区号,范围(0~499)
+    372          **            u32 sec2：终止扇区号,范围(0~499)
+    373          ** 出口参数:操作成功则返回OK,失败则返回ERROR        
+    374          ************************************************************************/
+    375          
+
+   \                                 In section .text, align 2, keep-with-next
+    376          u8 MX25L3206_Erase(u32 sec1, u32 sec2)
+    377          {
+   \                     MX25L3206_Erase: (+1)
+   \   00000000   0xE92D 0x41F0      PUSH     {R4-R8,LR}
+   \   00000004   0x0004             MOVS     R4,R0
+   \   00000006   0x000F             MOVS     R7,R1
+    378              u8  temp2 = 0,StatRgVal = 0;
+   \   00000008   0x2000             MOVS     R0,#+0
+   \   0000000A   0xF05F 0x0800      MOVS     R8,#+0
+    379              u32 SecnHdAddr = 0;                  
+   \   0000000E   0xF05F 0x0800      MOVS     R8,#+0
+    380              u32 no_SecsToEr = 0;                       // 要擦除的扇区数目
+   \   00000012   0x2600             MOVS     R6,#+0
+    381              u32 CurSecToEr = 0;                        // 当前要擦除的扇区号
+   \   00000014   0x2500             MOVS     R5,#+0
+    382              
+    383              /*  检查入口参数 */
+    384              if ((sec1 > SEC_MAX)||(sec2 > SEC_MAX))    
+   \   00000016   0xF5B4 0x5F80      CMP      R4,#+4096
+   \   0000001A   0xD802             BHI.N    ??MX25L3206_Erase_0
+   \   0000001C   0xF5B7 0x5F80      CMP      R7,#+4096
+   \   00000020   0xD901             BLS.N    ??MX25L3206_Erase_1
+    385              {
+    386                  return (0);    
+   \                     ??MX25L3206_Erase_0: (+1)
+   \   00000022   0x2000             MOVS     R0,#+0
+   \   00000024   0xE10A             B.N      ??MX25L3206_Erase_2
+    387              }       
+    388              
+    389              CE_Low();            
+   \                     ??MX25L3206_Erase_1: (+1)
+   \   00000026   0x2110             MOVS     R1,#+16
+   \   00000028   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   0000002A   0x.... 0x....      BL       GPIO_ResetBits
+    390              Send_Byte(0x06);                                // 发送写使能命令
+   \   0000002E   0x2006             MOVS     R0,#+6
+   \   00000030   0x.... 0x....      BL       Send_Byte
+    391              CE_High();            
+   \   00000034   0x2110             MOVS     R1,#+16
+   \   00000036   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   00000038   0x.... 0x....      BL       GPIO_SetBits
+    392          
+    393              /* 如果用户输入的起始扇区号大于终止扇区号，则在内部作出调整 */
+    394              if (sec1 > sec2)
+   \   0000003C   0x42A7             CMP      R7,R4
+   \   0000003E   0xD203             BCS.N    ??MX25L3206_Erase_3
+    395              {
+    396                 temp2 = sec1;
+   \   00000040   0x0020             MOVS     R0,R4
+    397                 sec1  = sec2;
+   \   00000042   0x003C             MOVS     R4,R7
+    398                 sec2  = temp2;
+   \   00000044   0x0007             MOVS     R7,R0
+   \   00000046   0xB2FF             UXTB     R7,R7            ;; ZeroExt  R7,R7,#+24,#+24
+    399              } 
+    400              /* 若起止扇区号相等则擦除单个扇区 */
+    401              if (sec1 == sec2)    
+   \                     ??MX25L3206_Erase_3: (+1)
+   \   00000048   0x42BC             CMP      R4,R7
+   \   0000004A   0xD131             BNE.N    ??MX25L3206_Erase_4
+    402              {
+    403                  SecnHdAddr = SEC_SIZE * sec1;               // 计算扇区的起始地址
+   \   0000004C   0xF44F 0x5080      MOV      R0,#+4096
+   \   00000050   0xFB00 0xF804      MUL      R8,R0,R4
+    404                  CE_Low();    
+   \   00000054   0x2110             MOVS     R1,#+16
+   \   00000056   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   00000058   0x.... 0x....      BL       GPIO_ResetBits
+    405                  Send_Byte(0x20);                            // 发送扇区擦除指令
+   \   0000005C   0x2020             MOVS     R0,#+32
+   \   0000005E   0x.... 0x....      BL       Send_Byte
+    406                  Send_Byte(((SecnHdAddr & 0xFFFFFF) >> 16)); // 发送3个字节的地址信息
+   \   00000062   0xEA5F 0x4018      LSRS     R0,R8,#+16
+   \   00000066   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000068   0x.... 0x....      BL       Send_Byte
+    407                     Send_Byte(((SecnHdAddr & 0xFFFF) >> 8));
+   \   0000006C   0xEA5F 0x2018      LSRS     R0,R8,#+8
+   \   00000070   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000072   0x.... 0x....      BL       Send_Byte
+    408                     Send_Byte(SecnHdAddr & 0xFF);
+   \   00000076   0x4640             MOV      R0,R8
+   \   00000078   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000007A   0x.... 0x....      BL       Send_Byte
+    409                    CE_High();            
+   \   0000007E   0x2110             MOVS     R1,#+16
+   \   00000080   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   00000082   0x.... 0x....      BL       GPIO_SetBits
+    410                  do
+    411                  {
+    412                      CE_Low();             
+   \                     ??MX25L3206_Erase_5: (+1)
+   \   00000086   0x2110             MOVS     R1,#+16
+   \   00000088   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   0000008A   0x.... 0x....      BL       GPIO_ResetBits
+    413                      Send_Byte(0x05);                        // 发送读状态寄存器命令
+   \   0000008E   0x2005             MOVS     R0,#+5
+   \   00000090   0x.... 0x....      BL       Send_Byte
+    414                      StatRgVal = Get_Byte();                 // 保存读得的状态寄存器值
+   \   00000094   0x.... 0x....      BL       Get_Byte
+   \   00000098   0x4680             MOV      R8,R0
+    415                      CE_High();                                
+   \   0000009A   0x2110             MOVS     R1,#+16
+   \   0000009C   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   0000009E   0x.... 0x....      BL       GPIO_SetBits
+    416                    }
+    417                  while (StatRgVal == 0x03);                  // 一直等待，直到芯片空闲
+   \   000000A2   0xFA5F 0xF888      UXTB     R8,R8            ;; ZeroExt  R8,R8,#+24,#+24
+   \   000000A6   0xF1B8 0x0F03      CMP      R8,#+3
+   \   000000AA   0xD0EC             BEQ.N    ??MX25L3206_Erase_5
+    418                  return (1);            
+   \   000000AC   0x2001             MOVS     R0,#+1
+   \   000000AE   0xE0C5             B.N      ??MX25L3206_Erase_2
+    419              }
+    420              
+    421                               /*         根据起始扇区和终止扇区间距调用最快速的擦除功能                             */    
+    422              
+    423              if (sec2 - sec1 == SEC_MAX)    
+   \                     ??MX25L3206_Erase_4: (+1)
+   \   000000B0   0x1B38             SUBS     R0,R7,R4
+   \   000000B2   0xF5B0 0x5F80      CMP      R0,#+4096
+   \   000000B6   0xD11F             BNE.N    ??MX25L3206_Erase_6
+    424              {
+    425                  CE_Low();            
+   \   000000B8   0x2110             MOVS     R1,#+16
+   \   000000BA   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   000000BC   0x.... 0x....      BL       GPIO_ResetBits
+    426                  Send_Byte(0x60);                            // 发送芯片擦除指令(60h or C7h)
+   \   000000C0   0x2060             MOVS     R0,#+96
+   \   000000C2   0x.... 0x....      BL       Send_Byte
+    427                  CE_High();            
+   \   000000C6   0x2110             MOVS     R1,#+16
+   \   000000C8   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   000000CA   0x.... 0x....      BL       GPIO_SetBits
+    428                  do
+    429                  {
+    430                      CE_Low();             
+   \                     ??MX25L3206_Erase_7: (+1)
+   \   000000CE   0x2110             MOVS     R1,#+16
+   \   000000D0   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   000000D2   0x.... 0x....      BL       GPIO_ResetBits
+    431                      Send_Byte(0x05);                        // 发送读状态寄存器命令
+   \   000000D6   0x2005             MOVS     R0,#+5
+   \   000000D8   0x.... 0x....      BL       Send_Byte
+    432                      StatRgVal = Get_Byte();                 // 保存读得的状态寄存器值
+   \   000000DC   0x.... 0x....      BL       Get_Byte
+   \   000000E0   0x4680             MOV      R8,R0
+    433                      CE_High(); 
+   \   000000E2   0x2110             MOVS     R1,#+16
+   \   000000E4   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   000000E6   0x.... 0x....      BL       GPIO_SetBits
+    434          			//Delay(10);								//此处延时是否考虑更改
+    435                  }
+    436                  while (StatRgVal == 0x03);                  // 一直等待，直到芯片空闲
+   \   000000EA   0xFA5F 0xF888      UXTB     R8,R8            ;; ZeroExt  R8,R8,#+24,#+24
+   \   000000EE   0xF1B8 0x0F03      CMP      R8,#+3
+   \   000000F2   0xD0EC             BEQ.N    ??MX25L3206_Erase_7
+    437                  return (1);
+   \   000000F4   0x2001             MOVS     R0,#+1
+   \   000000F6   0xE0A1             B.N      ??MX25L3206_Erase_2
+    438              }
+    439              
+    440              no_SecsToEr = sec2 - sec1 +1;                   // 获取要擦除的扇区数目
+   \                     ??MX25L3206_Erase_6: (+1)
+   \   000000F8   0x1B38             SUBS     R0,R7,R4
+   \   000000FA   0x1C46             ADDS     R6,R0,#+1
+    441              CurSecToEr  = sec1;                             // 从起始扇区开始擦除
+   \   000000FC   0x0025             MOVS     R5,R4
+   \   000000FE   0xE031             B.N      ??MX25L3206_Erase_8
+    442              
+    443              /* 若两个扇区之间的间隔够大，则采取16扇区擦除算法 */
+    444              while (no_SecsToEr >= 16)
+    445              {
+    446                  SecnHdAddr = SEC_SIZE * CurSecToEr;         // 计算扇区的起始地址
+   \                     ??MX25L3206_Erase_9: (+1)
+   \   00000100   0xF44F 0x5080      MOV      R0,#+4096
+   \   00000104   0xFB00 0xF805      MUL      R8,R0,R5
+    447                  CE_Low();    
+   \   00000108   0x2110             MOVS     R1,#+16
+   \   0000010A   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   0000010C   0x.... 0x....      BL       GPIO_ResetBits
+    448                  Send_Byte(0xD8);                            // 发送64KB块擦除指令
+   \   00000110   0x20D8             MOVS     R0,#+216
+   \   00000112   0x.... 0x....      BL       Send_Byte
+    449                  Send_Byte(((SecnHdAddr & 0xFFFFFF) >> 16)); // 发送3个字节的地址信息
+   \   00000116   0xEA5F 0x4018      LSRS     R0,R8,#+16
+   \   0000011A   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000011C   0x.... 0x....      BL       Send_Byte
+    450                  Send_Byte(((SecnHdAddr & 0xFFFF) >> 8));
+   \   00000120   0xEA5F 0x2018      LSRS     R0,R8,#+8
+   \   00000124   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000126   0x.... 0x....      BL       Send_Byte
+    451                  Send_Byte(SecnHdAddr & 0xFF);
+   \   0000012A   0x4640             MOV      R0,R8
+   \   0000012C   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000012E   0x.... 0x....      BL       Send_Byte
+    452                  CE_High();            
+   \   00000132   0x2110             MOVS     R1,#+16
+   \   00000134   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   00000136   0x.... 0x....      BL       GPIO_SetBits
+    453                  do
+    454                  {
+    455                      CE_Low();             
+   \                     ??MX25L3206_Erase_10: (+1)
+   \   0000013A   0x2110             MOVS     R1,#+16
+   \   0000013C   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   0000013E   0x.... 0x....      BL       GPIO_ResetBits
+    456                      Send_Byte(0x05);                        // 发送读状态寄存器命令
+   \   00000142   0x2005             MOVS     R0,#+5
+   \   00000144   0x.... 0x....      BL       Send_Byte
+    457                      StatRgVal = Get_Byte();                 // 保存读得的状态寄存器值
+   \   00000148   0x.... 0x....      BL       Get_Byte
+   \   0000014C   0x4680             MOV      R8,R0
+    458                      CE_High();                                
+   \   0000014E   0x2110             MOVS     R1,#+16
+   \   00000150   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   00000152   0x.... 0x....      BL       GPIO_SetBits
+    459                    }
+    460                  while (StatRgVal == 0x03);                  // 一直等待，直到芯片空闲
+   \   00000156   0xFA5F 0xF888      UXTB     R8,R8            ;; ZeroExt  R8,R8,#+24,#+24
+   \   0000015A   0xF1B8 0x0F03      CMP      R8,#+3
+   \   0000015E   0xD0EC             BEQ.N    ??MX25L3206_Erase_10
+    461                  CurSecToEr  += 16;                          // 计算擦除了16个扇区后,和擦除区域相邻的待擦除扇区号
+   \   00000160   0x3510             ADDS     R5,R5,#+16
+    462                  no_SecsToEr -=  16;                         // 对需擦除的扇区总数作出调整
+   \   00000162   0x3E10             SUBS     R6,R6,#+16
+    463              }
+   \                     ??MX25L3206_Erase_8: (+1)
+   \   00000164   0x2E10             CMP      R6,#+16
+   \   00000166   0xD2CB             BCS.N    ??MX25L3206_Erase_9
+    464              /* 若两个扇区之间的间隔够大，则采取8扇区擦除算法 */
+    465              while (no_SecsToEr >= 8)
+   \                     ??MX25L3206_Erase_11: (+1)
+   \   00000168   0x2E08             CMP      R6,#+8
+   \   0000016A   0xD364             BCC.N    ??MX25L3206_Erase_12
+    466              {
+    467                  SecnHdAddr = SEC_SIZE * CurSecToEr;         // 计算扇区的起始地址
+   \   0000016C   0xF44F 0x5080      MOV      R0,#+4096
+   \   00000170   0xFB00 0xF805      MUL      R8,R0,R5
+    468                  CE_Low();    
+   \   00000174   0x2110             MOVS     R1,#+16
+   \   00000176   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   00000178   0x.... 0x....      BL       GPIO_ResetBits
+    469                  Send_Byte(0x52);                            // 发送32KB擦除指令
+   \   0000017C   0x2052             MOVS     R0,#+82
+   \   0000017E   0x.... 0x....      BL       Send_Byte
+    470                  Send_Byte(((SecnHdAddr & 0xFFFFFF) >> 16)); // 发送3个字节的地址信息
+   \   00000182   0xEA5F 0x4018      LSRS     R0,R8,#+16
+   \   00000186   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000188   0x.... 0x....      BL       Send_Byte
+    471                  Send_Byte(((SecnHdAddr & 0xFFFF) >> 8));
+   \   0000018C   0xEA5F 0x2018      LSRS     R0,R8,#+8
+   \   00000190   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000192   0x.... 0x....      BL       Send_Byte
+    472                  Send_Byte(SecnHdAddr & 0xFF);
+   \   00000196   0x4640             MOV      R0,R8
+   \   00000198   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   0000019A   0x.... 0x....      BL       Send_Byte
+    473                  CE_High();            
+   \   0000019E   0x2110             MOVS     R1,#+16
+   \   000001A0   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   000001A2   0x.... 0x....      BL       GPIO_SetBits
+    474                  do
+    475                  {
+    476                      CE_Low();             
+   \                     ??MX25L3206_Erase_13: (+1)
+   \   000001A6   0x2110             MOVS     R1,#+16
+   \   000001A8   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   000001AA   0x.... 0x....      BL       GPIO_ResetBits
+    477                      Send_Byte(0x05);                        // 发送读状态寄存器命令
+   \   000001AE   0x2005             MOVS     R0,#+5
+   \   000001B0   0x.... 0x....      BL       Send_Byte
+    478                      StatRgVal = Get_Byte();                 // 保存读得的状态寄存器值
+   \   000001B4   0x.... 0x....      BL       Get_Byte
+   \   000001B8   0x4680             MOV      R8,R0
+    479                      CE_High();                                
+   \   000001BA   0x2110             MOVS     R1,#+16
+   \   000001BC   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   000001BE   0x.... 0x....      BL       GPIO_SetBits
+    480                    }
+    481                  while (StatRgVal == 0x03);                  // 一直等待，直到芯片空闲    
+   \   000001C2   0xFA5F 0xF888      UXTB     R8,R8            ;; ZeroExt  R8,R8,#+24,#+24
+   \   000001C6   0xF1B8 0x0F03      CMP      R8,#+3
+   \   000001CA   0xD0EC             BEQ.N    ??MX25L3206_Erase_13
+    482                  CurSecToEr  += 8;
+   \   000001CC   0x3508             ADDS     R5,R5,#+8
+    483                  no_SecsToEr -=  8;
+   \   000001CE   0x3E08             SUBS     R6,R6,#+8
+   \   000001D0   0xE7CA             B.N      ??MX25L3206_Erase_11
+    484              }
+    485              /* 采用扇区擦除算法擦除剩余的扇区 */
+    486              while (no_SecsToEr >= 1)
+    487              {
+    488                  SecnHdAddr = SEC_SIZE * CurSecToEr;         // 计算扇区的起始地址
+   \                     ??MX25L3206_Erase_14: (+1)
+   \   000001D2   0xF44F 0x5080      MOV      R0,#+4096
+   \   000001D6   0xFB00 0xF805      MUL      R8,R0,R5
+    489                  CE_Low();    
+   \   000001DA   0x2110             MOVS     R1,#+16
+   \   000001DC   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   000001DE   0x.... 0x....      BL       GPIO_ResetBits
+    490                  Send_Byte(0x20);                            // 发送扇区擦除指令
+   \   000001E2   0x2020             MOVS     R0,#+32
+   \   000001E4   0x.... 0x....      BL       Send_Byte
+    491                  Send_Byte(((SecnHdAddr & 0xFFFFFF) >> 16)); // 发送3个字节的地址信息
+   \   000001E8   0xEA5F 0x4018      LSRS     R0,R8,#+16
+   \   000001EC   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000001EE   0x.... 0x....      BL       Send_Byte
+    492                     Send_Byte(((SecnHdAddr & 0xFFFF) >> 8));
+   \   000001F2   0xEA5F 0x2018      LSRS     R0,R8,#+8
+   \   000001F6   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000001F8   0x.... 0x....      BL       Send_Byte
+    493                     Send_Byte(SecnHdAddr & 0xFF);
+   \   000001FC   0x4640             MOV      R0,R8
+   \   000001FE   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000200   0x.... 0x....      BL       Send_Byte
+    494                    CE_High();            
+   \   00000204   0x2110             MOVS     R1,#+16
+   \   00000206   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   00000208   0x.... 0x....      BL       GPIO_SetBits
+    495                  do
+    496                  {
+    497                        CE_Low();             
+   \                     ??MX25L3206_Erase_15: (+1)
+   \   0000020C   0x2110             MOVS     R1,#+16
+   \   0000020E   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   00000210   0x.... 0x....      BL       GPIO_ResetBits
+    498                      Send_Byte(0x05);                        // 发送读状态寄存器命令
+   \   00000214   0x2005             MOVS     R0,#+5
+   \   00000216   0x.... 0x....      BL       Send_Byte
+    499                      StatRgVal = Get_Byte();                 // 保存读得的状态寄存器值
+   \   0000021A   0x.... 0x....      BL       Get_Byte
+   \   0000021E   0x4680             MOV      R8,R0
+    500                      CE_High();                                
+   \   00000220   0x2110             MOVS     R1,#+16
+   \   00000222   0x....             LDR.N    R0,??DataTable8_1  ;; 0x40010800
+   \   00000224   0x.... 0x....      BL       GPIO_SetBits
+    501                    }
+    502                  while (StatRgVal == 0x03);                  // 一直等待，直到芯片空闲
+   \   00000228   0xFA5F 0xF888      UXTB     R8,R8            ;; ZeroExt  R8,R8,#+24,#+24
+   \   0000022C   0xF1B8 0x0F03      CMP      R8,#+3
+   \   00000230   0xD0EC             BEQ.N    ??MX25L3206_Erase_15
+    503                  CurSecToEr  += 1;
+   \   00000232   0x1C6D             ADDS     R5,R5,#+1
+    504                  no_SecsToEr -=  1;
+   \   00000234   0x1E76             SUBS     R6,R6,#+1
+    505              }
+   \                     ??MX25L3206_Erase_12: (+1)
+   \   00000236   0x2E00             CMP      R6,#+0
+   \   00000238   0xD1CB             BNE.N    ??MX25L3206_Erase_14
+    506              return (1);
+   \   0000023A   0x2001             MOVS     R0,#+1
+   \                     ??MX25L3206_Erase_2: (+1)
+   \   0000023C   0xE8BD 0x81F0      POP      {R4-R8,PC}       ;; return
+    507          }
+    508          
+    509          /*******************************************************************************
+    510          * Description  : FLASH写操作（写入非全1扇区前，需进行擦除操作）
+    511          * Author       : 2018/5/15 星期二, by redmorningcn
+    512          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    513          u8 WriteFlsh(u32 adr,u8 *buf,u32 len)
+    514          {
+   \                     WriteFlsh: (+1)
+   \   00000000   0xB5F8             PUSH     {R3-R7,LR}
+   \   00000002   0x0004             MOVS     R4,R0
+   \   00000004   0x000D             MOVS     R5,R1
+   \   00000006   0x0016             MOVS     R6,R2
+    515              u32     i = 0;
+   \   00000008   0x2700             MOVS     R7,#+0
+    516              /*******************************************************************************
+    517              * Description  : 进入写操作前，判断数据是否跨扇区（跨越扇区需先擦除）
+    518              * Author       : 2018/5/15 星期二, by redmorningcn
+    519              *******************************************************************************/
+    520              for(i = 0;i < len;i++)                                       
+   \   0000000A   0x2700             MOVS     R7,#+0
+   \   0000000C   0xE014             B.N      ??WriteFlsh_0
+    521              {
+    522                  if(((adr +i)&0x0FFF)==0)                                //在块边界，需要擦除块
+   \                     ??WriteFlsh_1: (+1)
+   \   0000000E   0x1938             ADDS     R0,R7,R4
+   \   00000010   0x0500             LSLS     R0,R0,#+20
+   \   00000012   0xD110             BNE.N    ??WriteFlsh_2
+    523                  {
+    524                      
+    525                      EEP_WaitEvent();
+   \   00000014   0x.... 0x....      BL       EEP_WaitEvent
+    526                      MX25L3206_Erase(((adr +i)>>12)&0x3FF,((adr +i)>>12)&0x3FF);
+   \   00000018   0x1938             ADDS     R0,R7,R4
+   \   0000001A   0x0280             LSLS     R0,R0,#+10       ;; ZeroExtS R0,R0,#+10,#+22
+   \   0000001C   0x0D80             LSRS     R0,R0,#+22
+   \   0000001E   0x0001             MOVS     R1,R0
+   \   00000020   0x1938             ADDS     R0,R7,R4
+   \   00000022   0x0002             MOVS     R2,R0
+   \   00000024   0x0292             LSLS     R2,R2,#+10       ;; ZeroExtS R2,R2,#+10,#+22
+   \   00000026   0x0D92             LSRS     R2,R2,#+22
+   \   00000028   0x0010             MOVS     R0,R2
+   \   0000002A   0x.... 0x....      BL       MX25L3206_Erase
+    527                      
+    528                      i += 0x0FFF;
+   \   0000002E   0xF607 0x77FF      ADDW     R7,R7,#+4095
+    529                      EEP_SendEvent();
+   \   00000032   0x.... 0x....      BL       EEP_SendEvent
+    530                      //break;                                              
+    531                  }
+    532              }
+   \                     ??WriteFlsh_2: (+1)
+   \   00000036   0x1C7F             ADDS     R7,R7,#+1
+   \                     ??WriteFlsh_0: (+1)
+   \   00000038   0x42B7             CMP      R7,R6
+   \   0000003A   0xD3E8             BCC.N    ??WriteFlsh_1
+    533              
+    534          	return MX25L3206_WR(adr, buf, len);
+   \   0000003C   0x0032             MOVS     R2,R6
+   \   0000003E   0x0029             MOVS     R1,R5
+   \   00000040   0x0020             MOVS     R0,R4
+   \   00000042   0x.... 0x....      BL       MX25L3206_WR
+   \   00000046   0xBDF2             POP      {R1,R4-R7,PC}    ;; return
+    535          }
+    536          
+    537          /*******************************************************************************
+    538          * Description  : FLASH读操作
+    539          * Author       : 2018/5/15 星期二, by redmorningcn
+    540          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    541          void ReadFlsh(u32 adr,u8 *buf,u32 len)
+    542          {
+   \                     ReadFlsh: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+   \   00000002   0x0013             MOVS     R3,R2
+    543          	MX25L3206_RD(adr,len,buf);
+   \   00000004   0x000A             MOVS     R2,R1
+   \   00000006   0x0019             MOVS     R1,R3
+   \   00000008   0x.... 0x....      BL       MX25L3206_RD
+    544          }
+   \   0000000C   0xBD01             POP      {R0,PC}          ;; return
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable8:
+   \   00000000   0x........         DC32     Bsp_EepSem
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable8_1:
+   \   00000000   0x40010800         DC32     0x40010800
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable8_2:
+   \   00000000   0x40013000         DC32     0x40013000
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable8_3:
+   \   00000000   0x........         DC32     ?_0
+
+   \                                 In section .rodata, align 4
+   \                     ?_0:
+   \   00000000   0x42 0x73          DC8 "Bsp EepSem"
+   \              0x70 0x20    
+   \              0x45 0x65    
+   \              0x70 0x53    
+   \              0x65 0x6D    
+   \              0x00         
+   \   0000000B   0x00               DC8 0
+    545          
+    546          
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       8   EEP_SendEvent
+         8   -> BSP_OS_SemPost
+       8   EEP_WaitEvent
+         8   -> BSP_OS_SemWait
+       8   Get_Byte
+         8   -> Send_Byte
+      24   MX25L3206_Erase
+        24   -> GPIO_ResetBits
+        24   -> GPIO_SetBits
+        24   -> Get_Byte
+        24   -> Send_Byte
+      24   MX25L3206_RD
+        24   -> EEP_SendEvent
+        24   -> EEP_WaitEvent
+        24   -> GPIO_ResetBits
+        24   -> GPIO_SetBits
+        24   -> Get_Byte
+        24   -> Send_Byte
+       8   MX25L3206_RdID
+         8   -> GPIO_ResetBits
+         8   -> GPIO_SetBits
+         8   -> Get_Byte
+         8   -> Send_Byte
+      24   MX25L3206_WR
+        24   -> EEP_SendEvent
+        24   -> EEP_WaitEvent
+        24   -> GPIO_ResetBits
+        24   -> GPIO_SetBits
+        24   -> Get_Byte
+        24   -> Send_Byte
+       8   ReadFlsh
+         8   -> MX25L3206_RD
+      32   SPI_FLASH_Init
+        32   -> BSP_OS_SemCreate
+        32   -> GPIO_Init
+        32   -> GPIO_SetBits
+        32   -> RCC_APB2PeriphClockCmd
+        32   -> SPI_Cmd
+        32   -> SPI_Flash_WAKEUP
+        32   -> SPI_Init
+       8   SPI_Flash_WAKEUP
+         8   -> GPIO_ResetBits
+         8   -> GPIO_SetBits
+         8   -> Send_Byte
+       8   Send_Byte
+         8   -> SPI_I2S_GetFlagStatus
+         8   -> SPI_I2S_ReceiveData
+         8   -> SPI_I2S_SendData
+      24   WriteFlsh
+        24   -> EEP_SendEvent
+        24   -> EEP_WaitEvent
+        24   -> MX25L3206_Erase
+        24   -> MX25L3206_WR
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable8
+       4  ??DataTable8_1
+       4  ??DataTable8_2
+       4  ??DataTable8_3
+      12  ?_0
+      40  Bsp_EepSem
+      12  EEP_SendEvent
+      14  EEP_WaitEvent
+      10  Get_Byte
+     576  MX25L3206_Erase
+      90  MX25L3206_RD
+      52  MX25L3206_RdID
+     146  MX25L3206_WR
+      14  ReadFlsh
+     228  SPI_FLASH_Init
+      28  SPI_Flash_WAKEUP
+      58  Send_Byte
+      72  WriteFlsh
+
+ 
+    40 bytes in section .bss
+    12 bytes in section .rodata
+ 1 316 bytes in section .text
+ 
+ 1 316 bytes of CODE  memory
+    12 bytes of CONST memory
+    40 bytes of DATA  memory
+
+Errors: none
+Warnings: none

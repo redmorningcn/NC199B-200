@@ -1,0 +1,1111 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.50.1.10123/W32 for ARM       15/Jul/2018  10:36:14
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  F:\iar\NC210\NC210-200处理板\source\task\app_dtu_rec.c
+#    Command line =  
+#        F:\iar\NC210\NC210-200处理板\source\task\app_dtu_rec.c -D
+#        USE_STDPERIPH_DRIVER -D APP_RELEASE -lCN
+#        F:\iar\NC210\NC210-200处理板\project\app_release\List -o
+#        F:\iar\NC210\NC210-200处理板\project\app_release\Obj --no_cse
+#        --no_unroll --no_inline --no_code_motion --no_tbaa --no_clustering
+#        --no_scheduling --debug --endian=little --cpu=Cortex-M3 -e --fpu=None
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.3\arm\INC\c\DLib_Config_Full.h" -I
+#        F:\iar\NC210\NC210-200处理板\project\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\config\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\task\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\user\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\OSAL\OS\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\OSAL\Ports\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\driver\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-LIB\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-CPU\ -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-CPU\ARM-Cortex-M3\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uCOS-III\Ports\ARM-Cortex-M3\Generic\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uCOS-III\Source\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\ST\STM32\inc\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\OS\uCOS-III\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\EvalBoards\Micrium\uC-Eval-STM32F107\BSP\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Cfg\Template\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\OS\uCOS-III\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Ports\STM32\STM32F103\IAR\
+#        -I
+#        F:\iar\NC210\NC210-200处理板\project\..\source\Software\uC-MB\Source\
+#        -Ol --use_c++_inline -I "C:\Program Files (x86)\IAR Systems\Embedded
+#        Workbench 7.3\arm\CMSIS\Include\"
+#    List file    =  
+#        F:\iar\NC210\NC210-200处理板\project\app_release\List\app_dtu_rec.lst
+#    Object file  =  
+#        F:\iar\NC210\NC210-200处理板\project\app_release\Obj\app_dtu_rec.o
+#
+###############################################################################
+
+F:\iar\NC210\NC210-200处理板\source\task\app_dtu_rec.c
+      1          /**************************************************************
+      2          * Description  : 处理板和dtu通讯，接收部分
+      3          * Author       : 2018/5/24 星期四, by redmorningcn
+      4          */
+      5          
+      6          /*******************************************************************************
+      7          * INCLUDES
+      8          */
+      9          #include    <includes.h>
+     10          #include    <app_com_type.h>
+     11          #include    <app_dtu_rec.h>
+     12          #include    <ds3231.h>
+     13          #include    <string.h>
+     14          #include    <bsp_time.h>
+     15          
+     16          typedef  void (*pFunction)(void);			    //定义一个函数类型的参数.
+
+   \                                 In section .bss, align 4
+     17          pFunction   pApp;
+   \                     pApp:
+   \   00000000                      DS8 4
+     18          
+     19          /*******************************************************************************
+     20           * 名    称： IAP_JumpTo()
+     21           * 功    能： 跳转到应用程序段
+     22           * 入口参数：
+     23           * 出口参数： 无
+     24           * 作　 　者： 无名沈
+     25           * 创建日期： 2014-04-23
+     26           * 修    改： 
+     27           * 修改日期： 
+     28           *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     29          void IAP_JumpTo(u32 appAddr)
+     30          {    
+   \                     IAP_JumpTo: (+1)
+   \   00000000   0xB538             PUSH     {R3-R5,LR}
+   \   00000002   0x0004             MOVS     R4,R0
+     31              u32     JumpAddress = 0;
+   \   00000004   0x2000             MOVS     R0,#+0
+     32              u8      cpu_sr;
+     33                  
+     34              /***********************************************
+     35              * 描述： 关中断，防止值被中断修改
+     36              */
+     37              CPU_CRITICAL_ENTER();
+   \   00000006   0x.... 0x....      BL       CPU_SR_Save
+   \   0000000A   0x0005             MOVS     R5,R0
+   \   0000000C   0x.... 0x....      BL       CPU_IntDisMeasStart
+     38          
+     39              /***********************************************
+     40              * 描述： 获取应用入口及初始化堆栈指针
+     41              */
+     42              JumpAddress   =*(volatile u32*) (appAddr + 4); // 地址+4为PC地址
+   \   00000010   0x6860             LDR      R0,[R4, #+4]
+     43              pApp          = (pFunction)JumpAddress;         // 函数指针指向APP
+   \   00000012   0x.... 0x....      LDR.W    R1,??DataTable2
+   \   00000016   0x6008             STR      R0,[R1, #+0]
+     44          //    __set_MSP       (*(volatile u32*) appAddr);    // 初始化主堆栈指针（MSP）
+     45          //    __set_PSP       (*(volatile u32*) appAddr);    // 初始化进程堆栈指针（PSP）
+     46          //    __set_CONTROL   (0);                            // 清零CONTROL
+     47              /***********************************************
+     48              * 描述： 跳转到APP程序
+     49              */
+     50              pApp();
+   \   00000018   0x.... 0x....      LDR.W    R0,??DataTable2
+   \   0000001C   0x6800             LDR      R0,[R0, #+0]
+   \   0000001E   0x4780             BLX      R0
+     51              
+     52              CPU_CRITICAL_EXIT();
+   \   00000020   0x.... 0x....      BL       CPU_IntDisMeasStop
+   \   00000024   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   00000026   0x0028             MOVS     R0,R5
+   \   00000028   0x.... 0x....      BL       CPU_SR_Restore
+     53          }
+   \   0000002C   0xBD31             POP      {R0,R4,R5,PC}    ;; return
+     54          
+     55          /**************************************************************
+     56          * Description  : 参数操作（读写或转发）
+     57          * Author       : 2018/5/25 星期五, by redmorningcn
+     58          */
+
+   \                                 In section .text, align 2, keep-with-next
+     59          void    app_operate_para(StrCOMCtrl *Com)
+     60          {
+   \                     app_operate_para: (+1)
+   \   00000000   0xB570             PUSH     {R4-R6,LR}
+   \   00000002   0xB08E             SUB      SP,SP,#+56
+   \   00000004   0x0004             MOVS     R4,R0
+     61              u32 code;       //指令码
+     62              u32 recordnum;
+     63              u16 data;
+     64              u16 err;
+     65              u16 addr;
+     66              u8  len;
+     67              u8  node;
+     68              
+     69              code = Com->Rd.dtu.code;
+   \   00000006   0x6820             LDR      R0,[R4, #+0]
+     70          
+     71              switch(code)
+   \   00000008   0x2801             CMP      R0,#+1
+   \   0000000A   0xF000 0x8174      BEQ.W    ??app_operate_para_0
+   \   0000000E   0xF5B0 0x7F80      CMP      R0,#+256
+   \   00000012   0xD021             BEQ.N    ??app_operate_para_1
+   \   00000014   0xF5B0 0x5F00      CMP      R0,#+8192
+   \   00000018   0xD047             BEQ.N    ??app_operate_para_2
+   \   0000001A   0xF5B0 0x2F00      CMP      R0,#+524288
+   \   0000001E   0xD06B             BEQ.N    ??app_operate_para_3
+   \   00000020   0xF5B0 0x1F80      CMP      R0,#+1048576
+   \   00000024   0xF000 0x8091      BEQ.W    ??app_operate_para_4
+   \   00000028   0xF5B0 0x0F00      CMP      R0,#+8388608
+   \   0000002C   0xF000 0x809E      BEQ.W    ??app_operate_para_5
+   \   00000030   0x.... 0x....      LDR.W    R1,??DataTable2_1  ;; 0x800001
+   \   00000034   0x4288             CMP      R0,R1
+   \   00000036   0xF000 0x80B9      BEQ.W    ??app_operate_para_6
+   \   0000003A   0x.... 0x....      LDR.W    R1,??DataTable2_2  ;; 0x1000001
+   \   0000003E   0x4288             CMP      R0,R1
+   \   00000040   0xF000 0x80D8      BEQ.W    ??app_operate_para_7
+   \   00000044   0xF1B0 0x7F00      CMP      R0,#+33554432
+   \   00000048   0xF000 0x80E7      BEQ.W    ??app_operate_para_8
+   \   0000004C   0x.... 0x....      LDR.W    R1,??DataTable2_3  ;; 0x2000001
+   \   00000050   0x4288             CMP      R0,R1
+   \   00000052   0xF000 0x811B      BEQ.W    ??app_operate_para_9
+   \   00000056   0xE15E             B.N      ??app_operate_para_10
+     72              {
+     73              case    CMD_TIME_SET:               //设置时间
+     74                  BSP_RTC_WriteTime(Com->Rd.dtu.time);
+   \                     ??app_operate_para_1: (+1)
+   \   00000058   0x2000             MOVS     R0,#+0
+   \                     ??app_operate_para_11: (+1)
+   \   0000005A   0x1901             ADDS     R1,R0,R4
+   \   0000005C   0x7909             LDRB     R1,[R1, #+4]
+   \   0000005E   0xAA01             ADD      R2,SP,#+4
+   \   00000060   0x5481             STRB     R1,[R0, R2]
+   \   00000062   0x1C40             ADDS     R0,R0,#+1
+   \   00000064   0x2808             CMP      R0,#+8
+   \   00000066   0xD3F8             BCC.N    ??app_operate_para_11
+   \   00000068   0xE9DD 0x0101      LDRD     R0,R1,[SP, #+4]
+   \   0000006C   0x.... 0x....      BL       BSP_RTC_WriteTime
+     75                  Com->Rd.dtu.reply.ack = 1;   //表示设置成功
+   \   00000070   0x2001             MOVS     R0,#+1
+   \   00000072   0x7320             STRB     R0,[R4, #+12]
+     76                  
+     77                  
+     78                  tm_now  = TIME_GetCalendarTime(); 
+   \   00000074   0xA803             ADD      R0,SP,#+12
+   \   00000076   0x.... 0x....      BL       TIME_GetCalendarTime
+   \   0000007A   0x.... 0x....      LDR.W    R0,??DataTable2_4
+   \   0000007E   0xA903             ADD      R1,SP,#+12
+   \   00000080   0x222C             MOVS     R2,#+44
+   \   00000082   0x.... 0x....      BL       __aeabi_memcpy4
+     79          
+     80                  App_DispDelay(2000);
+   \   00000086   0xF44F 0x60FA      MOV      R0,#+2000
+   \   0000008A   0x.... 0x....      BL       App_DispDelay
+     81          
+     82                  uprintf("%02d-%02d-%02d",
+     83                          tm_now.tm_hour,
+     84                          tm_now.tm_min,
+     85                          tm_now.tm_sec);  
+   \   0000008E   0x.... 0x....      LDR.W    R0,??DataTable2_4
+   \   00000092   0x6803             LDR      R3,[R0, #+0]
+   \   00000094   0x.... 0x....      LDR.W    R0,??DataTable2_4
+   \   00000098   0x6842             LDR      R2,[R0, #+4]
+   \   0000009A   0x.... 0x....      LDR.W    R0,??DataTable2_4
+   \   0000009E   0x6881             LDR      R1,[R0, #+8]
+   \   000000A0   0x.... 0x....      LDR.W    R0,??DataTable2_5
+   \   000000A4   0x.... 0x....      BL       uprintf
+     86                  break;
+   \   000000A8   0xE144             B.N      ??app_operate_para_12
+     87                  
+     88              case    CMD_LOCO_SET:               //设置机车号
+     89                  Ctrl.sProductInfo.LocoId.Nbr = Com->Rd.dtu.loco.Nbr;
+   \                     ??app_operate_para_2: (+1)
+   \   000000AA   0x88E0             LDRH     R0,[R4, #+6]
+   \   000000AC   0x.... 0x....      LDR.W    R1,??DataTable2_6
+   \   000000B0   0x8548             STRH     R0,[R1, #+42]
+     90                  Ctrl.sProductInfo.LocoId.Type= Com->Rd.dtu.loco.Type;
+   \   000000B2   0x88A0             LDRH     R0,[R4, #+4]
+   \   000000B4   0x.... 0x....      LDR.W    R1,??DataTable2_6
+   \   000000B8   0x8508             STRH     R0,[R1, #+40]
+     91                  
+     92                  Ctrl.sRunPara.FramFlg.WrProduct = 1;                //启动存储任务。
+   \   000000BA   0x.... 0x....      LDR.W    R0,??DataTable2_6
+   \   000000BE   0xF8B0 0x004C      LDRH     R0,[R0, #+76]
+   \   000000C2   0xF050 0x0004      ORRS     R0,R0,#0x4
+   \   000000C6   0x.... 0x....      LDR.W    R1,??DataTable2_6
+   \   000000CA   0xF8A1 0x004C      STRH     R0,[R1, #+76]
+     93                  osal_set_event(OS_TASK_ID_STORE,OS_EVT_STORE_FRAM); //设置存储事件，启动储存任务
+   \   000000CE   0x2102             MOVS     R1,#+2
+   \   000000D0   0x2004             MOVS     R0,#+4
+   \   000000D2   0x.... 0x....      BL       osal_set_event
+     94                  
+     95                  Com->Rd.dtu.reply.ack = 1;                       //表示设置成功
+   \   000000D6   0x2001             MOVS     R0,#+1
+   \   000000D8   0x7320             STRB     R0,[R4, #+12]
+     96                  
+     97                  App_DispDelay(2000);
+   \   000000DA   0xF44F 0x60FA      MOV      R0,#+2000
+   \   000000DE   0x.... 0x....      BL       App_DispDelay
+     98          
+     99                  uprintf("%4d.%4d",
+    100                  Ctrl.sProductInfo.LocoId.Type,
+    101                  Ctrl.sProductInfo.LocoId.Nbr); 
+   \   000000E2   0x.... 0x....      LDR.W    R0,??DataTable2_6
+   \   000000E6   0x8D42             LDRH     R2,[R0, #+42]
+   \   000000E8   0x.... 0x....      LDR.W    R0,??DataTable2_6
+   \   000000EC   0x8D01             LDRH     R1,[R0, #+40]
+   \   000000EE   0x.... 0x....      LDR.W    R0,??DataTable2_7
+   \   000000F2   0x.... 0x....      BL       uprintf
+    102                  break;
+   \   000000F6   0xE11D             B.N      ??app_operate_para_12
+    103                  
+    104              case    CMD_REC_CLR:                                    //数据清零
+    105                  Ctrl.sRecNumMgr.Current = 0;
+   \                     ??app_operate_para_3: (+1)
+   \   000000F8   0x2000             MOVS     R0,#+0
+   \   000000FA   0x.... 0x....      LDR.W    R1,??DataTable2_6
+   \   000000FE   0x6108             STR      R0,[R1, #+16]
+    106                  Ctrl.sRecNumMgr.GrsRead = 0;
+   \   00000100   0x2000             MOVS     R0,#+0
+   \   00000102   0x.... 0x....      LDR.W    R1,??DataTable2_6
+   \   00000106   0x6188             STR      R0,[R1, #+24]
+    107                  Ctrl.sRecNumMgr.PointNum= 0;
+   \   00000108   0x2000             MOVS     R0,#+0
+   \   0000010A   0x.... 0x....      LDR.W    R1,??DataTable2_6
+   \   0000010E   0x61C8             STR      R0,[R1, #+28]
+    108                  Ctrl.sRecNumMgr.Record  = 0;
+   \   00000110   0x2000             MOVS     R0,#+0
+   \   00000112   0x.... 0x....      LDR.W    R1,??DataTable2_6
+   \   00000116   0x6148             STR      R0,[R1, #+20]
+    109                  
+    110                  Ctrl.sRunPara.FramFlg.WrNumMgr = 1;
+   \   00000118   0x.... 0x....      LDR.W    R0,??DataTable2_6
+   \   0000011C   0xF8B0 0x004C      LDRH     R0,[R0, #+76]
+   \   00000120   0xF050 0x0002      ORRS     R0,R0,#0x2
+   \   00000124   0x.... 0x....      LDR.W    R1,??DataTable2_6
+   \   00000128   0xF8A1 0x004C      STRH     R0,[R1, #+76]
+    111                  osal_set_event(OS_TASK_ID_STORE,OS_EVT_STORE_FRAM); //设置存储事件，启动储存任务
+   \   0000012C   0x2102             MOVS     R1,#+2
+   \   0000012E   0x2004             MOVS     R0,#+4
+   \   00000130   0x.... 0x....      BL       osal_set_event
+    112          
+    113                  Com->Rd.dtu.reply.ack = 1;                       //表示设置成功
+   \   00000134   0x2001             MOVS     R0,#+1
+   \   00000136   0x7320             STRB     R0,[R4, #+12]
+    114                  
+    115                  App_DispDelay(2000);
+   \   00000138   0xF44F 0x60FA      MOV      R0,#+2000
+   \   0000013C   0x.... 0x....      BL       App_DispDelay
+    116          
+    117                  uprintf("CALL"); 
+   \   00000140   0x.... 0x....      LDR.W    R0,??DataTable2_8
+   \   00000144   0x.... 0x....      BL       uprintf
+    118                  break;
+   \   00000148   0xE0F4             B.N      ??app_operate_para_12
+    119                  
+    120              case    CMD_SYS_RST:                                    //系统重启
+    121                  //重启
+    122                  Ctrl.sRunPara.SysSts.SysReset = 1;                  //重启标识置位，准备重启
+   \                     ??app_operate_para_4: (+1)
+   \   0000014A   0x.... 0x....      LDR.W    R0,??DataTable2_6
+   \   0000014E   0xF8B0 0x0056      LDRH     R0,[R0, #+86]
+   \   00000152   0xF450 0x6080      ORRS     R0,R0,#0x400
+   \   00000156   0x.... 0x....      LDR.W    R1,??DataTable2_6
+   \   0000015A   0xF8A1 0x0056      STRH     R0,[R1, #+86]
+    123                  
+    124                  Com->Rd.dtu.reply.ack = 1;                          //表示设置成功
+   \   0000015E   0x2001             MOVS     R0,#+1
+   \   00000160   0x7320             STRB     R0,[R4, #+12]
+    125                  
+    126                  uprintf("rst...");                                  //系统准备重启    
+   \   00000162   0x.... 0x....      LDR.W    R0,??DataTable2_9
+   \   00000166   0x.... 0x....      BL       uprintf
+    127          
+    128                  break;
+   \   0000016A   0xE0E3             B.N      ??app_operate_para_12
+    129                  
+    130              case    CMD_PARA_SET:                                   //参数设置 
+    131                  
+    132                      for(u16 i = 0; i < (Com->Rd.dtu.paralen) / 2;i++ ){
+   \                     ??app_operate_para_5: (+1)
+   \   0000016C   0x2500             MOVS     R5,#+0
+   \   0000016E   0xE000             B.N      ??app_operate_para_13
+   \                     ??app_operate_para_14: (+1)
+   \   00000170   0x1C6D             ADDS     R5,R5,#+1
+   \                     ??app_operate_para_13: (+1)
+   \   00000172   0x88E0             LDRH     R0,[R4, #+6]
+   \   00000174   0x2102             MOVS     R1,#+2
+   \   00000176   0xFB90 0xF0F1      SDIV     R0,R0,R1
+   \   0000017A   0xB2AD             UXTH     R5,R5            ;; ZeroExt  R5,R5,#+16,#+16
+   \   0000017C   0x4285             CMP      R5,R0
+   \   0000017E   0xDA12             BGE.N    ??app_operate_para_15
+    133          
+    134                          MB_HoldingRegWr (  (Com->Rd.dtu.paraaddr / 2)+i,
+    135                                              Com->Rd.dtu.parabuf[i],
+    136                                              &err);   
+   \   00000180   0x466A             MOV      R2,SP
+   \   00000182   0xB2AD             UXTH     R5,R5            ;; ZeroExt  R5,R5,#+16,#+16
+   \   00000184   0xEB14 0x0045      ADDS     R0,R4,R5, LSL #+1
+   \   00000188   0x8901             LDRH     R1,[R0, #+8]
+   \   0000018A   0x88A0             LDRH     R0,[R4, #+4]
+   \   0000018C   0x2302             MOVS     R3,#+2
+   \   0000018E   0xFB90 0xF0F3      SDIV     R0,R0,R3
+   \   00000192   0x1828             ADDS     R0,R5,R0
+   \   00000194   0xB280             UXTH     R0,R0            ;; ZeroExt  R0,R0,#+16,#+16
+   \   00000196   0x.... 0x....      BL       MB_HoldingRegWr
+    137                          
+    138                          if(err != MODBUS_ERR_NONE){
+   \   0000019A   0xF8BD 0x0000      LDRH     R0,[SP, #+0]
+   \   0000019E   0x2800             CMP      R0,#+0
+   \   000001A0   0xD0E6             BEQ.N    ??app_operate_para_14
+    139                              Com->Rd.dtu.reply.ack = 0;           //表示设置失败
+   \   000001A2   0x2000             MOVS     R0,#+0
+   \   000001A4   0x7320             STRB     R0,[R4, #+12]
+    140                              break;
+    141                          }
+    142                      }
+    143                      Com->Rd.dtu.reply.ack = 1;                   //表示设置成功
+   \                     ??app_operate_para_15: (+1)
+   \   000001A6   0x2001             MOVS     R0,#+1
+   \   000001A8   0x7320             STRB     R0,[R4, #+12]
+    144          
+    145                      break;
+   \   000001AA   0xE0C3             B.N      ??app_operate_para_12
+    146                      
+    147              case    CMD_PARA_GET:                                   //参数设置 
+    148                  
+    149                  
+    150                  if((u8)Com->Rd.dtu.paralen > sizeof(Com->Rd.dtu.parabuf)){
+   \                     ??app_operate_para_6: (+1)
+   \   000001AC   0x79A0             LDRB     R0,[R4, #+6]
+   \   000001AE   0x2881             CMP      R0,#+129
+   \   000001B0   0xD302             BCC.N    ??app_operate_para_16
+    151                      Com->Rd.dtu.paralen = 0;
+   \   000001B2   0x2000             MOVS     R0,#+0
+   \   000001B4   0x80E0             STRH     R0,[R4, #+6]
+    152                      break;
+   \   000001B6   0xE0BD             B.N      ??app_operate_para_12
+    153                  }
+    154                  
+    155                  
+    156                  //调用参数设置函数
+    157                  for(u16 i = 0; i < (Com->Rd.dtu.paralen)/2;i++ ){
+   \                     ??app_operate_para_16: (+1)
+   \   000001B8   0x2500             MOVS     R5,#+0
+   \   000001BA   0xE004             B.N      ??app_operate_para_17
+    158                      
+    159                      data = MB_HoldingRegRd((Com->Rd.dtu.paraaddr/2)+i,&err);
+    160                      if(err != MODBUS_ERR_NONE){
+    161                          //Com->Rd.dtu.reply.ack = 0;             //表示设置失败
+    162                          Com->Rd.dtu.paralen = 0;
+    163                          break;
+    164                      }
+    165                      
+    166                      Com->Rd.dtu.parabuf[i] = data;               //赋值
+   \                     ??app_operate_para_18: (+1)
+   \   000001BC   0xB2AD             UXTH     R5,R5            ;; ZeroExt  R5,R5,#+16,#+16
+   \   000001BE   0xEB14 0x0145      ADDS     R1,R4,R5, LSL #+1
+   \   000001C2   0x8108             STRH     R0,[R1, #+8]
+   \   000001C4   0x1C6D             ADDS     R5,R5,#+1
+   \                     ??app_operate_para_17: (+1)
+   \   000001C6   0x88E0             LDRH     R0,[R4, #+6]
+   \   000001C8   0x2102             MOVS     R1,#+2
+   \   000001CA   0xFB90 0xF0F1      SDIV     R0,R0,R1
+   \   000001CE   0xB2AD             UXTH     R5,R5            ;; ZeroExt  R5,R5,#+16,#+16
+   \   000001D0   0x4285             CMP      R5,R0
+   \   000001D2   0xDA0E             BGE.N    ??app_operate_para_19
+   \   000001D4   0x4669             MOV      R1,SP
+   \   000001D6   0x88A0             LDRH     R0,[R4, #+4]
+   \   000001D8   0x2202             MOVS     R2,#+2
+   \   000001DA   0xFB90 0xF0F2      SDIV     R0,R0,R2
+   \   000001DE   0x1828             ADDS     R0,R5,R0
+   \   000001E0   0xB280             UXTH     R0,R0            ;; ZeroExt  R0,R0,#+16,#+16
+   \   000001E2   0x.... 0x....      BL       MB_HoldingRegRd
+   \   000001E6   0xF8BD 0x1000      LDRH     R1,[SP, #+0]
+   \   000001EA   0x2900             CMP      R1,#+0
+   \   000001EC   0xD0E6             BEQ.N    ??app_operate_para_18
+   \   000001EE   0x2000             MOVS     R0,#+0
+   \   000001F0   0x80E0             STRH     R0,[R4, #+6]
+    167                  }
+    168                  
+    169                  break;
+   \                     ??app_operate_para_19: (+1)
+   \   000001F2   0xE09F             B.N      ??app_operate_para_12
+    170                  
+    171              case    CMD_RECORD_GET:                                     //数据记录读取（读指定记录号的数据）
+    172                  recordnum = Com->Rd.dtu.recordnum;
+   \                     ??app_operate_para_7: (+1)
+   \   000001F4   0x6860             LDR      R0,[R4, #+4]
+    173                  Ctrl.sRecNumMgr.PointNum = recordnum;
+   \   000001F6   0x....             LDR.N    R1,??DataTable2_6
+   \   000001F8   0x61C8             STR      R0,[R1, #+28]
+    174                  
+    175                  //取数据记录号。
+    176                  //if(Ctrl.sRecNumMgr.Current < recordnum)  {
+    177                   //   recordnum = 0;
+    178                  //    if(Ctrl.sRecNumMgr.Current)
+    179                 //         recordnum = Ctrl.sRecNumMgr.Current - 1;        //最后有效记录赋值     
+    180                  //}
+    181                  //读取数据记录（查询指定的书记录）
+    182                  //app_ReadOneRecord((stcFlshRec *)&Com->Rd,recordnum);    //读取数据记录，（Set应答信息从Rd发送）    
+    183                  
+    184                  Ctrl.sRunPara.SysSts.SetBitFlg      = 0;                //不是参数设置状态
+   \   000001FA   0x....             LDR.N    R0,??DataTable2_6
+   \   000001FC   0xF8B0 0x0056      LDRH     R0,[R0, #+86]
+   \   00000200   0xF24F 0x71FF      MOVW     R1,#+63487
+   \   00000204   0x4008             ANDS     R0,R1,R0
+   \   00000206   0x....             LDR.N    R1,??DataTable2_6
+   \   00000208   0xF8A1 0x0056      STRH     R0,[R1, #+86]
+    185                  Com->ConnCtrl.ConnType              = RECORD_SEND_COMM; //默认为数据发送        
+   \   0000020C   0xF8D4 0x041E      LDR      R0,[R4, #+1054]
+   \   00000210   0xF030 0x00E0      BICS     R0,R0,#0xE0
+   \   00000214   0xF8C4 0x041E      STR      R0,[R4, #+1054]
+    186                  break;
+   \   00000218   0xE08C             B.N      ??app_operate_para_12
+    187                  
+    188              case    CMD_DETECT_SET:                                     //写检测板数据记录
+    189                  node    = Com->Rd.dtu.paralen >> 8;                     //取node
+   \                     ??app_operate_para_8: (+1)
+   \   0000021A   0x88E0             LDRH     R0,[R4, #+6]
+   \   0000021C   0xB280             UXTH     R0,R0            ;; ZeroExt  R0,R0,#+16,#+16
+   \   0000021E   0x0A00             LSRS     R0,R0,#+8
+    190                  MtrCom->ConnCtrl.MB_Node = node;                        //低字节为node号
+   \   00000220   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000222   0x....             LDR.N    R1,??DataTable2_10
+   \   00000224   0x6809             LDR      R1,[R1, #+0]
+   \   00000226   0xF8D1 0x141E      LDR      R1,[R1, #+1054]
+   \   0000022A   0xF360 0x4114      BFI      R1,R0,#+16,#+5
+   \   0000022E   0x....             LDR.N    R0,??DataTable2_10
+   \   00000230   0x6800             LDR      R0,[R0, #+0]
+   \   00000232   0xF8C0 0x141E      STR      R1,[R0, #+1054]
+    191                  //len     = (u8)Com->Rd.dtu.paralen >> 8;               //高字节为len
+    192                  len     = (u8)Com->Rd.dtu.paralen ;                     //高字节为len
+   \   00000236   0x88E5             LDRH     R5,[R4, #+6]
+    193                  if(len == 0)
+   \   00000238   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   0000023A   0x2D00             CMP      R5,#+0
+   \   0000023C   0xD07A             BEQ.N    ??app_operate_para_12
+    194                      break;
+    195                  
+    196                  memcpy((u8 *)&MtrCom->Wr,Com->Rd.dtu.parabuf,len);      //准备写入的数据
+   \                     ??app_operate_para_20: (+1)
+   \   0000023E   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   00000240   0xF114 0x0108      ADDS     R1,R4,#+8
+   \   00000244   0x....             LDR.N    R0,??DataTable2_10
+   \   00000246   0x6800             LDR      R0,[R0, #+0]
+   \   00000248   0xF510 0x7600      ADDS     R6,R0,#+512
+   \   0000024C   0x002A             MOVS     R2,R5
+   \   0000024E   0x0030             MOVS     R0,R6
+   \   00000250   0x.... 0x....      BL       __aeabi_memcpy
+    197                  addr    = Com->Rd.dtu.paraaddr;
+   \   00000254   0x88A0             LDRH     R0,[R4, #+4]
+    198                  
+    199                  extern  void    MtrWrSpecial(u16 addr,u8  len);
+    200                  MtrWrSpecial(addr/2,len/2);                              //写入数据 (16位计算)
+   \   00000256   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   00000258   0x2102             MOVS     R1,#+2
+   \   0000025A   0xFB95 0xF1F1      SDIV     R1,R5,R1
+   \   0000025E   0xB2C9             UXTB     R1,R1            ;; ZeroExt  R1,R1,#+24,#+24
+   \   00000260   0xB280             UXTH     R0,R0            ;; ZeroExt  R0,R0,#+16,#+16
+   \   00000262   0x2202             MOVS     R2,#+2
+   \   00000264   0xFB90 0xF0F2      SDIV     R0,R0,R2
+   \   00000268   0xB280             UXTH     R0,R0            ;; ZeroExt  R0,R0,#+16,#+16
+   \   0000026A   0x.... 0x....      BL       MtrWrSpecial
+    201                  
+    202                  Com->Rd.dtu.reply.ack = 0;
+   \   0000026E   0x2000             MOVS     R0,#+0
+   \   00000270   0x7320             STRB     R0,[R4, #+12]
+    203                  if(MtrCom->ConnCtrl.datalen == len/2)                     //判断写入是否正确
+   \   00000272   0x....             LDR.N    R0,??DataTable2_10
+   \   00000274   0x6800             LDR      R0,[R0, #+0]
+   \   00000276   0xF890 0x0432      LDRB     R0,[R0, #+1074]
+   \   0000027A   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   0000027C   0x2102             MOVS     R1,#+2
+   \   0000027E   0xFB95 0xF1F1      SDIV     R1,R5,R1
+   \   00000282   0x4288             CMP      R0,R1
+   \   00000284   0xD101             BNE.N    ??app_operate_para_21
+    204                      Com->Rd.dtu.reply.ack = 1;                       //表示设置成功
+   \   00000286   0x2001             MOVS     R0,#+1
+   \   00000288   0x7320             STRB     R0,[R4, #+12]
+    205          
+    206                  break;
+   \                     ??app_operate_para_21: (+1)
+   \   0000028A   0xE053             B.N      ??app_operate_para_12
+    207                  
+    208              case    CMD_DETECT_GET:                                     //读检测板数据记录
+    209                  //MtrCom->ConnCtrl.MB_Node = (u8)Com->Rd.dtu.paralen;  //低字节为node号
+    210                  //len     = (u8)Com->Rd.dtu.paralen >> 8;              //高字节为len
+    211                  
+    212                  node    = Com->Rd.dtu.paralen >> 8;                  //取node
+   \                     ??app_operate_para_9: (+1)
+   \   0000028C   0x88E0             LDRH     R0,[R4, #+6]
+   \   0000028E   0xB280             UXTH     R0,R0            ;; ZeroExt  R0,R0,#+16,#+16
+   \   00000290   0x0A00             LSRS     R0,R0,#+8
+    213                  MtrCom->ConnCtrl.MB_Node = node;  //低字节为node号
+   \   00000292   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   00000294   0x....             LDR.N    R1,??DataTable2_10
+   \   00000296   0x6809             LDR      R1,[R1, #+0]
+   \   00000298   0xF8D1 0x141E      LDR      R1,[R1, #+1054]
+   \   0000029C   0xF360 0x4114      BFI      R1,R0,#+16,#+5
+   \   000002A0   0x....             LDR.N    R0,??DataTable2_10
+   \   000002A2   0x6800             LDR      R0,[R0, #+0]
+   \   000002A4   0xF8C0 0x141E      STR      R1,[R0, #+1054]
+    214                  //len     = (u8)Com->Rd.dtu.paralen >> 8;              //高字节为len
+    215                  len     = (u8)Com->Rd.dtu.paralen ;                  //高字节为len
+   \   000002A8   0x88E5             LDRH     R5,[R4, #+6]
+    216                  addr    = Com->Rd.dtu.paraaddr;
+   \   000002AA   0x88A0             LDRH     R0,[R4, #+4]
+    217                  
+    218                  if(len == 0)
+   \   000002AC   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   000002AE   0x2D00             CMP      R5,#+0
+   \   000002B0   0xD040             BEQ.N    ??app_operate_para_12
+    219                      break;
+    220                         
+    221                  
+    222                  extern  void    MtrRdSpecial(u16 addr,u8  len);
+    223                  MtrRdSpecial(addr/2,len/2);                             //读入数据(16位计算)
+   \                     ??app_operate_para_22: (+1)
+   \   000002B2   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   000002B4   0x2102             MOVS     R1,#+2
+   \   000002B6   0xFB95 0xF1F1      SDIV     R1,R5,R1
+   \   000002BA   0xB2C9             UXTB     R1,R1            ;; ZeroExt  R1,R1,#+24,#+24
+   \   000002BC   0xB280             UXTH     R0,R0            ;; ZeroExt  R0,R0,#+16,#+16
+   \   000002BE   0x2202             MOVS     R2,#+2
+   \   000002C0   0xFB90 0xF0F2      SDIV     R0,R0,R2
+   \   000002C4   0xB280             UXTH     R0,R0            ;; ZeroExt  R0,R0,#+16,#+16
+   \   000002C6   0x.... 0x....      BL       MtrRdSpecial
+    224                  
+    225                  if(MtrCom->RxCtrl.Len == len/2)                         //判断写入是否正确
+   \   000002CA   0x....             LDR.N    R0,??DataTable2_10
+   \   000002CC   0x6800             LDR      R0,[R0, #+0]
+   \   000002CE   0xF890 0x0416      LDRB     R0,[R0, #+1046]
+   \   000002D2   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   000002D4   0x2102             MOVS     R1,#+2
+   \   000002D6   0xFB95 0xF1F1      SDIV     R1,R5,R1
+   \   000002DA   0x4288             CMP      R0,R1
+   \   000002DC   0xD108             BNE.N    ??app_operate_para_23
+    226                  {
+    227                      memcpy(Com->Rd.dtu.parabuf,(u8 *)&MtrCom->Rd,len);//取出数据
+   \   000002DE   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   000002E0   0x....             LDR.N    R0,??DataTable2_10
+   \   000002E2   0x6801             LDR      R1,[R0, #+0]
+   \   000002E4   0x3408             ADDS     R4,R4,#+8
+   \   000002E6   0x002A             MOVS     R2,R5
+   \   000002E8   0x0020             MOVS     R0,R4
+   \   000002EA   0x.... 0x....      BL       __aeabi_memcpy
+    228                  }else{
+   \   000002EE   0xE001             B.N      ??app_operate_para_24
+    229                      Com->Rd.dtu.paralen = 0;                         //将数据长度置0，表示错误
+   \                     ??app_operate_para_23: (+1)
+   \   000002F0   0x2000             MOVS     R0,#+0
+   \   000002F2   0x80E0             STRH     R0,[R4, #+6]
+    230                  }       
+    231                      
+    232                  break; 
+   \                     ??app_operate_para_24: (+1)
+   \   000002F4   0xE01E             B.N      ??app_operate_para_12
+    233                  
+    234              case    CMD_REC_START:                                      //马上启动数据发送
+    235                  Ctrl.sRunPara.SysSts.SetBitFlg     = 0;                        //不是参数设置状态
+   \                     ??app_operate_para_0: (+1)
+   \   000002F6   0x....             LDR.N    R0,??DataTable2_6
+   \   000002F8   0xF8B0 0x0056      LDRH     R0,[R0, #+86]
+   \   000002FC   0xF24F 0x71FF      MOVW     R1,#+63487
+   \   00000300   0x4008             ANDS     R0,R1,R0
+   \   00000302   0x....             LDR.N    R1,??DataTable2_6
+   \   00000304   0xF8A1 0x0056      STRH     R0,[R1, #+86]
+    236                  Com->ConnCtrl.ConnType   = RECORD_SEND_COMM;         //默认为数据发送
+   \   00000308   0xF8D4 0x041E      LDR      R0,[R4, #+1054]
+   \   0000030C   0xF030 0x00E0      BICS     R0,R0,#0xE0
+   \   00000310   0xF8C4 0x041E      STR      R0,[R4, #+1054]
+    237                  break;
+   \   00000314   0xE00E             B.N      ??app_operate_para_12
+    238              default:
+    239                  Ctrl.sRunPara.SysSts.SetBitFlg     = 0;              //不是参数设置状态
+   \                     ??app_operate_para_10: (+1)
+   \   00000316   0x....             LDR.N    R0,??DataTable2_6
+   \   00000318   0xF8B0 0x0056      LDRH     R0,[R0, #+86]
+   \   0000031C   0xF24F 0x71FF      MOVW     R1,#+63487
+   \   00000320   0x4008             ANDS     R0,R1,R0
+   \   00000322   0x....             LDR.N    R1,??DataTable2_6
+   \   00000324   0xF8A1 0x0056      STRH     R0,[R1, #+86]
+    240                  Com->ConnCtrl.ConnType   = RECORD_SEND_COMM;         //默认为数据发送
+   \   00000328   0xF8D4 0x041E      LDR      R0,[R4, #+1054]
+   \   0000032C   0xF030 0x00E0      BICS     R0,R0,#0xE0
+   \   00000330   0xF8C4 0x041E      STR      R0,[R4, #+1054]
+    241                  break;
+    242              }
+    243          }
+   \                     ??app_operate_para_12: (+1)
+   \   00000334   0xB00E             ADD      SP,SP,#+56
+   \   00000336   0xBD70             POP      {R4-R6,PC}       ;; return
+    244          
+    245          extern  void app_iap_deal(void);
+    246          /**************************************************************
+    247          * Description  : 和DTU通讯，接收部分
+    248          * Author       : 2018/5/24 星期三, by redmorningcn
+    249          */
+
+   \                                 In section .text, align 2, keep-with-next
+    250          void    app_dtu_rec(StrCOMCtrl *Com)
+    251          {
+   \                     app_dtu_rec: (+1)
+   \   00000000   0xB538             PUSH     {R3-R5,LR}
+   \   00000002   0x0004             MOVS     R4,R0
+    252              u8  conntype;                       //数据通许、参数设置、IAP
+    253              u8  enablesend = 0;                 //数据发送标识
+   \   00000004   0x2500             MOVS     R5,#+0
+    254              OS_ERR  err;
+    255              
+    256              /**************************************************************
+    257              * Description  : 确定通讯类型。
+    258              如果是程序下载，或者参数读写，则更改为对应的通讯类型。
+    259              * Author       : 2018/5/24 星期四, by redmorningcn
+    260              */
+    261              if(Com->RxCtrl.protocol == CSNC_PROTOCOL)                //csnc异步串口通讯协议
+   \   00000006   0xF894 0x0417      LDRB     R0,[R4, #+1047]
+   \   0000000A   0x2801             CMP      R0,#+1
+   \   0000000C   0xD140             BNE.N    ??app_dtu_rec_0
+    262              {
+    263                  switch(Com->RxCtrl.FrameCode)
+   \   0000000E   0xF894 0x0409      LDRB     R0,[R4, #+1033]
+   \   00000012   0x2800             CMP      R0,#+0
+   \   00000014   0xD01F             BEQ.N    ??app_dtu_rec_1
+   \   00000016   0x2802             CMP      R0,#+2
+   \   00000018   0xD015             BEQ.N    ??app_dtu_rec_2
+   \   0000001A   0x280A             CMP      R0,#+10
+   \   0000001C   0xD127             BNE.N    ??app_dtu_rec_3
+    264                  {
+    265                  case IAP_FRAME_CODE:
+    266                      Com->ConnCtrl.ConnType = IAP_COMM;               //IAP通讯
+   \                     ??app_dtu_rec_4: (+1)
+   \   0000001E   0x2002             MOVS     R0,#+2
+   \   00000020   0xF8D4 0x141E      LDR      R1,[R4, #+1054]
+   \   00000024   0xF360 0x1147      BFI      R1,R0,#+5,#+3
+   \   00000028   0xF8C4 0x141E      STR      R1,[R4, #+1054]
+    267                      Ctrl.sRunPara.SysSts.SetBitFlg  = 1;                //表示正在设置参数
+   \   0000002C   0x....             LDR.N    R0,??DataTable2_6
+   \   0000002E   0xF8B0 0x0056      LDRH     R0,[R0, #+86]
+   \   00000032   0xF450 0x6000      ORRS     R0,R0,#0x800
+   \   00000036   0x....             LDR.N    R1,??DataTable2_6
+   \   00000038   0xF8A1 0x0056      STRH     R0,[R1, #+86]
+    268                      Ctrl.sRunPara.SetOutTimes       = 60;
+   \   0000003C   0x203C             MOVS     R0,#+60
+   \   0000003E   0x....             LDR.N    R1,??DataTable2_6
+   \   00000040   0xF881 0x0060      STRB     R0,[R1, #+96]
+    269                      break;
+   \   00000044   0xE024             B.N      ??app_dtu_rec_0
+    270                  case SET_FRAME_CODE:
+    271                      Com->ConnCtrl.ConnType = SET_COMM;               //参数读取
+   \                     ??app_dtu_rec_2: (+1)
+   \   00000046   0x2001             MOVS     R0,#+1
+   \   00000048   0xF8D4 0x141E      LDR      R1,[R4, #+1054]
+   \   0000004C   0xF360 0x1147      BFI      R1,R0,#+5,#+3
+   \   00000050   0xF8C4 0x141E      STR      R1,[R4, #+1054]
+    272          
+    273                      break;
+   \   00000054   0xE01C             B.N      ??app_dtu_rec_0
+    274                  case RECORD_FRAME_CODE:
+    275                      if(Com->ConnCtrl.RecordSendFlg == 1){            //有数据发送，通讯类型不变。
+   \                     ??app_dtu_rec_1: (+1)
+   \   00000056   0xF8D4 0x041E      LDR      R0,[R4, #+1054]
+   \   0000005A   0xF3C0 0x0080      UBFX     R0,R0,#+2,#+1
+   \   0000005E   0x2800             CMP      R0,#+0
+   \   00000060   0xD005             BEQ.N    ??app_dtu_rec_3
+    276                          Com->ConnCtrl.RecordSendFlg = 0;
+   \   00000062   0xF8D4 0x041E      LDR      R0,[R4, #+1054]
+   \   00000066   0xF030 0x0004      BICS     R0,R0,#0x4
+   \   0000006A   0xF8C4 0x041E      STR      R0,[R4, #+1054]
+    277                      }
+    278                      //break;
+    279                  default:
+    280                      Com->ConnCtrl.ConnType       = RECORD_SEND_COMM; //默认为数据发送
+   \                     ??app_dtu_rec_3: (+1)
+   \   0000006E   0xF8D4 0x041E      LDR      R0,[R4, #+1054]
+   \   00000072   0xF030 0x00E0      BICS     R0,R0,#0xE0
+   \   00000076   0xF8C4 0x041E      STR      R0,[R4, #+1054]
+    281          
+    282                      if(Com->RxCtrl.sCsnc.sourceaddr == SET_ADDR)
+   \   0000007A   0xF894 0x0406      LDRB     R0,[R4, #+1030]
+   \   0000007E   0x28C2             CMP      R0,#+194
+   \   00000080   0xD106             BNE.N    ??app_dtu_rec_5
+    283                      {
+    284                          Com->ConnCtrl.ConnType   = SET_COMM;         //参数读取
+   \   00000082   0x2001             MOVS     R0,#+1
+   \   00000084   0xF8D4 0x141E      LDR      R1,[R4, #+1054]
+   \   00000088   0xF360 0x1147      BFI      R1,R0,#+5,#+3
+   \   0000008C   0xF8C4 0x141E      STR      R1,[R4, #+1054]
+    285                      }
+    286                      
+    287                      break;
+    288                  }
+    289              }
+    290              
+    291              /**************************************************************
+    292              * Description  : 增加gps定位模块
+    293              * Author       : 2018/6/4 星期一, by redmorningcn
+    294              */
+    295              if(Com->RxCtrl.protocol == Q560_PROTOCOL){
+   \                     ??app_dtu_rec_5: (+1)
+   \                     ??app_dtu_rec_0: (+1)
+   \   00000090   0xF894 0x0417      LDRB     R0,[R4, #+1047]
+   \   00000094   0x2802             CMP      R0,#+2
+   \   00000096   0xD106             BNE.N    ??app_dtu_rec_6
+    296                  Com->ConnCtrl.ConnType = GPS_COMM;                   //GPS定位模块通讯
+   \   00000098   0x2004             MOVS     R0,#+4
+   \   0000009A   0xF8D4 0x141E      LDR      R1,[R4, #+1054]
+   \   0000009E   0xF360 0x1147      BFI      R1,R0,#+5,#+3
+   \   000000A2   0xF8C4 0x141E      STR      R1,[R4, #+1054]
+    297              }
+    298          
+    299              //根据通讯类型处理
+    300              conntype = Com->ConnCtrl.ConnType;
+   \                     ??app_dtu_rec_6: (+1)
+   \   000000A6   0xF8D4 0x041E      LDR      R0,[R4, #+1054]
+   \   000000AA   0xF3C0 0x1042      UBFX     R0,R0,#+5,#+3
+    301              
+    302              switch(conntype){
+   \   000000AE   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000000B0   0x2800             CMP      R0,#+0
+   \   000000B2   0xD006             BEQ.N    ??app_dtu_rec_7
+   \   000000B4   0x2801             CMP      R0,#+1
+   \   000000B6   0xD02F             BEQ.N    ??app_dtu_rec_8
+   \   000000B8   0x2802             CMP      R0,#+2
+   \   000000BA   0xD03E             BEQ.N    ??app_dtu_rec_9
+   \   000000BC   0x2804             CMP      R0,#+4
+   \   000000BE   0xD040             BEQ.N    ??app_dtu_rec_10
+   \   000000C0   0xE047             B.N      ??app_dtu_rec_11
+    303                  
+    304              case RECORD_SEND_COMM:     
+    305                  //接收到发送数据的应答。判断发送应答帧号和接收帧号，相等认为发送成功。
+    306                  //判断是否有数据发送。
+    307                  enablesend = 0;
+   \                     ??app_dtu_rec_7: (+1)
+   \   000000C2   0x2500             MOVS     R5,#+0
+    308                  if(Com->ConnCtrl.SendRecordNum == Com->RxCtrl.sCsnc.framnum){
+   \   000000C4   0xF894 0x042A      LDRB     R0,[R4, #+1066]
+   \   000000C8   0xF894 0x1408      LDRB     R1,[R4, #+1032]
+   \   000000CC   0x4288             CMP      R0,R1
+   \   000000CE   0xD11C             BNE.N    ??app_dtu_rec_12
+    309                      Ctrl.sRecNumMgr.GrsRead++;
+   \   000000D0   0x....             LDR.N    R0,??DataTable2_6
+   \   000000D2   0x6980             LDR      R0,[R0, #+24]
+   \   000000D4   0x1C40             ADDS     R0,R0,#+1
+   \   000000D6   0x....             LDR.N    R1,??DataTable2_6
+   \   000000D8   0x6188             STR      R0,[R1, #+24]
+    310                      Com->ConnCtrl.SendRecordNum++;                               //发送记录++
+   \   000000DA   0xF894 0x042A      LDRB     R0,[R4, #+1066]
+   \   000000DE   0x1C40             ADDS     R0,R0,#+1
+   \   000000E0   0xF884 0x042A      STRB     R0,[R4, #+1066]
+    311                      Ctrl.sRunPara.FramFlg.WrNumMgr = 1;                             //存记录标识有效
+   \   000000E4   0x....             LDR.N    R0,??DataTable2_6
+   \   000000E6   0xF8B0 0x004C      LDRH     R0,[R0, #+76]
+   \   000000EA   0xF050 0x0002      ORRS     R0,R0,#0x2
+   \   000000EE   0x....             LDR.N    R1,??DataTable2_6
+   \   000000F0   0xF8A1 0x004C      STRH     R0,[R1, #+76]
+    312                      osal_set_event(OS_TASK_ID_STORE,OS_EVT_STORE_FRAM);             //设置存储事件，启动储存任务
+   \   000000F4   0x2102             MOVS     R1,#+2
+   \   000000F6   0x2004             MOVS     R0,#+4
+   \   000000F8   0x.... 0x....      BL       osal_set_event
+    313                      
+    314                      if(Ctrl.sRecNumMgr.GrsRead < Ctrl.sRecNumMgr.Current)           //有数据未发送，继续启动发送任务
+   \   000000FC   0x....             LDR.N    R0,??DataTable2_6
+   \   000000FE   0x6980             LDR      R0,[R0, #+24]
+   \   00000100   0x....             LDR.N    R1,??DataTable2_6
+   \   00000102   0x6909             LDR      R1,[R1, #+16]
+   \   00000104   0x4288             CMP      R0,R1
+   \   00000106   0xD200             BCS.N    ??app_dtu_rec_12
+    315                      {
+    316                          enablesend = 1;                                             //再次启动数据发送    
+   \   00000108   0x2501             MOVS     R5,#+1
+    317                      }
+    318                      
+    319                  }
+    320                  
+    321                  Com->ConnCtrl.RecordSendFlg = 0;
+   \                     ??app_dtu_rec_12: (+1)
+   \   0000010A   0xF8D4 0x041E      LDR      R0,[R4, #+1054]
+   \   0000010E   0xF030 0x0004      BICS     R0,R0,#0x4
+   \   00000112   0xF8C4 0x041E      STR      R0,[R4, #+1054]
+    322                  
+    323                  break;  
+   \   00000116   0xE01C             B.N      ??app_dtu_rec_13
+    324                  
+    325              case SET_COMM:
+    326                  
+    327                  Ctrl.sRunPara.SysSts.SetBitFlg  = 1;                                //表示正在设置参数
+   \                     ??app_dtu_rec_8: (+1)
+   \   00000118   0x....             LDR.N    R0,??DataTable2_6
+   \   0000011A   0xF8B0 0x0056      LDRH     R0,[R0, #+86]
+   \   0000011E   0xF450 0x6000      ORRS     R0,R0,#0x800
+   \   00000122   0x....             LDR.N    R1,??DataTable2_6
+   \   00000124   0xF8A1 0x0056      STRH     R0,[R1, #+86]
+    328                  Ctrl.sRunPara.SetOutTimes       = 60;        
+   \   00000128   0x203C             MOVS     R0,#+60
+   \   0000012A   0x....             LDR.N    R1,??DataTable2_6
+   \   0000012C   0xF881 0x0060      STRB     R0,[R1, #+96]
+    329                  
+    330                  app_operate_para(Com);                                               //参数设置（读取）
+   \   00000130   0x0020             MOVS     R0,R4
+   \   00000132   0x.... 0x....      BL       app_operate_para
+    331          
+    332                  enablesend = 1;                                                     //启动数据发送
+   \   00000136   0x2501             MOVS     R5,#+1
+    333                  break;
+   \   00000138   0xE00B             B.N      ??app_dtu_rec_13
+    334                  
+    335                  /**************************************************************
+    336                  * Description  : 程序升级。应答升级的内容
+    337                  * Author       : 2018/5/23 星期三, by redmorningcn
+    338                  */
+    339              case IAP_COMM:
+    340                  
+    341                  app_iap_deal();                 //iap升级处理
+   \                     ??app_dtu_rec_9: (+1)
+   \   0000013A   0x.... 0x....      BL       app_iap_deal
+    342                  
+    343                  enablesend = 1;                 //启动数据发送
+   \   0000013E   0x2501             MOVS     R5,#+1
+    344                  break;
+   \   00000140   0xE007             B.N      ??app_dtu_rec_13
+    345                  
+    346                  
+    347                  /**************************************************************
+    348                  * Description  : GPS模块通讯,成功接收到数据
+    349                  * Author       : 2018/6/4 星期一, by redmorningcn
+    350                  */
+    351              case GPS_COMM:
+    352                  
+    353                  enablesend = 0;   
+   \                     ??app_dtu_rec_10: (+1)
+   \   00000142   0x2500             MOVS     R5,#+0
+    354                  Com->ConnCtrl.ConnType       = RECORD_SEND_COMM;                 //默认为数据发送
+   \   00000144   0xF8D4 0x041E      LDR      R0,[R4, #+1054]
+   \   00000148   0xF030 0x00E0      BICS     R0,R0,#0xE0
+   \   0000014C   0xF8C4 0x041E      STR      R0,[R4, #+1054]
+    355                  break;
+   \   00000150   0xE7FF             B.N      ??app_dtu_rec_13
+    356              default:
+    357                  break;
+    358              }
+    359              
+    360              if( enablesend == 1 ){
+   \                     ??app_dtu_rec_11: (+1)
+   \                     ??app_dtu_rec_13: (+1)
+   \   00000152   0xB2ED             UXTB     R5,R5            ;; ZeroExt  R5,R5,#+24,#+24
+   \   00000154   0x2D01             CMP      R5,#+1
+   \   00000156   0xD113             BNE.N    ??app_dtu_rec_14
+    361                  
+    362                  if(Com == DtuCom){
+   \   00000158   0x....             LDR.N    R0,??DataTable2_11
+   \   0000015A   0x6800             LDR      R0,[R0, #+0]
+   \   0000015C   0x4284             CMP      R4,R0
+   \   0000015E   0xD105             BNE.N    ??app_dtu_rec_15
+    363                      OSFlagPost( ( OS_FLAG_GRP  *)&Ctrl.Os.CommEvtFlagGrp,               //通知DTU，可以进行数据发送
+    364                                 ( OS_FLAGS      )COMM_EVT_FLAG_DTU_TX,
+    365                                 ( OS_OPT        )OS_OPT_POST_FLAG_SET,
+    366                                 ( OS_ERR       *)&err
+    367                                     );
+   \   00000160   0x466B             MOV      R3,SP
+   \   00000162   0x2200             MOVS     R2,#+0
+   \   00000164   0x2110             MOVS     R1,#+16
+   \   00000166   0x....             LDR.N    R0,??DataTable2_12
+   \   00000168   0x.... 0x....      BL       OSFlagPost
+    368                  }
+    369                  
+    370                  if(Com == TaxCom){
+   \                     ??app_dtu_rec_15: (+1)
+   \   0000016C   0x....             LDR.N    R0,??DataTable2_13
+   \   0000016E   0x6800             LDR      R0,[R0, #+0]
+   \   00000170   0x4284             CMP      R4,R0
+   \   00000172   0xD105             BNE.N    ??app_dtu_rec_14
+    371                      OSFlagPost( ( OS_FLAG_GRP  *)&Ctrl.Os.CommEvtFlagGrp,               //通知DTU，可以进行数据发送
+    372                                 ( OS_FLAGS      )COMM_EVT_FLAG_TAX_TX,
+    373                                 ( OS_OPT        )OS_OPT_POST_FLAG_SET,
+    374                                 ( OS_ERR       *)&err
+    375                                     );
+   \   00000174   0x466B             MOV      R3,SP
+   \   00000176   0x2200             MOVS     R2,#+0
+   \   00000178   0x2120             MOVS     R1,#+32
+   \   0000017A   0x....             LDR.N    R0,??DataTable2_12
+   \   0000017C   0x.... 0x....      BL       OSFlagPost
+    376                  }
+    377              }
+    378          }
+   \                     ??app_dtu_rec_14: (+1)
+   \   00000180   0xBD31             POP      {R0,R4,R5,PC}    ;; return
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2:
+   \   00000000   0x........         DC32     pApp
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2_1:
+   \   00000000   0x00800001         DC32     0x800001
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2_2:
+   \   00000000   0x01000001         DC32     0x1000001
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2_3:
+   \   00000000   0x02000001         DC32     0x2000001
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2_4:
+   \   00000000   0x........         DC32     tm_now
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2_5:
+   \   00000000   0x........         DC32     ?_0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2_6:
+   \   00000000   0x........         DC32     Ctrl
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2_7:
+   \   00000000   0x........         DC32     ?_1
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2_8:
+   \   00000000   0x........         DC32     ?_2
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2_9:
+   \   00000000   0x........         DC32     ?_3
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2_10:
+   \   00000000   0x........         DC32     MtrCom
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2_11:
+   \   00000000   0x........         DC32     DtuCom
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2_12:
+   \   00000000   0x........         DC32     Ctrl+0x11E0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2_13:
+   \   00000000   0x........         DC32     TaxCom
+
+   \                                 In section .rodata, align 4
+   \                     ?_0:
+   \   00000000   0x25 0x30          DC8 "%02d-%02d-%02d"
+   \              0x32 0x64    
+   \              0x2D 0x25    
+   \              0x30 0x32    
+   \              0x64 0x2D    
+   \              0x25 0x30    
+   \              0x32 0x64    
+   \              0x00         
+   \   0000000F   0x00               DC8 0
+
+   \                                 In section .rodata, align 4
+   \                     ?_1:
+   \   00000000   0x25 0x34          DC8 "%4d.%4d"
+   \              0x64 0x2E    
+   \              0x25 0x34    
+   \              0x64 0x00    
+
+   \                                 In section .rodata, align 4
+   \                     ?_2:
+   \   00000000   0x43 0x41          DC8 "CALL"
+   \              0x4C 0x4C    
+   \              0x00         
+   \   00000005   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .rodata, align 4
+   \                     ?_3:
+   \   00000000   0x72 0x73          DC8 "rst..."
+   \              0x74 0x2E    
+   \              0x2E 0x2E    
+   \              0x00         
+   \   00000007   0x00               DC8 0
+    379          
+    380          
+    381          
+    382          
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+      16   IAP_JumpTo
+        16   -- Indirect call
+        16   -> CPU_IntDisMeasStart
+        16   -> CPU_IntDisMeasStop
+        16   -> CPU_SR_Restore
+        16   -> CPU_SR_Save
+      16   app_dtu_rec
+        16   -> OSFlagPost
+        16   -> app_iap_deal
+        16   -> app_operate_para
+        16   -> osal_set_event
+      72   app_operate_para
+        72   -> App_DispDelay
+        72   -> BSP_RTC_WriteTime
+        72   -> MB_HoldingRegRd
+        72   -> MB_HoldingRegWr
+        72   -> MtrRdSpecial
+        72   -> MtrWrSpecial
+        72   -> TIME_GetCalendarTime
+        72   -> __aeabi_memcpy
+        72   -> __aeabi_memcpy4
+        72   -> osal_set_event
+        72   -> uprintf
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable2
+       4  ??DataTable2_1
+       4  ??DataTable2_10
+       4  ??DataTable2_11
+       4  ??DataTable2_12
+       4  ??DataTable2_13
+       4  ??DataTable2_2
+       4  ??DataTable2_3
+       4  ??DataTable2_4
+       4  ??DataTable2_5
+       4  ??DataTable2_6
+       4  ??DataTable2_7
+       4  ??DataTable2_8
+       4  ??DataTable2_9
+      16  ?_0
+       8  ?_1
+       8  ?_2
+       8  ?_3
+      46  IAP_JumpTo
+     386  app_dtu_rec
+     824  app_operate_para
+       4  pApp
+
+ 
+     4 bytes in section .bss
+    40 bytes in section .rodata
+ 1 312 bytes in section .text
+ 
+ 1 312 bytes of CODE  memory
+    40 bytes of CONST memory
+     4 bytes of DATA  memory
+
+Errors: none
+Warnings: none
