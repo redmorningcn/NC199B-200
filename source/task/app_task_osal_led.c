@@ -58,6 +58,36 @@ static  void    AppTaskLed           (void *p_arg);
 
 /*******************************************************************************/
 
+/**************************************************************
+* Description  : 空气质量判断指示
+* Author       : 2018/07/16 星期二, by redmorningcn
+*/
+void    AirGradejudge(void)
+{
+    if(Ctrl.Rec.sAir.Humidity < HUM_LIMIT_GOOD){
+        Ctrl.Rec.Air_Hum_Grade = GOOD_GRADE;
+    }else if(Ctrl.Rec.sAir.Humidity > HUM_LIMIT_NORMAL){
+        Ctrl.Rec.Air_Hum_Grade = BAD_GRADE;
+    }else{ 
+        Ctrl.Rec.Air_Hum_Grade = NORMAL_GRADE;
+    }
+
+    if(Ctrl.Rec.sAir.VOCs < OIL_LIMIT_GOOD){
+        Ctrl.Rec.Air_Voc_Grade = GOOD_GRADE;
+    }else if(Ctrl.Rec.sAir.VOCs > OIL_LIMIT_NORMAL){
+        Ctrl.Rec.Air_Voc_Grade = BAD_GRADE;
+    }else{ 
+        Ctrl.Rec.Air_Voc_Grade = NORMAL_GRADE;
+    }
+
+    if(Ctrl.Rec.sAir.PM2D5_S < DUST_LIMIT_GOOD){
+        Ctrl.Rec.Air_Dust_Grade = GOOD_GRADE;
+    }else if(Ctrl.Rec.sAir.PM2D5_S > DUST_LIMIT_NORMAL){
+        Ctrl.Rec.Air_Dust_Grade = BAD_GRADE;
+    }else{ 
+        Ctrl.Rec.Air_Dust_Grade = NORMAL_GRADE;
+    }
+}
 
 /**************************************************************
 * Description  : 三色灯指示
@@ -65,97 +95,98 @@ static  void    AppTaskLed           (void *p_arg);
 */
 osalEvt  TaskLedEvtProcess(osalTid task_id, osalEvt task_event)
 {
-
-        OSSetWdtFlag( WDT_FLAG_LED );
-
-        if( task_event & OS_EVT_LED_TICKS ) {
-
-            static  uint8   mode = 0;
-            /***********************************************
-            * 描述： 开机显示.red /green /blue
-            */
-            while(mode < 12)
+    OSSetWdtFlag( WDT_FLAG_LED );
+    
+    if( task_event & OS_EVT_LED_TICKS ) {
+        
+        AirGradejudge();
+        
+        static  uint8   mode = 0;
+        /***********************************************
+        * 描述： 开机显示.red /green /blue
+        */
+        while(mode < 12)
+        {
+            mode++;
+            switch(mode %4)
             {
-                mode++;
-                switch(mode %4)
-                {
-                    case 0:
-                            for(uint8 i= 0;i < 3;i++)
-                                SetLedColor(i,RGB_LED_COLOR_RED);   break;
-                    case 1:
-                            for(uint8 i= 0;i < 3;i++)
-                                SetLedColor(i,RGB_LED_COLOR_GREEN); break;
-                    case 2:
-                            for(uint8 i= 0;i < 3;i++)
-                                SetLedColor(i,RGB_LED_COLOR_BLUE);  break;
-                    case 3:
-                            for(uint8 i= 0;i < 3;i++)
-                                SetLedColor(i,RGB_LED_COLOR_WHITE); break;
-                }
-                    
-                osal_start_timerEx( OS_TASK_ID_LED,
-                                    OS_EVT_LED_TICKS,
-                                    600);
-                return ( task_event ^ OS_EVT_LED_TICKS );
-            }
-
-            /***********************************************
-            * 描述： 湿度显示
-            */
-            switch(Ctrl.Rec.Air_Hum_Grade)
-            {
-                case GOOD_GRADE:
-                    SetLedColor(HUM_LED,RGB_LED_COLOR_BLUE);    break;
-                case NORMAL_GRADE:
-                    SetLedColor(HUM_LED,RGB_LED_COLOR_GREEN);   break;
-                case BAD_GRADE:
-                    SetLedColor(HUM_LED,RGB_LED_COLOR_RED);     break;
-                default:       
-                    SetLedColor(HUM_LED,RGB_LED_COLOR_BLUE);    break;
+                case 0:
+                    for(uint8 i= 0;i < 3;i++)
+                        SetLedColor(i,RGB_LED_COLOR_RED);   break;
+                case 1:
+                    for(uint8 i= 0;i < 3;i++)
+                        SetLedColor(i,RGB_LED_COLOR_GREEN); break;
+                case 2:
+                    for(uint8 i= 0;i < 3;i++)
+                        SetLedColor(i,RGB_LED_COLOR_BLUE);  break;
+                case 3:
+                    for(uint8 i= 0;i < 3;i++)
+                        SetLedColor(i,RGB_LED_COLOR_WHITE); break;
             }
             
-            /***********************************************
-            * 描述： 油显示
-            */
-            switch(Ctrl.Rec.Air_Voc_Grade)
-            {
-                case GOOD_GRADE:
-                    SetLedColor(OIL_LED,RGB_LED_COLOR_BLUE);    break;
-                case NORMAL_GRADE:
-                    SetLedColor(OIL_LED,RGB_LED_COLOR_GREEN);   break;
-                case BAD_GRADE:
-                    SetLedColor(OIL_LED,RGB_LED_COLOR_RED);     break;
-                default:       
-                    SetLedColor(OIL_LED,RGB_LED_COLOR_BLUE);    break;
-            }
-               
-            /***********************************************
-            * 描述： 粉尘显示
-            */
-            switch(Ctrl.Rec.Air_Dust_Grade)
-            {
-                case GOOD_GRADE:
-                    SetLedColor(DUST_LED,RGB_LED_COLOR_BLUE);    break;
-                case NORMAL_GRADE:
-                    SetLedColor(DUST_LED,RGB_LED_COLOR_GREEN);   break;
-                case BAD_GRADE:
-                    SetLedColor(DUST_LED,RGB_LED_COLOR_RED);     break;
-                default:       
-                    SetLedColor(DUST_LED,RGB_LED_COLOR_BLUE);    break;
-            }            
-            
-            /***********************************************
-            * 描述： 定时器重启
-            */
             osal_start_timerEx( OS_TASK_ID_LED,
-                                OS_EVT_LED_TICKS,
-                                100);
+                               OS_EVT_LED_TICKS,
+                               600);
             return ( task_event ^ OS_EVT_LED_TICKS );
         }
         
+        /***********************************************
+        * 描述： 湿度显示
+        */
+        switch(Ctrl.Rec.Air_Hum_Grade)
+        {
+            case GOOD_GRADE:
+                SetLedColor(HUM_LED,RGB_LED_COLOR_BLUE);    break;
+            case NORMAL_GRADE:
+                SetLedColor(HUM_LED,RGB_LED_COLOR_GREEN);   break;
+            case BAD_GRADE:
+                SetLedColor(HUM_LED,RGB_LED_COLOR_RED);     break;
+            default:       
+                SetLedColor(HUM_LED,RGB_LED_COLOR_BLUE);    break;
+        }
         
+        /***********************************************
+        * 描述： 油显示
+        */
+        switch(Ctrl.Rec.Air_Voc_Grade)
+        {
+            case GOOD_GRADE:
+                SetLedColor(OIL_LED,RGB_LED_COLOR_BLUE);    break;
+            case NORMAL_GRADE:
+                SetLedColor(OIL_LED,RGB_LED_COLOR_GREEN);   break;
+            case BAD_GRADE:
+                SetLedColor(OIL_LED,RGB_LED_COLOR_RED);     break;
+            default:       
+                SetLedColor(OIL_LED,RGB_LED_COLOR_BLUE);    break;
+        }
         
-        return  task_event;
+        /***********************************************
+        * 描述： 粉尘显示
+        */
+        switch(Ctrl.Rec.Air_Dust_Grade)
+        {
+            case GOOD_GRADE:
+                SetLedColor(DUST_LED,RGB_LED_COLOR_BLUE);    break;
+            case NORMAL_GRADE:
+                SetLedColor(DUST_LED,RGB_LED_COLOR_GREEN);   break;
+            case BAD_GRADE:
+                SetLedColor(DUST_LED,RGB_LED_COLOR_RED);     break;
+            default:       
+                SetLedColor(DUST_LED,RGB_LED_COLOR_BLUE);    break;
+        }            
+        
+        /***********************************************
+        * 描述： 定时器重启
+        */
+        osal_start_timerEx( OS_TASK_ID_LED,
+                           OS_EVT_LED_TICKS,
+                           100);
+        return ( task_event ^ OS_EVT_LED_TICKS );
+    }
+    
+    
+    
+    return  task_event;
 }
 
 
@@ -185,7 +216,6 @@ void TaskInitLed(void)
     /*************************************************
     * 描述：启动事件查询
     */
-    
 
     osal_start_timerEx( OS_TASK_ID_LED,
                         OS_EVT_LED_TICKS,

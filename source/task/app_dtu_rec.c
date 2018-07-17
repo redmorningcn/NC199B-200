@@ -79,10 +79,14 @@ void    app_operate_para(StrCOMCtrl *Com)
 
         App_DispDelay(2000);
 
-        uprintf("%02d-%02d-%02d",
+//        uprintf("%02d-%02d-%02d",
+//                tm_now.tm_hour,
+//                tm_now.tm_min,
+//                tm_now.tm_sec);  
+        uprintf("%02d.%02d",
                 tm_now.tm_hour,
-                tm_now.tm_min,
-                tm_now.tm_sec);  
+                tm_now.tm_min
+                );         //hour.minute 
         break;
         
     case    CMD_LOCO_SET:               //…Ë÷√ª˙≥µ∫≈
@@ -96,8 +100,7 @@ void    app_operate_para(StrCOMCtrl *Com)
         
         App_DispDelay(2000);
 
-        uprintf("%4d.%4d",
-        Ctrl.sProductInfo.LocoId.Type,
+        uprintf("%4d",
         Ctrl.sProductInfo.LocoId.Nbr); 
         break;
         

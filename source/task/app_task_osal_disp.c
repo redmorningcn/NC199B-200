@@ -7,7 +7,8 @@
  * INCLUDES
  */
 #include <includes.h>
-
+#include <bsp_max7219.h>
+     
 #ifdef VSC_INCLUDE_SOURCE_FILE_NAMES
 const  CPU_CHAR  *app_task_disp__c = "$Id: $";
 #endif
@@ -69,6 +70,12 @@ static  void                AppTaskDisp           (void *p_arg);
 
 #define     DIS_INFO_NUM        9
 #define     DIS_MAX_ERR_NUM     3      
+
+
+
+
+
+     
 /*******************************************************************************
 * Description  : 装置正常运行时，循环显示的内容。
                  如果有故障，则显示故障代码。
@@ -79,7 +86,10 @@ void    LedRunDisplayInfo(void)
     static  u8     times = 0;
     u8              mod = 9;
     
-    switch(times % mod)
+    //20180716 电磁兼容补丁
+    switch((times/5) % mod)
+    //switch(times/% mod)
+
     {
         case 0: uprintf("T");   
                 break;    
@@ -101,11 +111,14 @@ void    LedRunDisplayInfo(void)
         case 7: uprintf("%4d",Ctrl.Rec.sAir.PM2D5_S);   
                 break;                              //显示粉尘值  
         default:
-            times = 0;
+            //times = 0;
             break;
     }
     times++;
-    times %= mod;
+    
+    //20180716 电磁兼容补丁
+    times %= (mod*5);
+    //times %= mod;
 }
 
 /*******************************************************************************
@@ -125,6 +138,14 @@ osalEvt  TaskDispEvtProcess(osalTid task_id, osalEvt task_event)
     * 描述： 本任务看门狗标志置位
     */
     OSSetWdtFlag(( OS_FLAGS     ) WDT_FLAG_DISP);
+    
+    //20180716 电磁兼容补丁
+    LED_SPI_SendData( MAX7279_DISP_TEST,0x00 );                         // 设置工作模式
+    LED_SPI_SendData( MAX7279_SCAN,MAX7279_8_DIGIT_SCAN );              // 设置扫描界限
+    LED_SPI_SendData( MAX7279_DECODE_MODE,MAX7279_DECODE_SET );         // 设置译码模式
+    LED_SPI_SendData( MAX7279_BRIGHTNESS,MAX7279_BRIGHTNESS_LEVEL );    // 设置亮度
+    LED_SPI_SendData( MAX7279_LOW_PWR,MAX7279_NORMAL_MODE );            // 设置为正常工作模式
+    //20180716 电磁兼容补丁
     
     /***********************************************
     * 描述： 2017/11/27,无名沈：
@@ -161,7 +182,7 @@ osalEvt  TaskDispEvtProcess(osalTid task_id, osalEvt task_event)
             */
         case 2: 
             dis_mode++;
-                uprintf("SV_%2d.%02d",Ctrl.sProductInfo.SwVer/100,Ctrl.sProductInfo.SwVer%100);  
+                uprintf("%2d.%02d",Ctrl.sProductInfo.SwVer/100,Ctrl.sProductInfo.SwVer%100);  
             break;
             
             /*******************************************************************
@@ -223,6 +244,11 @@ osalEvt  TaskDispEvtProcess(osalTid task_id, osalEvt task_event)
         * 描述： 去除任务运行的时间，等到一个控制周期里剩余需要延时的时间
         */
         dly   = CYCLE_TIME_TICKS - ( OSTimeGet(&err) - ticks );
+        
+        //20180716 电磁兼容补丁
+        if(dis_mode > 7)
+            dly /=5;
+        
         if ( dly  < 1 ) {
             dly = 1;
         } else if ( dly > CYCLE_TIME_TICKS ) {

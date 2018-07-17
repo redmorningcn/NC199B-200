@@ -29,6 +29,9 @@ u8      BSP_FlashOsInit(void);
 void    App_FramPara(void);
 void    app_ReadOneRecord(stcFlshRec *pRec,u32 num);
 
+void  App_TaskMeasureCreate(void);
+
+
 //comm task
 void    App_TaskCommCreate(void);
 void    App_CommIdle(void);

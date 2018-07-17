@@ -24,42 +24,6 @@
 
 #define BSP_MAX7219_MODULE_EN 1
 #if BSP_MAX7219_MODULE_EN > 0
-/*******************************************************************************
- * CONSTANTS
- */
-/***********************************************
-* 描述： max7219寄存器地址定义
-*/
-#define MAX7279_NON_OPT         0x00            // 空操作寄存器
-#define Digit0                  0x01            // 数码管1寄存器
-#define Digit1                  0x02            // 数码管2寄存器
-#define Digit2                  0x03            // 数码管3寄存器
-#define Digit3                  0x04            // 数码管4寄存器
-#define Digit4                  0x05            // 数码管5寄存器
-#define Digit5                  0x06            // 数码管6寄存器
-#define Digit6                  0x07            // 数码管7寄存器
-#define Digit7                  0x08            // 数码管8寄存器
-/**/
-#define MAX7279_DECODE_MODE     0x09            // 译码模式寄存器
-#define MAX7279_BRIGHTNESS      0x0a            // 亮度寄存器
-#define MAX7279_SCAN            0x0b            // 扫描位数寄存器
-#define MAX7279_LOW_PWR         0x0c            // 低功耗模式寄存器
-#define MAX7279_DISP_TEST       0x0f            // 显示测试寄存器
-
-/***********************************************
-* 描述： max7219控制寄存器命令
-*/
-#define MAX7279_LOW_PWR_MODE    0x00            // 低功耗方式
-#define MAX7279_NORMAL_MODE     0x01            // 正常操作方式
-#define MAX7279_DECODE_SET      0x00            // 译码设置，8位均为BCD码;对8个数都编码
-#define MAX7279_8_DIGIT_SCAN    0x07            // 扫描位数设置，显示8位数码管
-#define MAX7279_4_DIGIT_SCAN    0x03            // 扫描位数设置，显示4位数码管
-//#define MAX7279_BRIGHTNESS_LEVEL    0x00      // 亮度级别设置
-#define MAX7279_BRIGHTNESS_LEVEL 0X0A           // 亮度级别设置
-//#define MAX7279_BRIGHTNESS_LEVEL    0xf       // 亮度级别设置
-#define MAX7279_TEST_ENTER      0x01            // 显示测试模式
-#define MAX7279_TEST_EXIT       0x00            // 显示测试结束，恢复正常工作模式
-
 /***********************************************
 * 描述: OS接口
 */
@@ -76,7 +40,14 @@ static  OS_EVENT      *Bsp_DispSem;             //信号量
 uint8           dis_num_pos = 0;                //显示位置
 
 StrLedDisp    LedDispCtrl[DISPLAY_FRAME_NUM]  = {0};
-u8       LedDispBuf[DISPLAY_LED_NUM]     = {Digit0,Digit1,Digit2,Digit3,Digit4,Digit5,Digit6,Digit7};
+#ifdef      DISPLAY_FRAME_NUM
+#if         (DISPLAY_FRAME_NUM > 4)  
+u8          LedDispBuf[DISPLAY_LED_NUM]     = {Digit0,Digit1,Digit2,Digit3,Digit4,Digit5,Digit6,Digit7};
+#else
+u8          LedDispBuf[DISPLAY_LED_NUM]     = {Digit0,Digit1,Digit2,Digit3};
+#endif
+#endif
+
 /***********************************************
 * 描述： redmorningcn 2017-05-22
 */
@@ -307,8 +278,13 @@ void BSP_DispWrite( int     Num,
     u8   BSP_DispBuff[8] = {0};
     u8   CharBuffer[8]   = {0};
     u8   NumbBuffer[8]   = {0};
-    u8   buf[DISPLAY_LED_NUM]          = {128,128,128,128,128,128,128,128};
-            temp            = Num;
+    
+    u8   buf[DISPLAY_LED_NUM];
+    
+    for(i = 0; i<DISPLAY_LED_NUM;i++ )
+       buf[i] = 128; 
+    
+    temp            = Num;
 
     /***********************************************
     * 描述： 

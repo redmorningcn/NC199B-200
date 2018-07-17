@@ -425,7 +425,7 @@ osalEvt  TaskStoreEvtProcess(osalTid task_id, osalEvt task_event)
     /***********************************************
     * 描述： 本任务看门狗标志置位
     */
-    //OSSetWdtFlag(( OS_FLAGS     ) WDT_FLAG_STORE);
+    OSSetWdtFlag(( OS_FLAGS     ) WDT_FLAG_STORE);
     static  u8     cnts;
     u8              base = 3;
     
@@ -489,11 +489,11 @@ void TaskInitStore(void)
     */
     BSP_StoreInit();
     
-//    /***********************************************
-//    * 描述： 在看门狗标志组注册本任务的看门狗标志
-//    */
-//    OSRegWdtFlag(( OS_FLAGS     )WDT_FLAG_STORE );
-//    
+    /***********************************************
+    * 描述： 在看门狗标志组注册本任务的看门狗标志
+    */
+    OSRegWdtFlag(( OS_FLAGS     )WDT_FLAG_STORE );
+    
     /***********************************************
     * 描述： 2017/12/3,无名沈：设置存储周期为60秒
     */

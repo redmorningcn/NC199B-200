@@ -42,6 +42,7 @@ INT8U BSP_WdtMode  = 0;
 *******************************************************************************/
 void  BSP_WDT_Rst(void)
 {
+    
     if ( BSP_WdtMode == BSP_WDT_MODE_NONE )
         return;
 #if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
@@ -53,6 +54,9 @@ void  BSP_WDT_Rst(void)
     if ( ( BSP_WdtMode == BSP_WDT_MODE_INT ) || ( BSP_WdtMode == BSP_WDT_MODE_ALL ) ) {
         IWDG_ReloadCounter();
     }
+    
+    
+    
 //    /***********************************************
 //    * √Ë ˆ£∫Õ‚≤øø¥√≈π∑Œππ∑
 //    */
@@ -96,6 +100,7 @@ u8  BSP_WDT_GetMode(void)
 u8 BSP_WDT_Init(u8 mode)
 {
     BSP_WdtMode = mode;
+    
 
     if ( mode == BSP_WDT_MODE_NONE )  //Ω˚÷ππ∑
         return 0;

@@ -176,7 +176,8 @@ static  void  AppTaskStart (void *p_arg)
         /***********************************************
         * 描述： 得到系统当前时间
         */
-        u32 ticks = OSTimeGet(&err);        
+        u32 ticks = OSTimeGet(&err);   
+        
         /***********************************************************************
         * 描述： 独立看门狗标志组检查， 判断是否所有任务已喂狗
         */
@@ -208,18 +209,17 @@ static  void  AppTaskStart (void *p_arg)
             } else {
                 BSP_LED_Flash( 1, 1, 450, 450);  
             }
-            
-            /***********************************************
-            * 描述： 去除任务运行的时间，等到一个控制周期里剩余需要延时的时间
-            */
-            u32 dly   = OS_TICKS_PER_SEC - ( OSTimeGet(&err) - ticks );
-            if ( dly  < 1 ) {
-                dly = 1;
-            } else if ( dly > OS_TICKS_PER_SEC ) {
-                dly = OS_TICKS_PER_SEC;
-            }
-            BSP_OS_TimeDlyMs(dly); 
         }
+        /***********************************************
+        * 描述： 去除任务运行的时间，等到一个控制周期里剩余需要延时的时间
+        */
+        u32 dly   = OS_TICKS_PER_SEC - ( OSTimeGet(&err) - ticks );
+        if ( dly  < 1 ) {
+        dly = 1;
+        } else if ( dly > OS_TICKS_PER_SEC ) {
+        dly = OS_TICKS_PER_SEC;
+        }
+        BSP_OS_TimeDlyMs(dly); 
     }
 }
 

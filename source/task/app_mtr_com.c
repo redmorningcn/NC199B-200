@@ -11,6 +11,8 @@
 #include    <app_mtr_com.h>
 #include    <string.h>
 
+
+
 /**************************************************************
 * Description  : 通讯状态指示
 * Author       : 2018/5/22 星期二, by redmorningcn
@@ -92,7 +94,6 @@ void    MtrWrSpecial(u16 addr,u8  len)
 */
 void app_mtr_com(void)
 {
-    u8      i = 0;
     u8      node = MtrCom->ConnCtrl.MB_Node;            //modbus地址
 
     if(MtrCom->ConnCtrl.protocol == MODBUS_PROTOCOL)    //modbus协议
@@ -100,7 +101,6 @@ void app_mtr_com(void)
         u8      conntype = MtrCom->ConnCtrl.ConnType;
         u16     addr;
         u8      len;
-        u16     freq[2];
         switch(conntype)
         {
             
@@ -121,6 +121,7 @@ void app_mtr_com(void)
                 
                 if(MtrCom->RxCtrl.Len == len){
                     memcpy((u8 *)&Ctrl.Rec.sAir,(u8 *)&MtrCom->Rd.sAir,sizeof(Ctrl.Rec.sAir));   //取工况信号
+                    
                 }
             }
             

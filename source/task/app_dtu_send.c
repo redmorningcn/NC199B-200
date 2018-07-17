@@ -153,7 +153,7 @@ void    app_dtu_send(StrCOMCtrl *Com)
 //        strcpy((char *)Com->pch->TxBuf,(const char *)GPS_RSSI_ASK);
 //        Com->pch->TxBufByteCtr = strlen(GPS_RSSI_ASK);
 //        
-//        Com->ConnCtrl.ConnType = RECORD_SEND_COMM;                           //默认状态位数据发送
+        Com->ConnCtrl.ConnType = RECORD_SEND_COMM;                           //默认状态位数据发送
 //        enablesend = 1;                     //数据发送标识1
         break;
         

@@ -207,5 +207,7 @@
 #define WDT_FLAG_LED                (1<< 5)         // 
 #define WDT_FLAG_STORE              (1<< 6)         // 
 #define WDT_FLAG_TMR                (1<< 7)         // 
+#define WDT_FLAG_MEASURE            (1<< 8)         // 
+
 
 #endif

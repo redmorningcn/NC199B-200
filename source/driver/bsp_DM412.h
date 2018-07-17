@@ -70,6 +70,15 @@ void    SetLedColor(uint8 lenuum,uint16  red,uint16  green,uint16  blue);
 #define     NORMAL_GRADE    1
 #define     BAD_GRADE       2
 
+#define     HUM_LIMIT_GOOD      (60)
+#define     HUM_LIMIT_NORMAL    (85)
+
+#define     DUST_LIMIT_GOOD     (200)
+#define     DUST_LIMIT_NORMAL   (500)
+
+#define     OIL_LIMIT_GOOD      (500)
+#define     OIL_LIMIT_NORMAL    (2000)
+
 
 #endif
 

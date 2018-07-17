@@ -77,7 +77,6 @@ static  void    AppTaskMeasure          (void *p_arg);
 static  void    APP_MeasureInit         (void);
 void            StartAirMeasure         (void);
 
-//static  void    MeasureValueHandle      (StrCtrlDCB *dcb);
 
 
 /*******************************************************************************
@@ -157,16 +156,14 @@ static  void  AppTaskMeasure (void *p_arg)
     BSP_OS_SemCreate(&Bsp_MeasureSem,0, "Bsp MeasureSem");      // 创建信号量
     BSP_OS_SemWait(&Bsp_MeasureSem,1);
     BSP_OS_TimeDlyMs(5000);
-    /***********************************************
-    * 描述：Task body, always written as an infinite loop.
-    */
-    //OSRegWdtFlag( WDT_FLAG_MEASURE );
+ 
+    
         
     while (DEF_TRUE) {
         /***********************************************
         * 描述： 本任务看门狗标志置位
         */
-        //OSSetWdtFlag( WDT_FLAG_MEASURE );
+        OSSetWdtFlag( WDT_FLAG_MEASURE );
             
         /***********************************************
         * 描述： 得到系统当前时间
@@ -188,7 +185,6 @@ static  void  AppTaskMeasure (void *p_arg)
             StartAirMeasure();
             timeadd= 0;
         }
-        
         
         /***********************************************
         * 描述： 去除任务运行的时间，等到一个控制周期里剩余需要延时的时间
@@ -280,17 +276,13 @@ void    StartAirMeasure(void)
 
     Ctrl.sRunPara.SysSts.StartMeasure = 1;
     
-
-    //初始化定时器
-    osal_start_timerEx( OS_TASK_ID_STORE,
-                      OS_EVT_STORE_TICKS,
-                      1);                       //置存储定时器1，马上启动存储
-    Ctrl.sRunPara.SysSts.Store   = 1;  //可以进行数据储存（测量过程的数据）
-    
+    Ctrl.sRunPara.SysSts.Store   = 1;                       //可以进行数据储存（测量过程的数据）
+    osal_set_event(OS_TASK_ID_STORE,OS_EVT_STORE_TICKS);    //设置存储事件，启动储存任务
+    BSP_OS_TimeDlyMs(10);
 
     CloseAir();                                 //关闭气路
       
-    Ctrl.sRunPara.SysSts.OpenAir = 0;  //气路打开标识置1
+    Ctrl.sRunPara.SysSts.OpenAir = 0;           //气路打开标识置1
     Ctrl.sRunPara.SysSts.CloseAir= 1;     
     
     Ctrl.sRunPara.SysSts.StartMeasure = 0;
@@ -317,7 +309,7 @@ static void APP_MeasureInit(void)
     /***********************************************
     * 描述： 在看门狗标志组注册本任务的看门狗标志
     */
-    //WdtFlags |= WDT_FLAG_KEY;
+    OSRegWdtFlag( WDT_FLAG_MEASURE );
 }
 
 /*******************************************************************************
